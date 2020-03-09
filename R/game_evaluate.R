@@ -18,9 +18,9 @@
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
-#' evaluate_agreement(default_params)
-evaluate_agreement <- function(params) {
-  # (eval_out <- evaluate_agreement(params_default()))
+#' evaluate_treaty(default_params)
+evaluate_treaty <- function(params) {
+  # (eval_out <- evaluate_treaty(params_default()))
   # this function calculates abstraction from the game,
   # and determines whether or not a treaty is signed
   if(dim(params)[1]!=1){
@@ -33,6 +33,12 @@ evaluate_agreement <- function(params) {
     stop("params should contain either Dix or PHIix, not both")
   } else if (any(grepl("D[sfij][sfij]",param_names))) {
     aquifer_type <- "confined"
+    if (all(names(params)!="d0s")) {
+      params$d0s <- params$d0s <- dBs - hs
+    }
+    if (all(names(params)!="d0f")) {
+      params$d0f <- params$d0s <- dBf - hf
+    }
   } else if (any(grepl("PHI[sfij][sfij]",param_names))) {
     aquifer_type <- "unconfined"
   } else {
@@ -70,7 +76,7 @@ evaluate_agreement <- function(params) {
 #' Evaluate treaty utility
 #'
 #' Evaluate utility given (single) treaty parameters
-evaluate_agreement_utility <- function(params,q_vals) {
+evaluate_treaty_utility <- function(params,q_vals) {
   # this function calculates utilities, given parameters and abstraction
   if(dim(params)[1]!=1){
     stop("This is an error message because params not 1 dimension")
@@ -95,7 +101,7 @@ evaluate_agreement_utility <- function(params,q_vals) {
 #' Evaluate treaty depth
 #'
 #' Evaluate water table depth given (single) treaty parameters
-evaluate_agreement_depths <- function(params,q_vals) {
+evaluate_treaty_depths <- function(params,q_vals) {
   # this function calculates water table depth, given parameters and abstraction
   if(dim(params)[1]!=1){
     stop("This is an error message because params not 1 dimension")
@@ -121,7 +127,7 @@ evaluate_agreement_depths <- function(params,q_vals) {
 #' Evaluate multiple treaty scenarios
 #'
 #' Evaluate whether or not the treaty will be made under multiple scenarios
-#' @param params_df Data.frame of parameters with each row sent to \code{evaluate_agreement()}.
+#' @param params_df Data.frame of parameters with each row sent to \code{evaluate_treaty()}.
 #' @param return_criteria Character string containing letters that indicate output variables. See details.
 #' @details
 #' Evaluate the treaty given multiple combinations of social, economic,
@@ -146,11 +152,11 @@ evaluate_agreement_depths <- function(params,q_vals) {
 #' @examples
 #' library(genevoisgame)
 #' params_df <- genevoisgame::default_params
-#' evaluate_agreement_cases(df)
-#' evaluate_agreement_cases(default_params,'')
-evaluate_agreement_cases <- function(params_df,return_criteria="qp") {
+#' evaluate_treaty_cases(df)
+#' evaluate_treaty_cases(default_params,'')
+evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
   params_list <- split(params_df,1:dim(params_df)[1])
-  eval_results <- do.call(rbind,lapply(params_list,evaluate_agreement))
+  eval_results <- do.call(rbind,lapply(params_list,evaluate_treaty))
   q_vals_list <- split(eval_results %>% dplyr::select(dplyr::starts_with("q")),1:dim(eval_results)[1])
   # eval_results_treat <- eval_results %>% select(treaty,zRange,zMinSwiss,zMaxFrench)
   eval_return <- eval_results %>% dplyr::select(treaty,zRange,zMinSwiss,zMaxFrench)
@@ -170,11 +176,11 @@ evaluate_agreement_cases <- function(params_df,return_criteria="qp") {
     eval_return <- eval_return %>% dplyr::bind_cols(eval_results%>% dplyr::select(starts_with("q")))
   }
   if (max(grepl("u",return_criteria))==1) { # return utilities
-    u_vals <- do.call(rbind,mapply(evaluate_agreement_utility,params=params_list,q_vals=q_vals_list,SIMPLIFY=FALSE))
+    u_vals <- do.call(rbind,mapply(evaluate_treaty_utility,params=params_list,q_vals=q_vals_list,SIMPLIFY=FALSE))
     eval_return <- eval_return %>% dplyr::bind_cols(u_vals)
   }
   if (max(grepl("d",return_criteria))==1) { # return depth to water table
-    d_vals <- do.call(rbind,mapply(evaluate_agreement_depths,params=params_list,q_vals=q_vals_list,SIMPLIFY=FALSE))
+    d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,q_vals=q_vals_list,SIMPLIFY=FALSE))
     eval_return <- eval_return %>% dplyr::bind_cols(d_vals)
   }
   return(eval_return)
