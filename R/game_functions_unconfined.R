@@ -68,19 +68,19 @@ evaluate_treaty_unconfined <- function(params) {
 
 # 4b Mathematica functions for depth, utility, and abstraction
 
-# conA_Us <- function(qs,qf,params,z) {
-#   with(params,
-#        -es-p0s*(-qs+Qs)-crs*rm-B*qs*(d0s+Dsf*qf+Dss*qs-rm*rs)+z
-#   )}
-# conA_Uf <- function(qs,qf,params,z) {
-#   with(params,
-#        -ef-p0f*(-qf+Qf)-B*qf*(d0f+Dff*qf+Dfs*qs-rf*rm)-z
-#   )}
+unconA_Us <- function(qs,qf,params,z) {
+  with(params,
+       -es-p0s*(-qs+Qs)-crs*rm-Bs*qs*(dBs-sqrt[h0s^2-PHIsf*qf-PHIss*qs+PHIrs*rm])+z
+  )}
+unconA_Uf <- function(qs,qf,params,z) {
+  with(params,
+       -ef-p0f*(-qf+Qf)-Bf*qf*(dBf-sqrt[h0f^2-PHIff*qf-PHIfs*qs+PHIrf*rm])-z
+  )}
 unconA_ds <- function(qs,qf,params) {
   with(params,
-       dBs-Sqrt[phi0s-PHIsf*qf-PHIss*qs+PHIrs*rm]
+       dBs-sqrt[h0s^2-PHIsf*qf-PHIss*qs+PHIrs*rm]
   )}
 unconA_df <- function(qs,qf,params) {
   with(params,
-       dBf-Sqrt[phi0f-PHIff*qf-PHIfs*qs+PHIrf*rm]
+       dBf-sqrt[h0f^2-PHIff*qf-PHIfs*qs+PHIrf*rm]
   )}
