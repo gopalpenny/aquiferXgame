@@ -36,10 +36,10 @@
 #' params_valid(params)
 #' params_valid(params %>% select())
 check_params <- function(params) {
-  drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs')
-  drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs')
-  initial_depth_confined_params <- c('d0s','d0f')
-  initial_depth_unconfined_params <- c('dBs','dBf','h0s','h0f')
+  drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs','d0s','d0f')
+  drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f')
+  # initial_depth_confined_params <- c('d0s','d0f')
+  # initial_depth_unconfined_params <- c('dBs','dBf','h0s','h0f')
   additional_params <- c('Qf','Qs','p0f','p0s','B','rmN','rmT','rsN','rsT','rfN','rfT','crs','gs','gf','es','ef')
 
   param_names <- names(params)
@@ -72,9 +72,9 @@ check_params <- function(params) {
 
     # 2b. if PHI, ensure all PHI parameters are present along with dBs, dBf, hs, hf
   } else if (any(grepl("PHI[sfij][sfij]",param_names))) {
-    aquifer_type <- "unconfined"
-    if (!all(initial_depth_unconfined_params %in% param_names)) {
-      missing_unconf_params <- initial_depth_unconfined_params[!(initial_depth_unconfined_params %in% param_names)]
+    params$aquifer_type <- "unconfined"
+    if (!all(drawdown_unconfined_params %in% param_names)) {
+      missing_unconf_params <- drawdown_unconfined_params[!(drawdown_unconfined_params %in% param_names)]
       # warning(paste("missing",paste(missing_unconf_params,collapse=", "),"in params"))
       missing_params <- c(missing_params,missing_unconf_params)
     }
