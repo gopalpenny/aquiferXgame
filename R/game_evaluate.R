@@ -23,27 +23,11 @@ evaluate_treaty <- function(params) {
   # (eval_out <- evaluate_treaty(params_default()))
   # this function calculates abstraction from the game,
   # and determines whether or not a treaty is signed
-  if(dim(params)[1]!=1){
+  if(nrow(params)!=1){
     stop("This is an error message because params not 1 dimension")
   }
 
-  param_names <- names(params)
-  # get abstraction rates
-  if (any(grepl("PHI[sfij][sfij]",param_names)) & any(grepl("PHI[sfij][sfij]",param_names))) {
-    stop("params should contain either Dix or PHIix, not both")
-  } else if (any(grepl("D[sfij][sfij]",param_names))) {
-    aquifer_type <- "confined"
-    if (all(names(params)!="d0s")) {
-      params$d0s <- params$d0s <- dBs - hs
-    }
-    if (all(names(params)!="d0f")) {
-      params$d0f <- params$d0s <- dBf - hf
-    }
-  } else if (any(grepl("PHI[sfij][sfij]",param_names))) {
-    aquifer_type <- "unconfined"
-  } else {
-    stop("Missing drawdown parameters (Dix or PHIix)")
-  }
+  aquifer_type <- check_params(params)
 
   if (aquifer_type == "confined") {
     q_hat <- conA_qeval(params,conAf_qs0=conA_qshat0,conA_qfhat0,conA_qshat2,conA_qfhat2)
