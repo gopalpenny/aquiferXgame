@@ -46,30 +46,31 @@ evaluate_treaty_confined <- function(params) {
 }
 
 
-#' Evaluate treaty depth in a confined aquifer
-#'
-#' Evaluate water table depth given (single) treaty parameters
-evaluate_treaty_depths_confined <- function(params,q_vals) {
-  # this function calculates water table depth, given parameters and abstraction
-  if(dim(params)[1]!=1){
-    stop("This is an error message because params not 1 dimension")
-  }
-  for (v in 1:dim(q_vals)[2]) {assign(names(q_vals)[v], q_vals[[v]])}
-  # get depths
-  ds_hat <- conA_ds(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
-  df_hat <- conA_df(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rf=rfT))
-  ds_star <- conA_ds(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rs=rsN))
-  df_star <- conA_df(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rf=rfN))
-  ds_double <- conA_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
-  df_double <- conA_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT))
-  ds_hat_double <- conA_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
-  df_hat_double <- conA_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT))
-  d_vals <- tibble(ds_hat=ds_hat,df_hat=df_hat,
-                   ds_star=ds_star,df_star=df_star,
-                   ds_double=ds_double,df_double=df_double,
-                   ds_hat_double=ds_hat_double,df_hat_double=df_hat_double)
-  return(d_vals)
-}
+#
+# Evaluate treaty depth in a confined aquifer
+#
+# Evaluate water table depth given (single) treaty parameters
+# evaluate_treaty_depths_confined <- function(params,q_vals) {
+#   # this function calculates water table depth, given parameters and abstraction
+#   if(dim(params)[1]!=1){
+#     stop("This is an error message because params not 1 dimension")
+#   }
+#   for (v in 1:dim(q_vals)[2]) {assign(names(q_vals)[v], q_vals[[v]])}
+#   # get depths
+#   ds_hat <- conA_ds(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
+#   df_hat <- conA_df(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rf=rfT))
+#   ds_star <- conA_ds(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rs=rsN))
+#   df_star <- conA_df(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rf=rfN))
+#   ds_double <- conA_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
+#   df_double <- conA_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT))
+#   ds_hat_double <- conA_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
+#   df_hat_double <- conA_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT))
+#   d_vals <- tibble(ds_hat=ds_hat,df_hat=df_hat,
+#                    ds_star=ds_star,df_star=df_star,
+#                    ds_double=ds_double,df_double=df_double,
+#                    ds_hat_double=ds_hat_double,df_hat_double=df_hat_double)
+#   return(d_vals)
+# }
 
 
 # 4a function to evaluate abstraction rates

@@ -58,11 +58,43 @@ evaluate_treaty_utility <- function(params,q_vals) {
   Uf_double <- conA_Uf(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT),z=0)
   Us_hat_double <- conA_Us(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rs=rsT),z=0)
   Uf_hat_double <- conA_Uf(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rf=rfT),z=0)
-  u_vals <- tibble(Us_hat=Us_hat,Uf_hat=Uf_hat,
-                   Us_star=Us_star,Uf_star=Uf_star,
-                   Us_double=Us_double,Uf_double=Uf_double,
-                   Us_hat_double=Us_hat_double,Uf_hat_double=Uf_hat_double)
+  u_vals <- tibble::tibble(Us_hat=Us_hat,Uf_hat=Uf_hat,
+                           Us_star=Us_star,Uf_star=Uf_star,
+                           Us_double=Us_double,Uf_double=Uf_double,
+                           Us_hat_double=Us_hat_double,Uf_hat_double=Uf_hat_double)
   return(u_vals)
+}
+
+#' Evaluate treaty depths
+#'
+#' Evaluate water table depth given (single) treaty parameters
+evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
+  # this function calculates water table depth, given parameters and abstraction
+  if(dim(params)[1]!=1){
+    stop("This is an error message because params not 1 dimension")
+  }
+  for (v in 1:dim(q_vals)[2]) {assign(names(q_vals)[v], q_vals[[v]])} # assign q_values to variables with appropriate names
+  # get depths
+  if (aquifer_type == "confined") {
+    get_ds <- conA_ds
+    get_df <- conA_df
+  } else {
+    get_ds <- unconA_ds
+    get_df <- unconA_df
+  }
+  ds_hat <- get_ds(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
+  df_hat <- get_df(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rf=rfT))
+  ds_star <- get_ds(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rs=rsN))
+  df_star <- get_df(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rf=rfN))
+  ds_double <- get_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
+  df_double <- get_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT))
+  ds_hat_double <- get_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
+  df_hat_double <- get_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT))
+  d_vals <- tibble::tibble(ds_hat=ds_hat,df_hat=df_hat,
+                           ds_star=ds_star,df_star=df_star,
+                           ds_double=ds_double,df_double=df_double,
+                           ds_hat_double=ds_hat_double,df_hat_double=df_hat_double)
+  return(d_vals)
 }
 
 
@@ -97,6 +129,7 @@ evaluate_treaty_utility <- function(params,q_vals) {
 #' evaluate_treaty_cases(df)
 #' evaluate_treaty_cases(default_params,'')
 evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
+  aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
   eval_results <- do.call(rbind,lapply(params_list,evaluate_treaty))
   q_vals_list <- split(eval_results %>% dplyr::select(dplyr::starts_with("q")),1:dim(eval_results)[1])
@@ -122,7 +155,7 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
     eval_return <- eval_return %>% dplyr::bind_cols(u_vals)
   }
   if (max(grepl("d",return_criteria))==1) { # return depth to water table
-    d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,q_vals=q_vals_list,SIMPLIFY=FALSE))
+    d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
     eval_return <- eval_return %>% dplyr::bind_cols(d_vals)
   }
   return(eval_return)
