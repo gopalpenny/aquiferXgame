@@ -7,9 +7,9 @@
 
 #' Evaluate the treaty scenario
 #'
-#' Evaluate whether or not the treaty will be made.
+#' Evaluate whether or not the treaty will be made in a confined or unconfined aquifer
 #' @param params Parameter list (or data.frame with 1 row) containing
-#' necessary parameters to evaluate the agreement.
+#' necessary parameters to evaluate the agreement. See \code{?check_params} for details.
 #' @details
 #' Evaluate the treaty given social, economic, and geophysical parameters.
 #' @return
@@ -30,31 +30,14 @@ evaluate_treaty <- function(params) {
   aquifer_type <- check_params(params)
 
   if (aquifer_type == "confined") {
-    q_hat <- conA_qeval(params,conAf_qs0=conA_qshat0,conA_qfhat0,conA_qshat2,conA_qfhat2)
-    q_star <- conA_qeval(params,conAf_qs0=conA_qsstar0,conA_qfstar0,conA_qsstar2,conA_qfstar2)
-    q_double <- conA_qeval(params %>% dplyr::mutate(qshat=q_hat$qs,qfhat=q_hat$qf),
-                         conAf_qs0=conA_qsdouble0,conA_qfdouble0,conA_qsdouble2,conA_qfdouble2)
+    treaty_results <- evaluate_treaty_confined(params)
+  } else if (aquifer_type == "confined") {
+    treaty_results <- evaluate_treaty_unconfined(params)
   } else {
-    first_best <- with(params,function(x) {
-      F1 <- p0s+1/2*B*(-((Dfs*x[2])/sqrt(d0f-rmT*rsT+Dfs*x[1]+Dff*x[2]))+(-2*d0s+2*rmT*rsT-3*Dss*x[1]-2*Dsf*x[2])/sqrt(d0s-rmT*rsT+Dss*x[1]+Dsf*x[2]))
-      F2 <- p0f+1/2*B*((-2*d0f+2*rmT*rsT-2*Dfs*x[1]-3*Dff*x[2])/sqrt(d0f-rmT*rsT+Dfs*x[1]+Dff*x[2])-(Dsf*x[1])/sqrt(d0s-rmT*rsT+Dss*x[1]+Dsf*x[2]))
-      return(list(F1=F1,F2=F2))
-    })
-    rootSolve::multiroot(f=firstbest,start=c(params$Qs*0.9,params$Qf*0.9))
+    stop("aquifer must be confined or unconfined, as specified by Dxx or PHIxx parameters.")
   }
 
-  q_vals <- tibble::tibble(qshat=q_hat$qs,qfhat=q_hat$qf,
-                   qsstar=q_star$qs,qfstar=q_star$qf,
-                   qsdouble=q_double$qs,qfdouble=q_double$qf)
-
-  # get z constraints
-  zMaxFrench_calc <- conA_zMaxFrench(params,q_vals)
-  zMinSwiss_calc <- conA_zMinSwiss(params,q_vals)
-  zRange_calc <- zMaxFrench_calc - zMinSwiss_calc
-  treaty <- ifelse(zRange_calc>0,"Y","N")
-  return(tibble::tibble(treaty=treaty,zRange=zRange_calc,
-                zMinSwiss=zMinSwiss_calc,zMaxFrench=zMaxFrench_calc) %>%
-           dplyr::bind_cols(q_vals))
+  return(treaty_results)
 }
 
 #' Evaluate treaty utility

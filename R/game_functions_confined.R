@@ -5,15 +5,46 @@
 # 4b Mathematica functions for depth, utility, and abstraction
 # 4c Mathematica functions for z constraints
 
-#' Apply interval contraints to numeric value
-apply_constraints <- function(x,interval) {
-  if (x<interval[1]) {
-    x <- interval[1]
-  } else if (x>interval[2]) {
-    x <- interval[2]
-  }
-  return(x)
+
+
+#' Evaluate the treaty in a confined aquifer
+#'
+#' Evaluate whether or not the treaty will be made.
+#' @param params Parameter list (or data.frame with 1 row) containing
+#' necessary parameters to evaluate the agreement.
+#' @details
+#' Evaluate the treaty given social, economic, and geophysical parameters.
+#' @return
+#' Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
+#' and whether or not there is a treaty (i.e., if zRange > 0)
+#' @importFrom magrittr %>%
+#' @export
+#' @examples
+#' evaluate_treaty(default_params)
+evaluate_treaty_confined <- function(params) {
+  # (eval_out <- evaluate_treaty(params_default()))
+  # this function calculates abstraction from the game,
+  # and determines whether or not a treaty is signed
+
+  q_hat <- conA_qeval(params,conAf_qs0=conA_qshat0,conA_qfhat0,conA_qshat2,conA_qfhat2)
+  q_star <- conA_qeval(params,conAf_qs0=conA_qsstar0,conA_qfstar0,conA_qsstar2,conA_qfstar2)
+  q_double <- conA_qeval(params %>% dplyr::mutate(qshat=q_hat$qs,qfhat=q_hat$qf),
+                         conAf_qs0=conA_qsdouble0,conA_qfdouble0,conA_qsdouble2,conA_qfdouble2)
+
+  q_vals <- tibble::tibble(qshat=q_hat$qs,qfhat=q_hat$qf,
+                           qsstar=q_star$qs,qfstar=q_star$qf,
+                           qsdouble=q_double$qs,qfdouble=q_double$qf)
+
+  # get z constraints
+  zMaxFrench_calc <- conA_zMaxFrench(params,q_vals)
+  zMinSwiss_calc <- conA_zMinSwiss(params,q_vals)
+  zRange_calc <- zMaxFrench_calc - zMinSwiss_calc
+  treaty <- ifelse(zRange_calc>0,"Y","N")
+  return(tibble::tibble(treaty=treaty,zRange=zRange_calc,
+                        zMinSwiss=zMinSwiss_calc,zMaxFrench=zMaxFrench_calc) %>%
+           dplyr::bind_cols(q_vals))
 }
+
 
 
 # 4a function to evaluate abstraction rates

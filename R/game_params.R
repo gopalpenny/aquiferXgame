@@ -89,3 +89,14 @@ check_params <- function(params) {
   # return aquifer type
   return(params$aquifer_type)
 }
+
+
+#' Apply interval contraints to numeric value
+apply_constraints <- function(x,interval) {
+  if (x<interval[1]) {
+    x <- interval[1]
+  } else if (x>interval[2]) {
+    x <- interval[2]
+  }
+  return(x)
+}
