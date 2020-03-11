@@ -19,3 +19,9 @@ test_that("evaluate_agreement returns correct zRange, q values for confined aqui
   expect_equal(evaluate_treaty(example_params_confined) %>% dplyr::mutate_if(is.numeric,function(x) round(x,digits=4)),
                df)
 })
+
+evaluate_treaty(example_params_unconfined)
+test_that("evaluate_agreement returns correct zRange, q values for unconfined aquifer",{
+  expect_equal(evaluate_treaty(example_params_unconfined) %>% dplyr::mutate_if(is.numeric,function(x) round(x,digits=4)),
+               df)
+})
