@@ -2,4 +2,7 @@
 
 export(evaluate_treaty)
 export(evaluate_treaty_cases)
+export(evaluate_treaty_confined)
+export(evaluate_treaty_unconfined)
+export(get_contours)
 importFrom(magrittr,"%>%")
