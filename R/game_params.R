@@ -6,7 +6,8 @@
 #' @param params \code{data.frame} or \code{list} of parameters
 #' @details
 #' To evaluate the game, a \code{data.frame} or \code{list} of paramers must be supplied to
-#' \code{evaluate_treaty} or \code{evaluate_treaty_cases}. These must include, for all scenarios:
+#' \code{evaluate_treaty} or \code{evaluate_treaty_cases}. Generally speaking, these parameters
+#' should be non-negative. The parameters must include, for all scenarios:
 #' \describe{
 #' \item{Demand}{\code{Qf, Qs}}
 #' \item{Unit cost of alternative supply}{\code{p0f, p0s}}
@@ -62,6 +63,7 @@ check_params <- function(params) {
   # 1. ensure parameters are specified as D or PHI
   # 2a. if D, ensure all D parameters are present along with d0s, d0f
   # 2b. if PHI, ensure all PHI parameters are present along with dBs, dBf, hs, hf
+  # 3. Check for negative values
 
   # 1. ensure parameters are specified as D or PHI
   if (any(grepl("D[sfij][sfij]",param_names)) & any(grepl("PHI[sfij][sfij]",param_names))) {
@@ -88,21 +90,16 @@ check_params <- function(params) {
     stop("Missing drawdown parameters (Dxx or PHIxx) in params.")
   }
 
+  # 3. Check for negative values
+  neg_vals_df <- params %>% dplyr::select_if(function(x) any(x < 0))
+  if (ncol(neg_vals_df) > 0) {
+    warning(paste0("param column(s), ",paste(names(neg_vals_df),collapse=", "),", contain negative values."))
+  }
+
   if (length(missing_params) > 0) {
     warning(paste("missing",paste(missing_params,collapse=", "),"in params"))
   }
 
   # return aquifer type
   return(aquifer_type)
-}
-
-
-#' Apply interval contraints to numeric value
-apply_constraints <- function(x,interval) {
-  if (x<interval[1]) {
-    x <- interval[1]
-  } else if (x>interval[2]) {
-    x <- interval[2]
-  }
-  return(x)
 }
