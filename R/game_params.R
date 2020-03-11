@@ -13,8 +13,6 @@
 #' \item{Unit cost of pumping}{\code{B}}
 #' \item{Unit cost of recharge, Swiss}{\code{crs}}
 #' \item{Volume of recharge, with (T) and without (N) a treaty}{\code{rmT, rmN}}
-#' \item{Recharge relationship with a treaty}{\code{rsT, rfT}}
-#' \item{Recharge relationship without a treaty}{\code{rsN, rfN}}
 #' \item{Trust between players}{\code{gs, gf}}
 #' \item{Cost of the treaty}{\code{es, ef}}
 #' }
@@ -22,11 +20,15 @@
 #' \describe{
 #' \item{Drawdown relationships}{\code{Dff, Dss, Dsf, Dfs}}
 #' \item{Groundwater depth without pumping}{\code{d0s, d0f}}
+#' \item{Recharge relationship with a treaty}{\code{DrsT, DrfT}}
+#' \item{Recharge relationship without a treaty}{\code{DrsN, DrfN}}
 #' }
 #' And for unconfined aquifers:
 #' \describe{
 #' \item{Drawdown relationships}{\code{PHIff, PHIss, PHIsf, PHIfs}}
 #' \item{Groundwater depth without pumping}{\code{dBs, dBf, h0s, h0f}}
+#' \item{Recharge relationship with a treaty}{\code{PHIrsT, PHIrfT}}
+#' \item{Recharge relationship without a treaty}{\code{PHIrsN, PHIrfN}}
 #' }
 #' @return
 #' Returns the aquifer type, depending on whether Dxx is specified ("confined") or PHIxx is specified ("unconfined")
@@ -40,11 +42,11 @@
 #' check_params(params)
 #' check_params(params %>% dplyr::select())
 check_params <- function(params) {
-  drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs','d0s','d0f')
-  drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f')
+  drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs','d0s','d0f','DrsN','DrsT','DrfN','DrfT')
+  drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f','PHIrsN','PHIrsT','PHIrfN','PHIrfT')
   # initial_depth_confined_params <- c('d0s','d0f')
   # initial_depth_unconfined_params <- c('dBs','dBf','h0s','h0f')
-  additional_params <- c('Qf','Qs','p0f','p0s','B','rmN','rmT','rsN','rsT','rfN','rfT','crs','gs','gf','es','ef')
+  additional_params <- c('Qf','Qs','p0f','p0s','B','rmN','rmT','crs','gs','gf','es','ef')
 
   param_names <- names(params)
   missing_params <- c()

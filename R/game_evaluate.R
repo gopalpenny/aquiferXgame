@@ -33,7 +33,7 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 
   if (aquifer_type == "confined") {
     treaty_results <- evaluate_treaty_confined(params)
-  } else if (aquifer_type == "confined") {
+  } else if (aquifer_type == "unconfined") {
     treaty_results <- evaluate_treaty_unconfined(params)
   } else {
     stop("aquifer must be confined or unconfined, as specified by Dxx or PHIxx parameters.")
@@ -123,14 +123,14 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
     get_Us <- unconA_Us
     get_Uf <- unconA_Uf
   }
-  Us_hat <- get_Us(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT),z=0)
-  Uf_hat <- get_Uf(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rf=rfT),z=0)
-  Us_star <- get_Us(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rs=rsN),z=0)
-  Uf_star <- get_Uf(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rf=rfN),z=0)
-  Us_double <- get_Us(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT),z=0)
-  Uf_double <- get_Uf(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT),z=0)
-  Us_hat_double <- get_Us(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rs=rsT),z=0)
-  Uf_hat_double <- get_Uf(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rf=rfT),z=0)
+  Us_hat <- get_Us(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,Drs=DrsT),z=0)
+  Uf_hat <- get_Uf(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,Drf=DrfT),z=0)
+  Us_star <- get_Us(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,Drs=DrsN),z=0)
+  Uf_star <- get_Uf(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,Drf=DrfN),z=0)
+  Us_double <- get_Us(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,Drs=DrsT),z=0)
+  Uf_double <- get_Uf(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,Drf=DrfT),z=0)
+  Us_hat_double <- get_Us(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,Drs=DrsT),z=0)
+  Uf_hat_double <- get_Uf(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,Drf=DrfT),z=0)
   u_vals <- tibble::tibble(Us_hat=Us_hat,Uf_hat=Uf_hat,
                            Us_star=Us_star,Uf_star=Uf_star,
                            Us_double=Us_double,Uf_double=Uf_double,
@@ -157,14 +157,14 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
     get_ds <- unconA_ds
     get_df <- unconA_df
   }
-  ds_hat <- get_ds(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
-  df_hat <- get_df(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rf=rfT))
-  ds_star <- get_ds(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rs=rsN))
-  df_star <- get_df(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,rf=rfN))
-  ds_double <- get_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
-  df_double <- get_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT))
-  ds_hat_double <- get_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,rs=rsT))
-  df_hat_double <- get_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,rf=rfT))
+  ds_hat <- get_ds(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,Drs=DrsT))
+  df_hat <- get_df(qs=qshat,qf=qfhat,params %>% dplyr::mutate(rm=rmT,Drf=DrfT))
+  ds_star <- get_ds(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,Drs=DrsN))
+  df_star <- get_df(qs=qsstar,qf=qfstar,params %>% dplyr::mutate(rm=rmN,Drf=DrfN))
+  ds_double <- get_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,Drs=DrsT))
+  df_double <- get_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,Drf=DrfT))
+  ds_hat_double <- get_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::mutate(rm=rmT,Drs=DrsT))
+  df_hat_double <- get_df(qs=qshat,qf=qfdouble,params %>% dplyr::mutate(rm=rmT,Drf=DrfT))
   d_vals <- tibble::tibble(ds_hat=ds_hat,df_hat=df_hat,
                            ds_star=ds_star,df_star=df_star,
                            ds_double=ds_double,df_double=df_double,
