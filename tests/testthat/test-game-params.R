@@ -1,21 +1,19 @@
 library(magrittr)
 
 test_that('check_params returns warning if missing parameters',{
-  expect_warning(check_params(default_params %>% dplyr::select(-rmN)),"missing rmN in params")
-  expect_warning(check_params(default_params %>% dplyr::select(-rmN)),"missing rmN in params")
-  expect_warning(check_params(default_params %>% dplyr::select(-rmN)),"missing rmN in params")
+  expect_warning(check_params(example_params_confined %>% dplyr::select(-rmN)),"missing rmN in params")
+  expect_warning(check_params(example_params_confined %>% dplyr::select(-rmN)),"missing rmN in params")
+  expect_warning(check_params(example_params_confined %>% dplyr::select(-rmN)),"missing rmN in params")
 })
 
-params_confined <- default_params
+params_confined <- example_params_confined
 test_that('check_params returns warning if missing CONFINED parameters',{
   expect_warning(check_params(params_confined %>% dplyr::select(-Dff,-d0s)),"missing Dff, d0s in params")
   expect_warning(check_params(params_confined %>% dplyr::select(-d0s)),"missing d0s in params")
   expect_warning(check_params(params_confined %>% dplyr::select(-Dff)),"missing Dff in params")
 })
 
-params_unconfined <-
-  default_params %>% dplyr::rename(PHIff = Dff, PHIss = Dss, PHIsf = Dsf, PHIfs = Dfs) %>%
-  dplyr::mutate(dBs = 1, dBf = 2, h0s = 0.5, h0f = 0.5)
+params_unconfined <- example_params_unconfined
 test_that('check_params returns correct aquifer type',{
   expect_equal(check_params(params_unconfined),"unconfined")
 })

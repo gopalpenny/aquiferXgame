@@ -1,7 +1,7 @@
 # test_game_evaluate.R
 
 test_that("evaluate_agreement returns tibble",{
-  expect_equal(class(evaluate_treaty(default_params)),c("tbl_df","tbl","data.frame"))
+  expect_equal(class(evaluate_treaty(example_params_confined)),c("tbl_df","tbl","data.frame"))
 })
 
 df <- tibble::tibble(treaty="Y",
@@ -15,7 +15,7 @@ df <- tibble::tibble(treaty="Y",
                  qsdouble=9.0375939849624,
                  qfdouble=9.0375939849624) %>%
   dplyr::mutate_if(is.numeric,function(x) round(x,digits=4))
-test_that("evaluate_agreement returns correct zRange, q values",{
-  expect_equal(evaluate_treaty(default_params) %>% dplyr::mutate_if(is.numeric,function(x) round(x,digits=4)),
+test_that("evaluate_agreement returns correct zRange, q values for confined aquifer",{
+  expect_equal(evaluate_treaty(example_params_confined) %>% dplyr::mutate_if(is.numeric,function(x) round(x,digits=4)),
                df)
 })
