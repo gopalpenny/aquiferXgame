@@ -32,9 +32,13 @@
 #' Returns the aquifer type, depending on whether Dxx is specified ("confined") or PHIxx is specified ("unconfined")
 #' @examples
 #' library(genevoisgame)
-#' params <- default_params %>% dplyr::select()
-#' params_valid(params)
-#' params_valid(params %>% select())
+#' check_params(example_params_confined)
+#' check_params(example_params_unconfined)
+#' check_params(example_params_confined %>% dplyr::select())
+#'
+#' params <- example_params_confined %>% dplyr::select(-gs) %>% tidyr::crossing(gs=c(0.2,0.8))
+#' check_params(params)
+#' check_params(params %>% dplyr::select())
 check_params <- function(params) {
   drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs','d0s','d0f')
   drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f')
@@ -63,7 +67,7 @@ check_params <- function(params) {
 
     # 2a. if D, ensure all D parameters are present along with d0s, d0f
   } else if (any(grepl("D[sfij][sfij]",param_names))) {
-    params$aquifer_type <- "confined"
+    aquifer_type <- "confined"
     if (!all(drawdown_confined_params %in% param_names)) {
       missing_conf_params <- drawdown_confined_params[!(drawdown_confined_params %in% param_names)]
       # warning(paste("missing",paste(missing_conf_params,collapse=", "),"in params"))
@@ -72,7 +76,7 @@ check_params <- function(params) {
 
     # 2b. if PHI, ensure all PHI parameters are present along with dBs, dBf, hs, hf
   } else if (any(grepl("PHI[sfij][sfij]",param_names))) {
-    params$aquifer_type <- "unconfined"
+    aquifer_type <- "unconfined"
     if (!all(drawdown_unconfined_params %in% param_names)) {
       missing_unconf_params <- drawdown_unconfined_params[!(drawdown_unconfined_params %in% param_names)]
       # warning(paste("missing",paste(missing_unconf_params,collapse=", "),"in params"))
@@ -87,7 +91,7 @@ check_params <- function(params) {
   }
 
   # return aquifer type
-  return(params$aquifer_type)
+  return(aquifer_type)
 }
 
 
