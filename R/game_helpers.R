@@ -18,3 +18,27 @@ apply_constraints <- function(x,interval) {
 in_range <- function(x,range) {
   x >= range[1] & x <= range[2]
 }
+
+
+#' Convert Mathematica to R
+#' @param path Path to file to convert
+#' @param ... Arguments to change, listed in vector format, e.g.: \code{c(" ","*"))}
+#' @return
+#' Returns the corrected equations
+#' @examples
+#' eqns <- MM2R(path="mathematica/unconfined_eqns.txt", g1=c(" ","*"), g1=c("Sqrt","sqrt"))
+MM2R <- function(path,...) {
+  fil <- file(path)
+  # cat("TITLE extra line", "2 3 5 7", "", "11 13 17", file = fil,
+  #     sep = "\n")
+  file_lines <- readLines(fil, n = -1)
+  unlink(fil) # tidy up
+  params <- list(...)
+  for (i in 1:length(params)) {
+    file_lines <- gsub(params[[i]][1],params[[i]][2],file_lines)
+  }
+  for (i in 1:length(file_lines)) {
+    cat(file_lines[i],"\n")
+  }
+  return(file_lines)
+}
