@@ -1,0 +1,82 @@
+---
+title: "trust_games"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{trust_games}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+First we load the `tidyverse` package for easy data wrangling. We also load the `genevoisgame` package.
+
+```{r setup}
+library(tidyverse)
+library(genevoisgame)
+```
+
+## CONFINED AQUIFER: trust vs trust
+
+We will use the built-in dataset `example_params_confined` as a basis for our analysis. To run other simulations, all the parameters in this object can be set manually. Parameters are validated using `check_params` function, and a full list of requred parameters can be found in the documentation for this function. The game is evaluated using `evaluate_treaty` for a single scenario, or can be evaluated for multiple scenarios using `evaluate_treaty_cases`. 
+
+In order to plot contour lines of the outcomes, we can use the function `get_contours`, which is part of the `genevoisgame` package. It's a simple wrapper around `grDevices::contourLines`, written to more easily use the output from `evaluate_treaty_cases`.
+
+```{r confined_example,fig.width=5,fig.height=3}
+# Generate parameter data.frame
+params_basic_trust_v_trust <- example_params_confined %>% select(-gf,-gs)
+params_df_trust_v_trust <- params_basic_trust_v_trust %>% 
+  crossing(gs=seq(0,1,by=.05),
+           gf=seq(0,1,by=.05))
+
+# Run the game theoretic model
+outcomes_trust_v_trust <- evaluate_treaty_cases(params_df_trust_v_trust)
+
+# Get contours for the model
+cl_trust_v_trust <- get_contours(outcomes_trust_v_trust %>% rename(x=gs,y=gf,z=zRange),levels=c(-0.2,0,0.2))
+
+# Plot the output
+ggplot() + 
+  geom_raster(data=outcomes_trust_v_trust,aes(gs,gf,fill=zRange)) +
+  geom_path(data=cl_trust_v_trust,aes(x,y,group=line,linetype=level_factor)) +
+  scale_fill_gradient2() + coord_equal()
+```
+
+## UNCONFINED AQUIFER: trust vs trust
+
+```{r confined_example,fig.width=5,fig.height=3}
+# Generate parameter data.frame
+# params_get(scenario) %>% %>% select(-Dss,-Dff,-Dsf,-Dfs) %>%
+#   mutate(rmN=8,gs=0.4,gf=0.4)
+# params_df <- params_basic %>% 
+#   crossing(nesting(Dss=seq(0.5,5,by=.5),
+#                    Dff=seq(0.5,5,by=.5)),
+#            nesting(Dsf=seq(0.5,5,by=.5),
+#                    Dfs=seq(0.5,5,by=.5)))
+params_basic_trust_v_trust <- example_params_unconfined %>% select(-gf,-gs)
+params_df_trust_v_trust <- params_basic_trust_v_trust %>% 
+  crossing(gs=seq(0,1,by=.05),
+           gf=seq(0,1,by=.05))
+# params_df_trust_v_Dij_over_Dii <- params_basic_trust_v_Dij_over_Dii %>% 
+#   crossing(nesting(Dij_over_Dii=seq(0.05,0.95,by=0.05)),
+#            nesting(gs=seq(.01,1,by=.05),
+#                    gf=seq(.01,1,by=.05))) %>% 
+#   mutate(Dss=Dsf/Dij_over_Dii,Dff=Dfs/Dij_over_Dii)
+
+# Run the game theoretic model
+outcomes_trust_v_trust <- evaluate_treaty_cases(params_df_trust_v_trust)
+
+# Get contours for the model
+cl_trust_v_trust <- get_contours(outcomes_trust_v_trust %>% rename(x=gs,y=gf,z=zRange),levels=c(-0.2,0,0.2))
+
+# Plot the output
+ggplot() + 
+  geom_raster(data=outcomes_trust_v_trust,aes(gs,gf,fill=zRange)) +
+  geom_path(data=cl_trust_v_trust,aes(x,y,group=line,linetype=level_factor)) +
+  scale_fill_gradient2() + coord_equal()
+```
