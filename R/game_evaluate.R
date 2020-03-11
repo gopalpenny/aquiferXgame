@@ -19,7 +19,7 @@
 #' @export
 #' @examples
 #' evaluate_treaty(default_params)
-evaluate_treaty <- function(params) {
+evaluate_treaty <- function(params, aquifer_type = NULL) {
   # (eval_out <- evaluate_treaty(params_default()))
   # this function calculates abstraction from the game,
   # and determines whether or not a treaty is signed
@@ -27,7 +27,9 @@ evaluate_treaty <- function(params) {
     stop("This is an error message because params not 1 dimension")
   }
 
-  aquifer_type <- check_params(params)
+  if (is.null(aquifer_type)) {
+    aquifer_type <- check_params(params)
+  }
 
   if (aquifer_type == "confined") {
     treaty_results <- evaluate_treaty_confined(params)
@@ -72,7 +74,7 @@ evaluate_treaty <- function(params) {
 evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
   aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
-  eval_results <- do.call(rbind,lapply(params_list,evaluate_treaty))
+  eval_results <- do.call(rbind,lapply(params_list,evaluate_treaty,aquifer_type=aquifer_type))
   q_vals_list <- split(eval_results %>% dplyr::select(dplyr::starts_with("q")),1:dim(eval_results)[1])
   # eval_results_treat <- eval_results %>% select(treaty,zRange,zMinSwiss,zMaxFrench)
   eval_return <- eval_results %>% dplyr::select(treaty,zRange,zMinSwiss,zMaxFrench)
@@ -168,4 +170,76 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
                            ds_double=ds_double,df_double=df_double,
                            ds_hat_double=ds_hat_double,df_hat_double=df_hat_double)
   return(d_vals)
+}
+
+#' Get contour lines
+#'
+#' Get contour lines, using a wrapper for contourLines
+#' @param df A data.frame containing x, y, and z columns. x and y must form a raster,
+#'     meaning every x must be represented for each y, and vice versa.
+#' @param levels A vector of values at which contours should be plotted. If used, nlevels is ignored.
+#' @param ... If x, y, and z are directly specified here, df will be ignored.
+#' @importFrom magrittr %>%
+#' @export
+#' @examples
+#' df <- tidyr::crossing(x=-10:10,y=-10:10) %>% dplyr::mutate(z=x^2)
+#' cl <- get_contours(df,levels=5)
+#' unique(cl$level)
+#' ggplot() +
+#'   geom_raster(data=df,aes(x,y,fill=z)) +
+#'   geom_path(data=cl,aes(x,y,group=line))
+#'
+#' cl <- get_contours(df,levels=c(15,20,60))
+#' unique(cl$level)
+#'
+#' df <- tidyr::crossing(x=seq(-5,5,length.out=20),y=seq(-5,5,length.out=20)) %>% dplyr::mutate(z=sqrt(x^2+y^2))
+#' cl <- get_contours(df,levels=seq(2,10,by=2))
+#' ggplot() +
+#'   geom_raster(data=df,aes(x,y,fill=z)) +
+#'   geom_path(data=cl,aes(x,y,group=line)) + coord_equal()
+get_contours <- function(df = NULL, levels = 0, ...) {
+  params <- list(...)
+  if (all(c("x","y","z") %in% names(params))) {
+    df$x <- x
+    df$y <- y
+    df$z <- z
+  } else if (!all(c("x","y","z") %in% names(df))) {
+    stop("df must contain columns for x, y, and z")
+  }
+  z_values_check <- df %>% tidyr::complete(x,y) %>% purrr::pluck("z")
+  df_error <-  any(is.na(z_values_check) & !is.nan(z_values_check))
+  if (df_error) {
+    stop("in df, every x, y combination must have a z value.")
+  }
+  nx <- length(unique(df$x))
+  ny <- length(unique(df$y))
+  # if (nlevels > nx | nlevels > ny) {
+  #   stop("nlevels (",nlevels,") must be less than nx (",nx,") and ny (",ny,").")
+  # }
+  df <- df %>%
+    dplyr::arrange(y,x)
+  xmat <- df %>% purrr::pluck("x") %>% matrix(ncol=ny)
+  ymat <- df %>% purrr::pluck("y") %>% matrix(ncol=ny)
+  zmat <- df %>% purrr::pluck("z") %>% matrix(ncol=ny)
+  x_seq <- xmat[,1]
+  y_seq <- ymat[1,]
+
+  # get contour lines
+  cl_list <- contourLines(x_seq,y_seq,zmat,levels=levels)
+  if (length(cl_list) > 0 ) {
+    for (i in 1:length(cl_list)) {
+      cl_list[[i]]$line <- i
+    }
+
+    # bind contour lines
+    cl <- do.call(rbind,lapply(cl_list,function(l) data.frame(x=l$x,y=l$y,level=l$level, line=l$line))) %>%
+      dplyr::mutate(i=dplyr::row_number(),
+                    level_factor=as.factor(as.character(level)))
+
+  } else {
+    warning(paste0("No contours found. Level range: (",min(level),",",max(level),"). ",
+                   "z range: (",min(df$z,na.rm=TRUE),",",max(df$z,na.rm=TRUE),")"))
+    cl <- NULL
+  }
+  return(cl)
 }
