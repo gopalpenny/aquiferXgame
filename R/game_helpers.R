@@ -32,7 +32,7 @@ MM2R <- function(path,...) {
   # cat("TITLE extra line", "2 3 5 7", "", "11 13 17", file = fil,
   #     sep = "\n")
   file_lines <- readLines(fil, n = -1)
-  unlink(fil) # tidy up
+  close(fil) # tidy up
   params <- list(...)
   for (i in 1:length(params)) {
     file_lines <- gsub(params[[i]][1],params[[i]][2],file_lines)
