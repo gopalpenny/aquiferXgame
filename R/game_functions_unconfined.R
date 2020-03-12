@@ -29,7 +29,7 @@ evaluate_treaty_unconfined <- function(params) {
 
   q_hat <- unconA_qeval(params,unconA_qhat0,unconA_qhat2)
   q_star <- unconA_qeval(params,unconA_qstar0,unconA_qstar2)
-  q_double <- unconA_qeval(params,unconA_qdouble0,unconA_qdouble2,qshat=q_hat[1],qfhat=q_hat[2])
+  q_double <- unconA_qeval(params,unconA_qdouble0,unconA_qdouble2,qshat=q_hat$qs,qfhat=q_hat$qf)
   # q_double <- unconA_qdouble(params,qshat=q_hat[1],qfhat=q_hat[2])
 
   # q_hat <- conA_qeval(params,conAf_qs0=conA_qshat0,conA_qfhat0,conA_qshat2,conA_qfhat2)
@@ -37,9 +37,9 @@ evaluate_treaty_unconfined <- function(params) {
   # q_double <- conA_qeval(params %>% dplyr::mutate(qshat=q_hat$qs,qfhat=q_hat$qf),
   #                        conAf_qs0=conA_qsdouble0,conA_qfdouble0,conA_qsdouble2,conA_qfdouble2)
 
-  q_vals <- tibble::tibble(qshat=q_hat[1],qfhat=q_hat[2],
-                           qsstar=q_star[1],qfstar=q_star[2],
-                           qsdouble=q_double[1],qfdouble=q_double[2])
+  q_vals <- tibble::tibble(qshat=q_hat$qs,qfhat=q_hat$qf,
+                           qsstar=q_star$qs,qfstar=q_star$qf,
+                           qsdouble=q_double$qs,qfdouble=q_double$qf)
 
   # # get z constraints
   zMaxFrench_calc <- unconA_zMaxFrench(params,q_vals)
