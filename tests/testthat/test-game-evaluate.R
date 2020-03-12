@@ -21,11 +21,21 @@ test_that("evaluate_treaty returns correct zRange, q values for confined aquifer
                df)
 })
 
-evaluate_treaty(example_params_unconfined)
+df <- tibble::tibble(treaty="N",
+                     zRange=0,
+                     zMinSwiss=0,
+                     zMaxFrench=0,
+                     qshat=20,
+                     qfhat=20,
+                     qsstar=20,
+                     qfstar=20,
+                     qsdouble=20,
+                     qfdouble=20)
 test_that("evaluate_treaty returns correct zRange, q values for unconfined aquifer",{
-  expect_equal(evaluate_treaty(example_params_unconfined) %>% dplyr::mutate_if(is.numeric,function(x) round(x,digits=4)),
+  expect_equal(evaluate_treaty(example_params_unconfined),
                df)
 })
+evaluate_treaty(example_params_unconfined) %>% ggp::print_data_frame_for_entry()
 
 
 ## evaluate_treaty_cases

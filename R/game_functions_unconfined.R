@@ -41,6 +41,14 @@ evaluate_treaty_unconfined <- function(params) {
                            qsstar=q_star$qs,qfstar=q_star$qf,
                            qsdouble=q_double$qs,qfdouble=q_double$qf)
 
+  # is the aquifer depleted (AD) in any of the cases?
+  AD_fb <- check_aquifer_depleted(q_vals$qshat,q_vals$qshat,params,treaty=TRUE)
+  AD_nash <- check_aquifer_depleted(q_vals$qsstar,q_vals$qfstar,params,treaty=FALSE)
+  AD_cheat <- check_aquifer_depleted(q_vals$qsdouble,q_vals$qfdouble,params,treaty=TRUE)
+  if (any(c(AD_fb,AD_fb,AD_cheat))) {
+    warning(paste0("The aquifer was fully depleted for at least one player in the ",paste(c("First Best","Nash","Cheat")[c(AD_fb,AD_nash,AD_cheat)],sep=", "),"scenarios"))
+  }
+
   # # get z constraints
   zMaxFrench_calc <- unconA_zMaxFrench(params,q_vals)
   zMinSwiss_calc <- unconA_zMinSwiss(params,q_vals)
@@ -282,11 +290,13 @@ unconA_zRange <- function(params,q_vals) {
 
 #' Check if unconfined aquifer is fully depleted
 #'
-#' Is pumping enough to fully deplete the aquifer for either player
+#' Is pumping enough to fully deplete the aquifer for either player?
 #' @param params parameter data.frame with single row
 #' @param treaty boolean value that determines the context for evaluation (e.g., for Nash should be \code{F}, for First Best should be \code{T})
 #' @param qs pumping from player S
 #' @param qf pumping from player F
+#' @return
+#' Returns boolean value, TRUE if the aquifer has been fully depleted for some amount of pumping.
 check_aquifer_depleted <- function(qs,qf,params,treaty) {
   if (treaty) {
     params <- params %>% dplyr::rename(rm=rmT, PHIrs=PHIrsT, PHIrf=PHIrfT)
