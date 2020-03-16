@@ -52,7 +52,7 @@ test_that("evaluate_treaty_cases returns correct zRange, q, U, and d values",{
 test_that("evaluate_treaty_cases returns all input parameters for options a, q, u, d input",{
   expect_equal(evaluate_treaty_cases(example_params_confined,"a") %>% names(),
                c('treaty','zRange','zMinSwiss','zMaxFrench','Qf','Qs','p0f','p0s','B','Dff','Dss','Dsf','Dfs',
-                 'd0s','d0f','rmN','rmT','DrsN','DrsT','DrfN','DrfT','crs','gs','gf','es','ef'))
+                 'd0s','d0f','rmN','rmT','DsrN','DsrT','DfrN','DfrT','crs','gs','gf','es','ef'))
   expect_equal(evaluate_treaty_cases(example_params_confined,"q") %>% names(),
                c('treaty','zRange','zMinSwiss','zMaxFrench','qshat','qfhat','qsstar','qfstar','qsdouble','qfdouble'))
   expect_equal(evaluate_treaty_cases(example_params_confined,"u") %>% names(),

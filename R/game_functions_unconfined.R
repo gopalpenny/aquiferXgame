@@ -64,19 +64,19 @@ evaluate_treaty_unconfined <- function(params) {
 
 unconA_Us <- function(qs,qf,params,z) {
   with(params,
-       -es-p0s*(-qs+Qs)-crs*rm-Bs*qs*(dBs-sqrt[h0s^2-PHIsf*qf-PHIss*qs+PHIrs*rm])+z
+       -es-p0s*(-qs+Qs)-crs*rm-Bs*qs*(dBs-sqrt[h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm])+z
   )}
 unconA_Uf <- function(qs,qf,params,z) {
   with(params,
-       -ef-p0f*(-qf+Qf)-Bf*qf*(dBf-sqrt[h0f^2-PHIff*qf-PHIfs*qs+PHIrf*rm])-z
+       -ef-p0f*(-qf+Qf)-Bf*qf*(dBf-sqrt[h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm])-z
   )}
 unconA_ds <- function(qs,qf,params) {
   with(params,
-       dBs-sqrt[h0s^2-PHIsf*qf-PHIss*qs+PHIrs*rm]
+       dBs-sqrt[h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm]
   )}
 unconA_df <- function(qs,qf,params) {
   with(params,
-       dBf-sqrt[h0f^2-PHIff*qf-PHIfs*qs+PHIrf*rm]
+       dBf-sqrt[h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm]
   )}
 
 # q values
@@ -121,10 +121,10 @@ unconA_qhat0 <- function(params) {
     if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & x[1] > 0 & x[2] > 0) {
       # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       F1<-with(params,
-               -Bs*dBs+p0s-(Bf*PHIfs*x[2])/(2*sqrt(h0f^2+PHIrfT*rmT-PHIfs*x[1]-PHIff*x[2]))+(Bs*(2*h0s^2+2*PHIrsT*rmT-3*PHIss*x[1]-2*PHIsf*x[2]))/(2*sqrt(h0s^2+PHIrsT*rmT-PHIss*x[1]-PHIsf*x[2]))
+               -Bs*dBs+p0s-(Bf*PHIfs*x[2])/(2*sqrt(h0f^2+PHIfrT*rmT-PHIfs*x[1]-PHIff*x[2]))+(Bs*(2*h0s^2+2*PHIsrT*rmT-3*PHIss*x[1]-2*PHIsf*x[2]))/(2*sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]-PHIsf*x[2]))
       )
       F2<-with(params,
-               -Bf*dBf+p0f+(Bf*(2*h0f^2+2*PHIrfT*rmT-2*PHIfs*x[1]-3*PHIff*x[2]))/(2*sqrt(h0f^2+PHIrfT*rmT-PHIfs*x[1]-PHIff*x[2]))-(Bs*PHIsf*x[1])/(2*sqrt(h0s^2+PHIrsT*rmT-PHIss*x[1]-PHIsf*x[2]))
+               -Bf*dBf+p0f+(Bf*(2*h0f^2+2*PHIfrT*rmT-2*PHIfs*x[1]-3*PHIff*x[2]))/(2*sqrt(h0f^2+PHIfrT*rmT-PHIfs*x[1]-PHIff*x[2]))-(Bs*PHIsf*x[1])/(2*sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]-PHIsf*x[2]))
       )
     } else {
       # Stop root finding if aquifer depleted or pumping is negative for either player
@@ -142,7 +142,7 @@ unconA_qhat2 <- function(params,qs1,qf1) {
   first_best_equations_qs2 <- function(x,params,qf1) {
     if (!check_aquifer_depleted(x,qf1,params,TRUE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       F1<-with(params,
-               -Bs*dBs+p0s-(Bf*PHIfs*qf1)/(2*sqrt(h0f^2-PHIff*qf1+PHIrfT*rmT-PHIfs*x))+(Bs*(2*h0s^2-2*PHIsf*qf1+2*PHIrsT*rmT-3*PHIss*x))/(2*sqrt(h0s^2-PHIsf*qf1+PHIrsT*rmT-PHIss*x))
+               -Bs*dBs+p0s-(Bf*PHIfs*qf1)/(2*sqrt(h0f^2-PHIff*qf1+PHIfrT*rmT-PHIfs*x))+(Bs*(2*h0s^2-2*PHIsf*qf1+2*PHIsrT*rmT-3*PHIss*x))/(2*sqrt(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x))
       )
     } else { # Stop root finding if aquifer depleted or pumping is negative for either player
       F1 <- 0
@@ -154,7 +154,7 @@ unconA_qhat2 <- function(params,qs1,qf1) {
   first_best_equations_qf2 <- function(x,params,qs1) {
     if (!check_aquifer_depleted(qs1,x,params,TRUE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       F2<-with(params,
-               -Bf*dBf+p0f+(Bf*(2*h0f^2-2*PHIfs*qs1+2*PHIrfT*rmT-3*PHIff*x))/(2*sqrt(h0f^2-PHIfs*qs1+PHIrfT*rmT-PHIff*x))-(Bs*PHIsf*qs1)/(2*sqrt(h0s^2-PHIss*qs1+PHIrsT*rmT-PHIsf*x))
+               -Bf*dBf+p0f+(Bf*(2*h0f^2-2*PHIfs*qs1+2*PHIfrT*rmT-3*PHIff*x))/(2*sqrt(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x))-(Bs*PHIsf*qs1)/(2*sqrt(h0s^2-PHIss*qs1+PHIsrT*rmT-PHIsf*x))
       )
     } else { # Stop root finding if aquifer depleted or pumping is negative for either player
       F2 <- 0
@@ -172,10 +172,10 @@ unconA_qstar0 <- function(params) {
     if (!check_aquifer_depleted(x[1],x[2],params,FALSE) & x[1] > 0 & x[2] > 0) {
       # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       N1<-with(params,
-               -Bs*dBs+p0s+(Bs*(2*h0s^2+2*PHIrsN*rmN-3*PHIss*x[1]-2*PHIsf*x[2]))/(2*sqrt(h0s^2+PHIrsN*rmN-PHIss*x[1]-PHIsf*x[2]))
+               -Bs*dBs+p0s+(Bs*(2*h0s^2+2*PHIsrN*rmN-3*PHIss*x[1]-2*PHIsf*x[2]))/(2*sqrt(h0s^2+PHIsrN*rmN-PHIss*x[1]-PHIsf*x[2]))
       )
       N2<-with(params,
-               -Bf*dBf+p0f+(Bf*(2*h0f^2+2*PHIrfN*rmN-2*PHIfs*x[1]-3*PHIff*x[2]))/(2*sqrt(h0f^2+PHIrfN*rmN-PHIfs*x[1]-PHIff*x[2]))
+               -Bf*dBf+p0f+(Bf*(2*h0f^2+2*PHIfrN*rmN-2*PHIfs*x[1]-3*PHIff*x[2]))/(2*sqrt(h0f^2+PHIfrN*rmN-PHIfs*x[1]-PHIff*x[2]))
       )
     } else {
       # Stop root finding if aquifer depleted or pumping is negative for either player
@@ -193,7 +193,7 @@ unconA_qstar2 <- function(params,qs1,qf1) {
   nash_equations_qs2 <- function(x,params,qf1) {
     if (!check_aquifer_depleted(x,qf1,params,FALSE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       N1<-with(params,
-               -Bs*dBs+p0s+(Bs*(2*h0s^2-2*PHIsf*qf1+2*PHIrsN*rmN-3*PHIss*x))/(2*sqrt(h0s^2-PHIsf*qf1+PHIrsN*rmN-PHIss*x))
+               -Bs*dBs+p0s+(Bs*(2*h0s^2-2*PHIsf*qf1+2*PHIsrN*rmN-3*PHIss*x))/(2*sqrt(h0s^2-PHIsf*qf1+PHIsrN*rmN-PHIss*x))
       )
     } else { # Stop root finding if aquifer depleted or pumping is negative for either player
       N1 <- 0
@@ -206,7 +206,7 @@ unconA_qstar2 <- function(params,qs1,qf1) {
   nash_equations_qf2 <- function(x,params,qs1) {
     if (!check_aquifer_depleted(qs1,x,params,FALSE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       N2<-with(params,
-               -Bf*dBf+p0f+(Bf*(2*h0f^2-2*PHIfs*qs1+2*PHIrfN*rmN-3*PHIff*x))/(2*sqrt(h0f^2-PHIfs*qs1+PHIrfN*rmN-PHIff*x))
+               -Bf*dBf+p0f+(Bf*(2*h0f^2-2*PHIfs*qs1+2*PHIfrN*rmN-3*PHIff*x))/(2*sqrt(h0f^2-PHIfs*qs1+PHIfrN*rmN-PHIff*x))
       )
     } else { # Stop root finding if aquifer depleted or pumping is negative for either player
       N2 <- 0
@@ -224,10 +224,10 @@ unconA_qdouble0 <- function(params,qshat,qfhat) {
     if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & x[1] > 0 & x[2] > 0) {
       # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       D1<-with(params,
-               gs*(p0s-(Bs*PHIss*x[1])/(2*sqrt(h0s^2-PHIsf*qfhat+PHIrsT*rmT-PHIss*x[1]))-Bs*(dBs-sqrt(h0s^2-PHIsf*qfhat+PHIrsT*rmT-PHIss*x[1])))+(1-gs)*(p0s-(Bs*PHIss*x[1])/(2*sqrt(h0s^2+PHIrsT*rmT-PHIss*x[1]-PHIsf*x[2]))-Bs*(dBs-sqrt(h0s^2+PHIrsT*rmT-PHIss*x[1]-PHIsf*x[2])))
+               gs*(p0s-(Bs*PHIss*x[1])/(2*sqrt(h0s^2-PHIsf*qfhat+PHIsrT*rmT-PHIss*x[1]))-Bs*(dBs-sqrt(h0s^2-PHIsf*qfhat+PHIsrT*rmT-PHIss*x[1])))+(1-gs)*(p0s-(Bs*PHIss*x[1])/(2*sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]-PHIsf*x[2]))-Bs*(dBs-sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]-PHIsf*x[2])))
       )
       D2<-with(params,
-               gf*(p0f-(Bf*PHIff*x[2])/(2*sqrt(h0f^2-PHIfs*qshat+PHIrfT*rmT-PHIff*x[2]))-Bf*(dBf-sqrt(h0f^2-PHIfs*qshat+PHIrfT*rmT-PHIff*x[2])))+(1-gf)*(p0f-(Bf*PHIff*x[2])/(2*sqrt(h0f^2+PHIrfT*rmT-PHIfs*x[1]-PHIff*x[2]))-Bf*(dBf-sqrt(h0f^2+PHIrfT*rmT-PHIfs*x[1]-PHIff*x[2])))
+               gf*(p0f-(Bf*PHIff*x[2])/(2*sqrt(h0f^2-PHIfs*qshat+PHIfrT*rmT-PHIff*x[2]))-Bf*(dBf-sqrt(h0f^2-PHIfs*qshat+PHIfrT*rmT-PHIff*x[2])))+(1-gf)*(p0f-(Bf*PHIff*x[2])/(2*sqrt(h0f^2+PHIfrT*rmT-PHIfs*x[1]-PHIff*x[2]))-Bf*(dBf-sqrt(h0f^2+PHIfrT*rmT-PHIfs*x[1]-PHIff*x[2])))
       )
     } else {
       # Stop root finding if aquifer depleted or pumping is negative for either player
@@ -245,7 +245,7 @@ unconA_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
   cheat_equations_qs2 <- function(x,params,qshat,qfhat,qf1) {
     if (!check_aquifer_depleted(x,qf1,params,TRUE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       D1<-with(params,
-               (1-gs)*(p0s-(Bs*PHIss*x)/(2*sqrt(h0s^2-PHIsf*qf1+PHIrsT*rmT-PHIss*x))-Bs*(dBs-sqrt(h0s^2-PHIsf*qf1+PHIrsT*rmT-PHIss*x)))+gs*(p0s-(Bs*PHIss*x)/(2*sqrt(h0s^2-PHIsf*qfhat+PHIrsT*rmT-PHIss*x))-Bs*(dBs-sqrt(h0s^2-PHIsf*qfhat+PHIrsT*rmT-PHIss*x)))
+               (1-gs)*(p0s-(Bs*PHIss*x)/(2*sqrt(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x))-Bs*(dBs-sqrt(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x)))+gs*(p0s-(Bs*PHIss*x)/(2*sqrt(h0s^2-PHIsf*qfhat+PHIsrT*rmT-PHIss*x))-Bs*(dBs-sqrt(h0s^2-PHIsf*qfhat+PHIsrT*rmT-PHIss*x)))
       )
     } else { # Stop root finding if aquifer depleted or pumping is negative for either player
       D1 <- 0
@@ -258,7 +258,7 @@ unconA_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
   cheat_equations_qf2 <- function(x,params,qshat,qfhat,qs1) {
     if (!check_aquifer_depleted(qs1,x,params,TRUE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       D2<-with(params,
-               (1-gf)*(p0f-(Bf*PHIff*x)/(2*sqrt(h0f^2-PHIfs*qs1+PHIrfT*rmT-PHIff*x))-Bf*(dBf-sqrt(h0f^2-PHIfs*qs1+PHIrfT*rmT-PHIff*x)))+gf*(p0f-(Bf*PHIff*x)/(2*sqrt(h0f^2-PHIfs*qshat+PHIrfT*rmT-PHIff*x))-Bf*(dBf-sqrt(h0f^2-PHIfs*qshat+PHIrfT*rmT-PHIff*x)))
+               (1-gf)*(p0f-(Bf*PHIff*x)/(2*sqrt(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x))-Bf*(dBf-sqrt(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x)))+gf*(p0f-(Bf*PHIff*x)/(2*sqrt(h0f^2-PHIfs*qshat+PHIfrT*rmT-PHIff*x))-Bf*(dBf-sqrt(h0f^2-PHIfs*qshat+PHIfrT*rmT-PHIff*x)))
       )
     } else { # Stop root finding if aquifer depleted or pumping is negative for either player
       D2 <- 0
@@ -275,12 +275,12 @@ unconA_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
 unconA_zMinSwiss <- function(params,q_vals) {
   with(q_vals, # q_vals should include qsstar,qfstar,qshat,qfhat,qsdouble,qfdouble
        with(params,
-            es+p0s*(Qs-qshat)-p0s*(Qs-qsstar)-crs*rmN-Bs*qsstar*(dBs-sqrt(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIrsN*rmN))+crs*rmT+Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIrsT*rmT))-gs*(Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIrsT*rmT))-Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIrsT*rmT)))
+            es+p0s*(Qs-qshat)-p0s*(Qs-qsstar)-crs*rmN-Bs*qsstar*(dBs-sqrt(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIsrN*rmN))+crs*rmT+Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))-gs*(Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))-Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIsrT*rmT)))
        ))}
 unconA_zMaxFrench <- function(params,q_vals) {
   with(q_vals,
        with(params,
-            -ef-p0f*(Qf-qfhat)+p0f*(Qf-qfstar)+Bf*qfstar*(dBf-sqrt(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIrfN*rmN))-Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIrfT*rmT))+gf*(Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIrfT*rmT))-Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIrfT*rmT)))
+            -ef-p0f*(Qf-qfhat)+p0f*(Qf-qfstar)+Bf*qfstar*(dBf-sqrt(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIfrN*rmN))-Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))+gf*(Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))-Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIfrT*rmT)))
        ))}
 unconA_zRange <- function(params,q_vals) {
   zRange <- unconA_zMaxFrench(params,q_vals) - unconA_zMinSwiss(params,q_vals)
@@ -299,16 +299,16 @@ unconA_zRange <- function(params,q_vals) {
 #' Returns boolean value, TRUE if the aquifer has been fully depleted for some amount of pumping.
 check_aquifer_depleted <- function(qs,qf,params,treaty) {
   if (treaty) {
-    params <- params %>% dplyr::rename(rm=rmT, PHIrs=PHIrsT, PHIrf=PHIrfT)
+    params <- params %>% dplyr::rename(rm=rmT, PHIsr=PHIsrT, PHIfr=PHIfrT)
   } else {
-    params <- params %>% dplyr::rename(rm=rmN, PHIrs=PHIrsN, PHIrf=PHIrfN)
+    params <- params %>% dplyr::rename(rm=rmN, PHIsr=PHIsrN, PHIfr=PHIfrN)
   }
   phis<-with(params,
-             h0s^2-PHIsf*qf-PHIss*qs+PHIrs*rm
+             h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm
   )
 
   phif<-with(params,
-             h0f^2-PHIff*qf-PHIfs*qs+PHIrf*rm
+             h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm
   )
 
   if (phis < 0 | phif < 0) {

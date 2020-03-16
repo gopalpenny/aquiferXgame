@@ -21,16 +21,17 @@
 #' \describe{
 #' \item{Drawdown relationships}{\code{Dff, Dss, Dsf, Dfs}}
 #' \item{Groundwater depth without pumping}{\code{d0s, d0f}}
-#' \item{Recharge relationship with a treaty}{\code{DrsT, DrfT}}
-#' \item{Recharge relationship without a treaty}{\code{DrsN, DrfN}}
+#' \item{Recharge relationship with a treaty}{\code{DsrT, DfrT}}
+#' \item{Recharge relationship without a treaty}{\code{DsrN, DfrN}}
 #' }
 #' And for unconfined aquifers:
 #' \describe{
 #' \item{Drawdown relationships}{\code{PHIff, PHIss, PHIsf, PHIfs}}
 #' \item{Groundwater depth without pumping}{\code{dBs, dBf, h0s, h0f}}
-#' \item{Recharge relationship with a treaty}{\code{PHIrsT, PHIrfT}}
-#' \item{Recharge relationship without a treaty}{\code{PHIrsN, PHIrfN}}
+#' \item{Recharge relationship with a treaty}{\code{PHIsrT, PHIfrT}}
+#' \item{Recharge relationship without a treaty}{\code{PHIsrN, PHIfrN}}
 #' }
+#' @export
 #' @return
 #' Returns the aquifer type, depending on whether Dxx is specified ("confined") or PHIxx is specified ("unconfined")
 #' @examples
@@ -43,8 +44,8 @@
 #' check_params(params)
 #' check_params(params %>% dplyr::select())
 check_params <- function(params) {
-  drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs','d0s','d0f','DrsN','DrsT','DrfN','DrfT')
-  drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f','PHIrsN','PHIrsT','PHIrfN','PHIrfT')
+  drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs','d0s','d0f','DsrN','DsrT','DfrN','DfrT')
+  drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f','PHIsrN','PHIsrT','PHIfrN','PHIfrT')
   # initial_depth_confined_params <- c('d0s','d0f')
   # initial_depth_unconfined_params <- c('dBs','dBf','h0s','h0f')
   additional_params <- c('Qf','Qs','p0f','p0s','B','rmN','rmT','crs','gs','gf','es','ef')

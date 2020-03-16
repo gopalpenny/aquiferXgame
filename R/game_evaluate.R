@@ -119,15 +119,15 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
   if (aquifer_type == "confined") {
     get_Us <- conA_Us
     get_Uf <- conA_Uf
-    params_treaty <- params %>% dplyr::rename(rm=rmT,Drs=DrsT,Drf=DrfT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,Drs=DrsN,Drf=DrfN)
+    params_treaty <- params %>% dplyr::rename(rm=rmT,Dsr=DsrT,Dfr=DfrT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,Dsr=DsrN,Dfr=DfrN)
   } else {
     params$Bs <- params$B
     params$Bf <- params$B
     get_Us <- unconA_Us
     get_Uf <- unconA_Uf
-    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIrs=PHIrsT,PHIrf=PHIrfT) # note: major speed improvements after switching from recode
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIrs=PHIrsN,PHIrf=PHIrfN)
+    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIrsT,PHIfr=PHIrfT) # note: major speed improvements after switching from recode
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIrsN,PHIfr=PHIrfN)
   }
   Us_hat <- get_Us(qs=qshat,qf=qfhat,params_treaty,z=0)
   Uf_hat <- get_Uf(qs=qshat,qf=qfhat,params_treaty,z=0)
@@ -157,15 +157,15 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
   if (aquifer_type == "confined") {
     get_ds <- conA_ds
     get_df <- conA_df
-    params_treaty <- params %>% dplyr::rename(rm=rmT,Drs=DrsT,Drf=DrfT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,Drs=DrsN,Drf=DrfN)
+    params_treaty <- params %>% dplyr::rename(rm=rmT,Dsr=DsrT,Dfr=DfrT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,Dsr=DsrN,Dfr=DfrN)
   } else {
     params$Bs <- params$B
     params$Bf <- params$B
     get_ds <- unconA_ds
     get_df <- unconA_df
-    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIrs=PHIrsT,PHIrf=PHIrfT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIrs=PHIrsN,PHIrf=PHIrfN)
+    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIrsT,PHIfr=PHIrfT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIrsN,PHIfr=PHIrfN)
   }
   ds_hat <- get_ds(qs=qshat,qf=qfhat,params_treaty)
   df_hat <- get_df(qs=qshat,qf=qfhat,params_treaty)
