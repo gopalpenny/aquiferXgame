@@ -1,5 +1,5 @@
 ---
-title: "trust_games"
+title: "Vignette: genevoisgame"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{trust_games}
@@ -14,18 +14,41 @@ knitr::opts_chunk$set(
 )
 ```
 
-First we load the `tidyverse` package for easy data wrangling. We also load the `genevoisgame` package.
+This package is designed to allow simulation of a non-cooperative game theoretic model that evaluates whether or not two parties will agree to sign a treaty over a shared transboundary aquifer. The model incorporates geophysical, economic, and social features of the transboundary scenario to make this determination. These include aquifer connectivity and drawdown, the cost of abstracting groundwater and potential alternative sources, and trust between the players.
 
-```{r setup}
+## Background 
+
+
+
+The game is based on the genevois aquifer, shared by switzerland and France, where an important and influential groundwater sharing treaty has existed since the 1970s. Thus, in the game, the two players are refered to S and F representing these two countries. 
+
+Utilities for Switzerland and France are given by:
+$$u_i=U_i(q_s,q_f | \Omega,z,D_{ij})=-p_{0i}(Q_i-q_i)-\beta (d_{Bi}-h_i) q_i - c_{ri}r_M(\Omega)-\epsilon_i(\Omega)\pm z$$
+where $q_i$ is the water abstracted by country $i$, $p_{0i}$ is the unit cost of water from some alternative water source, $Q_i$ is the total water requirement, $d_{Bi}-h_i$ is the groundwater depth (calculated as the depth to the bottom of the aquifer, $d_{Bi}$, minus hydraulic thickness of the water table, $h_i$), $\beta$ is the volumetric pumping cost per groundwater depth, $c_{ri}$ is the unit cost of recharge (because France doesn't pay directly, $c_{rf}=0$), $r_M(\Omega)$ is managed aquifer recharge and is high (low) if $\Omega=1$ ($\Omega=0$), $\epsilon_i$ accounts for uncertain costs of signing the treaty and is zero in the case of no treaty, and $z$ is the price paid by France to Switzerland for French abstraction per the agreement. Because recharge is limited by physical properties of water supply and the aquifer, we assume that the construction of a recharge facility entails a fixed quantity of recharge, $r_M$. % $c_{0ri}$ is the fixed construction fixed cost that country $i$ has to pay if the recharge facility is built
+The hydraulic thickness of the water table is the hydraulic head relative to the bottom of the aquifer. In confined aquifers, the hydraulic thickness is greater than the aquifer thickness and changes linearly with pumping. It is given by
+$$ h_i=h_{0i}-D_{ii} q_i-D_{ij} q_j+D_{ir}(\Omega) r_M(\Omega),$$
+where $h_{0i}$ is the natural thickness of the water table accounting for steady-state recharge and discharge, and the remaining coefficients capture aquifer properties that relate groundwater depth with abstraction within country $i$ ($D_{ii}$), abstraction by country $j$ ($D_{ij}$), and managed recharge ($D_{ir}$). 
+
+For unconfined aquifers, abstraction is related linearly with discharge potential, $\phi_i$, which is equivalent to the square of the thickness of the water table, which is given by
+$$h_i^2=\phi_i=h_{0i}^2-\Phi_{ii}q_i-\Phi_{ij}q_j+\Phi_{ir}(\Omega)r_M(\Omega),$$
+where the coefficients relate discharge potential with abstraction by country $i$ ($\Phi_{ii}$), abstraction by country $j$ ($\Phi_{ij}$), and managed recharge ($\Phi_{ir}$). 
+
+## Using the package
+
+This vignette will show you the basic utilization of the package. First we load the `tidyverse` package for easy data wrangling. We also load the `genevoisgame` package.
+
+```{r setup, message=FALSE}
 library(tidyverse)
 library(genevoisgame)
 ```
 
-## CONFINED AQUIFER: trust vs trust
+### Confned aquifer: trust vs trust
 
-We will use the built-in dataset `example_params_confined` as a basis for our analysis. To run other simulations, all the parameters in this object can be set manually. Parameters are validated using `check_params` function, and a full list of requred parameters can be found in the documentation for this function. The game is evaluated using `evaluate_treaty` for a single scenario, or can be evaluated for multiple scenarios using `evaluate_treaty_cases`. 
+We will use the built-in dataset `example_params_confined` as a basis for our analysis. Whenever a treaty game is simulated, parameters are validated using the `check_params` function, and a full list of required parameters can be found in the documentation for this function. The game determines whether to use a confined or unconfined scenario using the parameters input to the game. If `Dxx` are used, the game will apply to a *confined* aquifer. If `PHIxx` are used, the game will apply to an *unconfined* aquifer. See `?check_params` for details.
 
-In order to plot contour lines of the outcomes, we can use the function `get_contours`, which is part of the `genevoisgame` package. It's a simple wrapper around `grDevices::contourLines`, written to more easily use the output from `evaluate_treaty_cases`.
+The game is evaluated using `evaluate_treaty` for a single scenario, or can be evaluated for multiple scenarios using `evaluate_treaty_cases`. For confined aquifers, the game is analyzed using analytical equations.
+
+In order to plot contour lines of the outcomes, we will use the function `get_contours`, which is part of the `genevoisgame` package.
 
 ```{r confined_example,fig.width=5,fig.height=3}
 # Generate parameter data.frame
@@ -38,18 +61,47 @@ params_df_trust_v_trust <- params_basic_trust_v_trust %>%
 outcomes_trust_v_trust <- evaluate_treaty_cases(params_df_trust_v_trust)
 
 # Get contours for the model
-cl_trust_v_trust <- get_contours(outcomes_trust_v_trust %>% rename(x=gs,y=gf,z=zRange),levels=c(-0.2,0,0.2))
+cl_trust_v_trust <- get_contours(outcomes_trust_v_trust %>% rename(x=gs,y=gf,z=zRange),
+                                 levels=c(-0.2,0,0.2))
 
 # Plot the output
 ggplot() + 
   geom_raster(data=outcomes_trust_v_trust,aes(gs,gf,fill=zRange)) +
   geom_path(data=cl_trust_v_trust,aes(x,y,group=line,linetype=level_factor)) +
-  scale_fill_gradient2() + coord_equal()
+  scale_fill_gradient2() + coord_equal() +
+  theme(legend.box = "horizontal")
 ```
 
-## UNCONFINED AQUIFER: trust vs trust
+### Unconfined aquifer: trust vs trust
 
-```{r confined_example,fig.width=5,fig.height=3}
+We will now do the same analysis, but using `example_params_unconfined`, meaning that the game will operate on an unconfined aquifer.
+
+Game simulation takes longer for unconfined aquifers because the underlying equations are nonlinear and must be evaluated numerically.
+
+```{r unconfined_example,fig.width=5,fig.height=3}
+params_basic_trust_v_trust_un <- example_params_unconfined %>% select(-gf,-gs)
+params_df_trust_v_trust_un <- params_basic_trust_v_trust_un %>% 
+  crossing(gs=seq(0,1,by=.2),
+           gf=seq(0,1,by=.2))
+
+
+# Run the game theoretic model
+outcomes_trust_v_trust_un <- evaluate_treaty_cases(params_df_trust_v_trust_un)
+
+# Get contours for the model
+cl_trust_v_trust_un <- get_contours(outcomes_trust_v_trust_un %>% rename(x=gs,y=gf,z=zRange),
+                                    levels=c(-0.1,-0.05,0,0.05,0.1))
+
+# Plot the output
+ggplot() + 
+  geom_raster(data=outcomes_trust_v_trust_un,aes(gs,gf,fill=zRange)) +
+  geom_path(data=cl_trust_v_trust_un,aes(x,y,group=line,linetype=level_factor)) +
+  scale_fill_gradient2() + coord_equal() +
+  theme(legend.box = "horizontal")
+```
+
+```{r echo=FALSE}
+
 # Generate parameter data.frame
 # params_get(scenario) %>% %>% select(-Dss,-Dff,-Dsf,-Dfs) %>%
 #   mutate(rmN=8,gs=0.4,gf=0.4)
@@ -58,25 +110,10 @@ ggplot() +
 #                    Dff=seq(0.5,5,by=.5)),
 #            nesting(Dsf=seq(0.5,5,by=.5),
 #                    Dfs=seq(0.5,5,by=.5)))
-params_basic_trust_v_trust <- example_params_unconfined %>% select(-gf,-gs)
-params_df_trust_v_trust <- params_basic_trust_v_trust %>% 
-  crossing(gs=seq(0,1,by=.05),
-           gf=seq(0,1,by=.05))
 # params_df_trust_v_Dij_over_Dii <- params_basic_trust_v_Dij_over_Dii %>% 
 #   crossing(nesting(Dij_over_Dii=seq(0.05,0.95,by=0.05)),
 #            nesting(gs=seq(.01,1,by=.05),
 #                    gf=seq(.01,1,by=.05))) %>% 
 #   mutate(Dss=Dsf/Dij_over_Dii,Dff=Dfs/Dij_over_Dii)
-
-# Run the game theoretic model
-outcomes_trust_v_trust <- evaluate_treaty_cases(params_df_trust_v_trust)
-
-# Get contours for the model
-cl_trust_v_trust <- get_contours(outcomes_trust_v_trust %>% rename(x=gs,y=gf,z=zRange),levels=c(-0.2,0,0.2))
-
-# Plot the output
-ggplot() + 
-  geom_raster(data=outcomes_trust_v_trust,aes(gs,gf,fill=zRange)) +
-  geom_path(data=cl_trust_v_trust,aes(x,y,group=line,linetype=level_factor)) +
-  scale_fill_gradient2() + coord_equal()
 ```
+
