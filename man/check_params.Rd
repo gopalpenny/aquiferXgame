@@ -17,7 +17,8 @@ Check for valid parameters
 }
 \details{
 To evaluate the game, a \code{data.frame} or \code{list} of paramers must be supplied to
-\code{evaluate_treaty} or \code{evaluate_treaty_cases}. These must include, for all scenarios:
+\code{evaluate_treaty} or \code{evaluate_treaty_cases}. Generally speaking, these parameters
+should be non-negative. The parameters must include, for all scenarios:
 \describe{
 \item{Demand}{\code{Qf, Qs}}
 \item{Unit cost of alternative supply}{\code{p0f, p0s}}
@@ -31,15 +32,15 @@ And additional parameters depending on the type of aquifer. For confined aquifer
 \describe{
 \item{Drawdown relationships}{\code{Dff, Dss, Dsf, Dfs}}
 \item{Groundwater depth without pumping}{\code{d0s, d0f}}
-\item{Recharge relationship with a treaty}{\code{DrsT, DrfT}}
-\item{Recharge relationship without a treaty}{\code{DrsN, DrfN}}
+\item{Recharge relationship with a treaty}{\code{DsrT, DfrT}}
+\item{Recharge relationship without a treaty}{\code{DsrN, DfrN}}
 }
 And for unconfined aquifers:
 \describe{
 \item{Drawdown relationships}{\code{PHIff, PHIss, PHIsf, PHIfs}}
 \item{Groundwater depth without pumping}{\code{dBs, dBf, h0s, h0f}}
-\item{Recharge relationship with a treaty}{\code{PHIrsT, PHIrfT}}
-\item{Recharge relationship without a treaty}{\code{PHIrsN, PHIrfN}}
+\item{Recharge relationship with a treaty}{\code{PHIsrT, PHIfrT}}
+\item{Recharge relationship without a treaty}{\code{PHIsrN, PHIfrN}}
 }
 }
 \examples{
