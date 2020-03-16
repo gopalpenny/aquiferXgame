@@ -87,17 +87,17 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
     params_cases <- params_df %>% dplyr::select(-match(vars_stable,names(params_df))) # remove identified parameters
     eval_return <- eval_return %>% dplyr::bind_cols(params_cases)
   }
-  if (max(grepl("a",return_criteria))==1) { # return all parameters
+  if (any(grepl("a",return_criteria))) { # return all parameters
     eval_return <- eval_return %>% dplyr::bind_cols(params_df)
   }
-  if (max(grepl("q",return_criteria))==1) { # return abstraction rates
+  if (any(grepl("q",return_criteria))) { # return abstraction rates
     eval_return <- eval_return %>% dplyr::bind_cols(eval_results%>% dplyr::select(starts_with("q")))
   }
-  if (max(grepl("u",return_criteria))==1) { # return utilities
+  if (any(grepl("u",return_criteria))) { # return utilities
     u_vals <- do.call(rbind,mapply(evaluate_treaty_utility,params=params_list,q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
     eval_return <- eval_return %>% dplyr::bind_cols(u_vals)
   }
-  if (max(grepl("d",return_criteria))==1) { # return depth to water table
+  if (any(grepl("d",return_criteria))) { # return depth to water table
     d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
     eval_return <- eval_return %>% dplyr::bind_cols(d_vals)
   }

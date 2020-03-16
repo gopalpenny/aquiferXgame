@@ -35,7 +35,6 @@ test_that("evaluate_treaty returns correct zRange, q values for unconfined aquif
   expect_equal(evaluate_treaty(example_params_unconfined),
                df)
 })
-evaluate_treaty(example_params_unconfined) %>% ggp::print_data_frame_for_entry()
 
 
 ## evaluate_treaty_cases
@@ -47,4 +46,17 @@ df_cases <- tibble::tibble(treaty="Y", zRange=0.0443,zMinSwiss=-0.0222,zMaxFrenc
 test_that("evaluate_treaty_cases returns correct zRange, q, U, and d values",{
   expect_equal(evaluate_treaty_cases(example_params_confined,"qud") %>% dplyr::mutate_if(is.numeric,function(x) round(x,digits=4)),
                df_cases)
+})
+
+# paste(evaluate_treaty_cases(example_params_confined,"d") %>% names(),collapse="\',\'")
+test_that("evaluate_treaty_cases returns all input parameters for options a, q, u, d input",{
+  expect_equal(evaluate_treaty_cases(example_params_confined,"a") %>% names(),
+               c('treaty','zRange','zMinSwiss','zMaxFrench','Qf','Qs','p0f','p0s','B','Dff','Dss','Dsf','Dfs',
+                 'd0s','d0f','rmN','rmT','DrsN','DrsT','DrfN','DrfT','crs','gs','gf','es','ef'))
+  expect_equal(evaluate_treaty_cases(example_params_confined,"q") %>% names(),
+               c('treaty','zRange','zMinSwiss','zMaxFrench','qshat','qfhat','qsstar','qfstar','qsdouble','qfdouble'))
+  expect_equal(evaluate_treaty_cases(example_params_confined,"u") %>% names(),
+               c('treaty','zRange','zMinSwiss','zMaxFrench','Us_hat','Uf_hat','Us_star','Uf_star','Us_double','Uf_double','Us_hat_double','Uf_hat_double'))
+  expect_equal(evaluate_treaty_cases(example_params_confined,"d") %>% names(),
+               c('treaty','zRange','zMinSwiss','zMaxFrench','ds_hat','df_hat','ds_star','df_star','ds_double','df_double','ds_hat_double','df_hat_double'))
 })
