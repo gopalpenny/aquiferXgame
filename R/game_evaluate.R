@@ -94,11 +94,13 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
     eval_return <- eval_return %>% dplyr::bind_cols(eval_results%>% dplyr::select(starts_with("q")))
   }
   if (any(grepl("u",return_criteria))) { # return utilities
-    u_vals <- do.call(rbind,mapply(evaluate_treaty_utility,params=params_list,q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+    u_vals <- do.call(rbind,mapply(evaluate_treaty_utility,params=params_list,
+                                   q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
     eval_return <- eval_return %>% dplyr::bind_cols(u_vals)
   }
   if (any(grepl("d",return_criteria))) { # return depth to water table
-    d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+    d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,
+                                   q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
     eval_return <- eval_return %>% dplyr::bind_cols(d_vals)
   }
   return(eval_return)
@@ -112,25 +114,29 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
   if(dim(params)[1]!=1){
     stop("This is an error message because params not 1 dimension")
   }
-  for (v in 1:dim(q_vals)[2]) {assign(names(q_vals)[v], q_vals[[v]])}
+  for (v in 1:ncol(q_vals)) {assign(names(q_vals)[v], q_vals[[v]])}
   # get utilities
   if (aquifer_type == "confined") {
     get_Us <- conA_Us
     get_Uf <- conA_Uf
+    params_treaty <- params %>% dplyr::rename(rm=rmT,Drs=DrsT,Drf=DrfT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,Drs=DrsN,Drf=DrfN)
   } else {
     params$Bs <- params$B
     params$Bf <- params$B
     get_Us <- unconA_Us
     get_Uf <- unconA_Uf
+    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIrs=PHIrsT,PHIrf=PHIrfT) # note: major speed improvements after switching from recode
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIrs=PHIrsN,PHIrf=PHIrfN)
   }
-  Us_hat <- get_Us(qs=qshat,qf=qfhat,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrsT="Drs",PHIrsT="PHIrs"),z=0)
-  Uf_hat <- get_Uf(qs=qshat,qf=qfhat,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrfT="Drf",PHIrfT="PHIrf"),z=0)
-  Us_star <- get_Us(qs=qsstar,qf=qfstar,params %>% dplyr::rename_all(dplyr::recode,rmN="rm",DrsN="Drs",PHIrsN="PHIrs"),z=0)
-  Uf_star <- get_Uf(qs=qsstar,qf=qfstar,params %>% dplyr::rename_all(dplyr::recode,rmN="rm",DrfN="Drf",PHIrfN="PHIrf"),z=0)
-  Us_double <- get_Us(qs=qsdouble,qf=qfhat,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrsT="Drs",PHIrsT="PHIrs"),z=0)
-  Uf_double <- get_Uf(qs=qshat,qf=qfdouble,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrfT="Drf",PHIrfT="PHIrf"),z=0)
-  Us_hat_double <- get_Us(qs=qshat,qf=qfdouble,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrsT="Drs",PHIrsT="PHIrs"),z=0)
-  Uf_hat_double <- get_Uf(qs=qsdouble,qf=qfhat,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrfT="Drf",PHIrfT="PHIrf"),z=0)
+  Us_hat <- get_Us(qs=qshat,qf=qfhat,params_treaty,z=0)
+  Uf_hat <- get_Uf(qs=qshat,qf=qfhat,params_treaty,z=0)
+  Us_star <- get_Us(qs=qsstar,qf=qfstar,params_notreaty,z=0)
+  Uf_star <- get_Uf(qs=qsstar,qf=qfstar,params_notreaty,z=0)
+  Us_double <- get_Us(qs=qsdouble,qf=qfhat,params_treaty,z=0)
+  Uf_double <- get_Uf(qs=qshat,qf=qfdouble,params_treaty,z=0)
+  Us_hat_double <- get_Us(qs=qshat,qf=qfdouble,params_treaty,z=0)
+  Uf_hat_double <- get_Uf(qs=qsdouble,qf=qfhat,params_treaty,z=0)
   u_vals <- tibble::tibble(Us_hat=Us_hat,Uf_hat=Uf_hat,
                            Us_star=Us_star,Uf_star=Uf_star,
                            Us_double=Us_double,Uf_double=Uf_double,
@@ -151,20 +157,24 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
   if (aquifer_type == "confined") {
     get_ds <- conA_ds
     get_df <- conA_df
+    params_treaty <- params %>% dplyr::rename(rm=rmT,Drs=DrsT,Drf=DrfT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,Drs=DrsN,Drf=DrfN)
   } else {
     params$Bs <- params$B
     params$Bf <- params$B
     get_ds <- unconA_ds
     get_df <- unconA_df
+    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIrs=PHIrsT,PHIrf=PHIrfT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIrs=PHIrsN,PHIrf=PHIrfN)
   }
-  ds_hat <- get_ds(qs=qshat,qf=qfhat,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrsT="Drs",PHIrsT="PHIrs"))
-  df_hat <- get_df(qs=qshat,qf=qfhat,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrfT="Drf",PHIrfT="PHIrf"))
-  ds_star <- get_ds(qs=qsstar,qf=qfstar,params %>% dplyr::rename_all(dplyr::recode,rmN="rm",DrsN="Drs",PHIrsN="PHIrs"))
-  df_star <- get_df(qs=qsstar,qf=qfstar,params %>% dplyr::rename_all(dplyr::recode,rmN="rm",DrfN="Drf",PHIrfN="PHIrf"))
-  ds_double <- get_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrsT="Drs",PHIrsT="PHIrs"))
-  df_double <- get_df(qs=qshat,qf=qfdouble,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrfT="Drf",PHIrfT="PHIrf"))
-  ds_hat_double <- get_ds(qs=qsdouble,qf=qfhat,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrsT="Drs",PHIrsT="PHIrs"))
-  df_hat_double <- get_df(qs=qshat,qf=qfdouble,params %>% dplyr::rename_all(dplyr::recode,rmT="rm",DrfT="Drf",PHIrfT="PHIrf"))
+  ds_hat <- get_ds(qs=qshat,qf=qfhat,params_treaty)
+  df_hat <- get_df(qs=qshat,qf=qfhat,params_treaty)
+  ds_star <- get_ds(qs=qsstar,qf=qfstar,params_notreaty)
+  df_star <- get_df(qs=qsstar,qf=qfstar,params_notreaty)
+  ds_double <- get_ds(qs=qsdouble,qf=qfhat,params_treaty)
+  df_double <- get_df(qs=qshat,qf=qfdouble,params_treaty)
+  ds_hat_double <- get_ds(qs=qsdouble,qf=qfhat,params_treaty)
+  df_hat_double <- get_df(qs=qshat,qf=qfdouble,params_treaty)
   d_vals <- tibble::tibble(ds_hat=ds_hat,df_hat=df_hat,
                            ds_star=ds_star,df_star=df_star,
                            ds_double=ds_double,df_double=df_double,
