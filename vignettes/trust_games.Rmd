@@ -18,8 +18,6 @@ This package is designed to allow simulation of a non-cooperative game theoretic
 
 ## Background 
 
-
-
 The game is based on the genevois aquifer, shared by switzerland and France, where an important and influential groundwater sharing treaty has existed since the 1970s. Thus, in the game, the two players are refered to S and F representing these two countries. 
 
 Utilities for Switzerland and France are given by:
@@ -35,11 +33,18 @@ where the coefficients relate discharge potential with abstraction by country $i
 
 ## Using the package
 
-This vignette will show you the basic utilization of the package. First we load the `tidyverse` package for easy data wrangling. We also load the `genevoisgame` package.
+This vignette will show you the basic utilization of the package. If you haven't installed the `genevoisgame` package, you can do so using `devtools::install_github`:
+
+```{r eval=FALSE}
+# Install the package
+devtools::install_github("https://github.com/gopalpenny/genevoisgame")
+```
+
+Next we will load the package along with the `tidyverse` package for easy data wrangling.
 
 ```{r setup, message=FALSE}
-library(tidyverse)
 library(genevoisgame)
+library(tidyverse)
 ```
 
 ### Confned aquifer: trust vs trust
