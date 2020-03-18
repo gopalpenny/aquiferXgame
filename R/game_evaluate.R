@@ -126,8 +126,8 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
     params$Bf <- params$B
     get_Us <- unconA_Us
     get_Uf <- unconA_Uf
-    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIrsT,PHIfr=PHIrfT) # note: major speed improvements after switching from recode
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIrsN,PHIfr=PHIrfN)
+    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIsrT,PHIfr=PHIfrT) # note: major speed improvements after switching from recode
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIsrN,PHIfr=PHIfrN)
   }
   Us_hat <- get_Us(qs=qshat,qf=qfhat,params_treaty,z=0)
   Uf_hat <- get_Uf(qs=qshat,qf=qfhat,params_treaty,z=0)
@@ -164,8 +164,8 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
     params$Bf <- params$B
     get_ds <- unconA_ds
     get_df <- unconA_df
-    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIrsT,PHIfr=PHIrfT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIrsN,PHIfr=PHIrfN)
+    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIsrT,PHIfr=PHIfrT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIsrN,PHIfr=PHIfrN)
   }
   ds_hat <- get_ds(qs=qshat,qf=qfhat,params_treaty)
   df_hat <- get_df(qs=qshat,qf=qfhat,params_treaty)
