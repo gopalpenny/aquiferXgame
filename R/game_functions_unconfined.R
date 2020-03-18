@@ -64,19 +64,19 @@ evaluate_treaty_unconfined <- function(params) {
 
 unconA_Us <- function(qs,qf,params,z) {
   with(params,
-       -es-p0s*(-qs+Qs)-crs*rm-Bs*qs*(dBs-sqrt[h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm])+z
+       -es-p0s*(-qs+Qs)-crs*rm-Bs*qs*(dBs-sqrt(h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm))+z
   )}
 unconA_Uf <- function(qs,qf,params,z) {
   with(params,
-       -ef-p0f*(-qf+Qf)-Bf*qf*(dBf-sqrt[h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm])-z
+       -ef-p0f*(-qf+Qf)-Bf*qf*(dBf-sqrt(h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm))-z
   )}
 unconA_ds <- function(qs,qf,params) {
   with(params,
-       dBs-sqrt[h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm]
+       dBs-sqrt(h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm)
   )}
 unconA_df <- function(qs,qf,params) {
   with(params,
-       dBf-sqrt[h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm]
+       dBf-sqrt(h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm)
   )}
 
 # q values
