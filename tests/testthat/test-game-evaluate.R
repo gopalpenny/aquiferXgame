@@ -54,11 +54,11 @@ test_that("evaluate_treaty_cases CONFINED returns all input parameters for optio
                c('treaty','zRange','zMinSwiss','zMaxFrench','Qf','Qs','p0f','p0s','B','Dff','Dss','Dsf','Dfs',
                  'd0s','d0f','rmN','rmT','DsrN','DsrT','DfrN','DfrT','crs','gs','gf','es','ef'))
   expect_equal(evaluate_treaty_cases(example_params_confined,"q") %>% names(),
-               c('treaty','zRange','zMinSwiss','zMaxFrench','qshat','qfhat','qsstar','qfstar','qsdouble','qfdouble'))
+               c('treaty','zRange','zMinSwiss','zMaxFrench','qshat','qsstar','qsdouble','qfhat','qfstar','qfdouble'))
   expect_equal(evaluate_treaty_cases(example_params_confined,"u") %>% names(),
-               c('treaty','zRange','zMinSwiss','zMaxFrench','Us_hat','Uf_hat','Us_star','Uf_star','Us_double','Uf_double','Us_hat_double','Uf_hat_double'))
+               c('treaty','zRange','zMinSwiss','zMaxFrench','Us_hat','Us_star','Us_double','Us_hat_double','Uf_hat','Uf_star','Uf_double','Uf_hat_double'))
   expect_equal(evaluate_treaty_cases(example_params_confined,"d") %>% names(),
-               c('treaty','zRange','zMinSwiss','zMaxFrench','ds_hat','df_hat','ds_star','df_star','ds_double','df_double','ds_hat_double','df_hat_double'))
+               c('treaty','zRange','zMinSwiss','zMaxFrench','ds_hat','ds_star','ds_double','ds_hat_double','df_hat','df_star','df_double','df_hat_double'))
 })
 
 paste(evaluate_treaty_cases(example_params_unconfined,"a") %>% names(),collapse="\',\'")
@@ -67,11 +67,11 @@ test_that("evaluate_treaty_cases UNCONFINED returns all input parameters for opt
                c('treaty','zRange','zMinSwiss','zMaxFrench','Qf','Qs','p0f','p0s','B','dBs','dBf','h0s','h0f','rmN','rmT',
                  'crs','gs','gf','es','ef','PHIff','PHIfrT','PHIfs','PHIsf','PHIsrT','PHIss','PHIsrN','PHIfrN'))
   expect_equal(evaluate_treaty_cases(example_params_unconfined,"q") %>% names(),
-               c('treaty','zRange','zMinSwiss','zMaxFrench','qshat','qfhat','qsstar','qfstar','qsdouble','qfdouble'))
+               c('treaty','zRange','zMinSwiss','zMaxFrench','qshat','qsstar','qsdouble','qfhat','qfstar','qfdouble'))
   expect_equal(evaluate_treaty_cases(example_params_unconfined,"u") %>% names(),
-               c('treaty','zRange','zMinSwiss','zMaxFrench','Us_hat','Uf_hat','Us_star','Uf_star','Us_double','Uf_double','Us_hat_double','Uf_hat_double'))
+               c('treaty','zRange','zMinSwiss','zMaxFrench','Us_hat','Us_star','Us_double','Us_hat_double','Uf_hat','Uf_star','Uf_double','Uf_hat_double'))
   expect_equal(evaluate_treaty_cases(example_params_unconfined,"d") %>% names(),
-               c('treaty','zRange','zMinSwiss','zMaxFrench','ds_hat','df_hat','ds_star','df_star','ds_double','df_double','ds_hat_double','df_hat_double'))
+               c('treaty','zRange','zMinSwiss','zMaxFrench','ds_hat','ds_star','ds_double','ds_hat_double','df_hat','df_star','df_double','df_hat_double'))
 })
 
 
