@@ -12,13 +12,21 @@ necessary parameters to evaluate the agreement. See \code{?check_params} for det
 }
 \value{
 Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
-and whether or not there is a treaty (i.e., if zRange > 0)
+and whether or not there is a treaty (i.e., if zRange > 0).
+
+If the aquifer in the
+game is confined (see \code{?check_params} for how aquifer type is determined)  the solution is
+exact. If the aquifer is unconfined, the solution is calculated numerically using \code{multiroot}
+from the \code{rootSolve} package, using default tolerance parameters. This means that there
+could be small errors in the results for \code{zMinSwiss} and \code{zMaxFrench}. For unconfined aquifers,
+\code{zRange} is rounded to the 6th decimal place to minimize the effect of numerical errors on
+the treaty outcome. If necessary, it can be recalculated as \code{zRange = zMaxFrench - zMinSwiss}.
 }
 \description{
 Evaluate whether or not the treaty will be made in a confined or unconfined aquifer
 }
 \details{
-Evaluate the treaty given social, economic, and geophysical parameters.
+Evaluate the treaty given social, economic, and geophysical parameters
 }
 \examples{
 evaluate_treaty(default_params)

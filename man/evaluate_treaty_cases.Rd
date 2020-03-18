@@ -14,6 +14,13 @@ evaluate_treaty_cases(params_df, return_criteria = "qp")
 \value{
 Returns a \code{tibble} containing z-values needed for the treaty
 and whether or not there is a treaty (i.e., if zRange > 0), as well as output specified by \code{return_criteria}.
+
+If the aquifer in the game is confined (see \code{?check_params} for how aquifer type is determined)  the solution is
+exact. If the aquifer is unconfined, the solution is calculated numerically using \code{multiroot}
+from the \code{rootSolve} package, using default tolerance parameters. This means that there
+could be small errors in the results for \code{zMinSwiss} and \code{zMaxFrench}. For unconfined aquifers,
+\code{zRange} is rounded to the 6th decimal place to minimize the effect of numerical errors on
+the treaty outcome. If necessary, it can be recalculated as \code{zRange = zMaxFrench - zMinSwiss}.
 }
 \description{
 Evaluate whether or not the treaty will be made under multiple scenarios
