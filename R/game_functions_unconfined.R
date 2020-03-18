@@ -52,9 +52,9 @@ evaluate_treaty_unconfined <- function(params) {
   # # get z constraints
   zMaxFrench_calc <- unconA_zMaxFrench(params,q_vals)
   zMinSwiss_calc <- unconA_zMinSwiss(params,q_vals)
-  zRange_calc <- zMaxFrench_calc - zMinSwiss_calc
+  zRange_calc <- round(zMaxFrench_calc - zMinSwiss_calc,6)
   treaty <- ifelse(zRange_calc>0,"Y","N")
-  return(tibble::tibble(treaty=treaty,zRange=round(zRange_calc,6),
+  return(tibble::tibble(treaty=treaty,zRange=zRange_calc,
                 zMinSwiss=zMinSwiss_calc,zMaxFrench=zMaxFrench_calc) %>%
            dplyr::bind_cols(q_vals))
 }
