@@ -81,7 +81,7 @@ ggplot() +
 
 We will now do the same analysis, but using `example_params_unconfined`, meaning that the game will operate on an unconfined aquifer.
 
-Game simulation takes longer for unconfined aquifers because the underlying equations are nonlinear and must be evaluated numerically.
+For unconfined aquifers, the underlying game equations are nonlinear and the results are calculated numerically using the `multiroot` function from the `rootSolve` package. For this reason, game simulation takes longer for unconfined aquifers. Also note that the results for `zRange` are rounded to the 6th decimal place to avoid numerical errors in determination of the treaty.
 
 ```{r unconfined_example,fig.width=5,fig.height=3}
 params_basic_trust_v_trust_un <- example_params_unconfined %>% select(-gf,-gs)
