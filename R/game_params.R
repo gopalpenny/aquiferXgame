@@ -104,3 +104,91 @@ check_params <- function(params) {
   # return aquifer type
   return(aquifer_type)
 }
+
+
+
+#' Check game dynamics
+#'
+#' Check the basic game dynamics, particularly in cases where zRange=0 and the first best
+#' and nash outcomes are the same.
+#' @param params game parameters
+#' @param text_results logical value determining if results are returned as text or a tibble
+#' @param aquifer_type "confined" or "unconfined", or \code{NULL} -- in which case \code{check_params} will determine the type
+#' @details
+#' In a number of situations, the genevois game does nothing interesting: both players pump at their
+#' entire demand, the first best is equivalent to the nash equilibrium, and there are no
+#' advantages or disadvantages to signing a treaty. This function helps us better understand
+#' why this is the case.
+#'
+#' For any interesting dynamics to arise from the game, the First Best has to be different (better)
+#' than the Nash Equilibrium. This occurs when players forgo pumping and supply their water from another
+#' source, which can only occur if the other source is less expensive than pumping. In other words,
+#' pumping for at least one of the players has to be great enough that the cost of pumping is greater
+#' than the cost of alternative supply. If this is not the case, then the players cannot do any better
+#' working together than they could on their own.
+#' @return
+#' Either (1) a text description of the dynamics (if \code{text_results==TRUE}) or (2) a table
+#' containing the following values:
+#' \itemize{
+#' \item: \code{ds_max, df_max}: The maximum depth for each player, if both players pump at their demand (\code{Qs, Qf}).
+#' \item: \code{ds_threshold, df_threshold}: The depth for each player where the cost of pumping equals the cost of alternative supply (\code{Qi=B*di}).
+#' }
+#' @examples
+#' library(magrittr)
+#'
+#' # Table output
+#' check_game_dynamics(example_params_unconfined,text_results = FALSE)
+#' example_params_unconfined %>% dplyr::mutate(Qs=1,Qf=1) %>% check_game_dynamics(text_results = FALSE)
+#'
+#' # Text output
+#' check_game_dynamics(example_params_unconfined) %>% cat()
+#' example_params_unconfined %>% dplyr::mutate(Qs=1,Qf=1) %>% check_game_dynamics() %>% cat()
+check_game_dynamics <- function(params, text_results=TRUE, aquifer_type=NULL) {
+  # this function calculates water table depth, given parameters and abstraction
+  if(dim(params)[1]!=1){
+    stop("This is an error message because params not 1 dimension")
+  }
+  if (is.null(aquifer_type)) {
+    aquifer_type <- check_params(params)
+  }
+
+  # get depths
+  if (aquifer_type == "confined") {
+    get_ds <- conA_ds
+    get_df <- conA_df
+    params_treaty <- params %>% dplyr::rename(rm=rmT,Dsr=DsrT,Dfr=DfrT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,Dsr=DsrN,Dfr=DfrN)
+    ds_threshold <- params$p0s / params$B
+    df_threshold <- params$p0f / params$B
+  } else {
+    params$Bs <- params$B
+    params$Bf <- params$B
+    get_ds <- unconA_ds
+    get_df <- unconA_df
+    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIsrT,PHIfr=PHIfrT)
+    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIsrN,PHIfr=PHIfrN)
+    ds_threshold <- params$p0s / params$Bs
+    df_threshold <- params$p0f / params$Bf
+  }
+
+  ds_max <- get_ds(qs=params$Qs,qf=params$Qf,params_notreaty)
+  df_max <- get_df(qs=params$Qs,qf=params$Qf,params_notreaty)
+
+  if (ds_max > ds_threshold | df_max > df_threshold) {
+    dynamics <- "possibly interesting"
+  } else {
+    dynamics <- "no interesting"
+  }
+
+  if (text_results) {
+    results <- paste0("If both players pump at their maximum (qi=Qi), the water table depth will be ds = ",ds_max,", df = ",df_max,".\n",
+                      "For the cost of pumping to equal the cost of alternative supply, the depths would be ds = ",ds_threshold,", df = ",df_threshold,".\n",
+                      "In other words, you would expect ",dynamics," dynamics from this game.\n")
+  } else {
+    results <- tibble::tibble(ds_max=ds_max,df_max=df_max,
+                              ds_threshold=ds_threshold,df_threshold=df_threshold,
+                              dynamics=dynamics)
+  }
+
+  return(results)
+}

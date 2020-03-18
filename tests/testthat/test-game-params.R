@@ -50,3 +50,26 @@ test_that('check_params gives warning if a columns has negative values',{
   expect_warning(check_params(params_negative %>% dplyr::mutate(PHIsf=c(-1,2))),"param column\\(s\\), Qf, PHIsf, contain negative values.")
 })
 
+
+game_dynamics_table1 <- tibble::tibble(ds_max=17.7047,
+                 df_max=18.9515,
+                 ds_threshold=10,
+                 df_threshold=10,
+                 dynamics="possibly interesting")
+game_dynamics_table2 <- tibble::tibble(ds_max=2.5456,
+                 df_max=2.6165,
+                 ds_threshold=10,
+                 df_threshold=10,
+                 dynamics="no interesting")
+# check_game_dynamics(example_params_unconfined %>% dplyr::mutate(Qs=1,Qf=1),text_results = FALSE) %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)) %>% ggp::print_data_frame_for_entry()
+# cat(check_game_dynamics(example_params_unconfined))
+test_that('check_game_dynamics works for table output',{
+  expect_equal(check_game_dynamics(example_params_unconfined,text_results = FALSE) %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)),
+               game_dynamics_table1)
+  expect_equal(check_game_dynamics(example_params_unconfined %>% dplyr::mutate(Qs=1,Qf=1),text_results = FALSE) %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)),
+               game_dynamics_table2)
+})
+test_that('check_game_dynamics works for text output',{
+  expect_equal(grepl("possibly interesting dynamics",check_game_dynamics(example_params_unconfined)),TRUE)
+  expect_equal(grepl("no interesting dynamics",check_game_dynamics(example_params_unconfined %>% dplyr::mutate(Qs=1,Qf=1))),TRUE)
+})
