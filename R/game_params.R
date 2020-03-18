@@ -114,6 +114,7 @@ check_params <- function(params) {
 #' @param params game parameters
 #' @param text_results logical value determining if results are returned as text or a tibble
 #' @param aquifer_type "confined" or "unconfined", or \code{NULL} -- in which case \code{check_params} will determine the type
+#' @export
 #' @details
 #' In a number of situations, the genevois game does nothing interesting: both players pump at their
 #' entire demand, the first best is equivalent to the nash equilibrium, and there are no
