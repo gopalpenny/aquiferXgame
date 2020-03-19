@@ -85,6 +85,13 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 #' could be small errors in the results for \code{zMinSwiss} and \code{zMaxFrench}. For unconfined aquifers,
 #' \code{zRange} is rounded to the 6th decimal place to minimize the effect of numerical errors on
 #' the treaty outcome. If necessary, it can be recalculated as \code{zRange = zMaxFrench - zMinSwiss}.
+#'
+#' In unconfined aquifers, it is possible that the game converges on a result that allows the aquifer
+#' to be fully depleted for as least one of the players (hi < 0). In this case, the results will included
+#' three additional columns:
+#' \code{AD_fb,AD_nash,AD_cheat}, representing logical values that indicate in which scenario the aquifer was depleted
+#' (first best, nash, or cheat). Unfortunately, this model is unable to resolve such a scenario which represents
+#' another type of game: a game of chicken.
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
