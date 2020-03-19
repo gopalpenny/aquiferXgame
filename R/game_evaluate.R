@@ -36,17 +36,22 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
   }
 
   if (is.null(aquifer_type)) {
+    aq_null <- TRUE
     aquifer_type <- check_params(params)
+  } else {
+    aq_null <- FALSE
   }
 
   if (aquifer_type == "confined") {
     treaty_results <- evaluate_treaty_confined(params)
   } else if (aquifer_type == "unconfined") {
     treaty_results <- evaluate_treaty_unconfined(params)
-    # check for aquifer depletion
-    if (all(grepl("AD_fb","AD_nash","AD_cheat",names(treaty_results)))) {
-      warning(paste("The aquifer was fully depleted for at least one player in the",
-                    with(treaty_results,paste(c("First Best","Nash","Cheat")[c(AD_fb,AD_nash,AD_cheat)],sep=", ")),"scenario(s)"))
+    # check for aquifer depletion ONLY if aquifer was not specified (if aquifer is specified, assume call comes from evaluate_treaty_cases)
+    if (aq_null) {
+      if (all(c("AD_fb","AD_nash","AD_cheat") %in% names(treaty_results))) {
+        warning(paste("The aquifer was fully depleted for at least one player in the",
+                      with(treaty_results,paste(c("First Best","Nash","Cheat")[c(AD_fb,AD_nash,AD_cheat)],collapse=", ")),"scenario(s)"))
+      }
     }
   } else {
     stop("aquifer must be confined or unconfined, as specified by Dxx or PHIxx parameters.")
@@ -136,6 +141,11 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
       dplyr::pull(variable)
     params_cases <- params_df %>% dplyr::select(-match(vars_stable,names(params_df))) # remove identified parameters
     eval_return <- eval_return %>% dplyr::bind_cols(params_cases)
+  }
+  # check for aquifer depletion
+  if (all(c("AD_fb","AD_nash","AD_cheat") %in% names(eval_return))) {
+    warning(paste("The aquifer was fully depleted for at least one player in some parameter sets in the",
+                  with(eval_return,paste(c("First Best","Nash","Cheat")[c(any(AD_fb),any(AD_nash),any(AD_cheat))],collapse=", ")),"scenario(s)"))
   }
   return(eval_return)
 }
