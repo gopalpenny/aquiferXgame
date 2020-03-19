@@ -43,6 +43,11 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
     treaty_results <- evaluate_treaty_confined(params)
   } else if (aquifer_type == "unconfined") {
     treaty_results <- evaluate_treaty_unconfined(params)
+    # check for aquifer depletion
+    if (all(grepl("AD_fb","AD_nash","AD_cheat",names(treaty_results)))) {
+      warning(paste("The aquifer was fully depleted for at least one player in the",
+                    with(treaty_results,paste(c("First Best","Nash","Cheat")[c(AD_fb,AD_nash,AD_cheat)],sep=", ")),"scenario(s)"))
+    }
   } else {
     stop("aquifer must be confined or unconfined, as specified by Dxx or PHIxx parameters.")
   }
@@ -89,22 +94,10 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
   aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
-  eval_results <- do.call(rbind,lapply(params_list,evaluate_treaty,aquifer_type=aquifer_type))
+  eval_results <- lapply(params_list,evaluate_treaty,aquifer_type=aquifer_type) %>% dplyr::bind_rows()
   q_vals_list <- split(eval_results %>% dplyr::select(dplyr::starts_with("q")),1:dim(eval_results)[1])
   # eval_results_treat <- eval_results %>% select(treaty,zRange,zMinSwiss,zMaxFrench)
-  eval_return <- eval_results %>% dplyr::select(treaty,zRange,zMinSwiss,zMaxFrench)
-  if (max(grepl("p",return_criteria))==1) { # identify parameters that do not vary AND are equal to default value
-    vars_stable <- params_df %>% tidyr::gather(variable,value) %>% dplyr::group_by(variable) %>%
-      dplyr::summarize(n_unique=length(unique(value))) %>%
-      # dplyr::left_join(params_default() %>% tidyr::gather(variable,default),by="variable") %>%
-      dplyr::filter(n_unique==1) %>%
-      dplyr::pull(variable)
-    params_cases <- params_df %>% dplyr::select(-match(vars_stable,names(params_df))) # remove identified parameters
-    eval_return <- eval_return %>% dplyr::bind_cols(params_cases)
-  }
-  if (any(grepl("a",return_criteria))) { # return all parameters
-    eval_return <- eval_return %>% dplyr::bind_cols(params_df)
-  }
+  eval_return <- eval_results %>% dplyr::select(treaty,zRange,zMinSwiss,zMaxFrench,dplyr::starts_with("AD_"))
   if (any(grepl("q",return_criteria))) { # return abstraction rates
     eval_return <- eval_return %>% dplyr::bind_cols(eval_results%>% dplyr::select(dplyr::starts_with("qs"),dplyr::starts_with("qf")))
   }
@@ -117,6 +110,17 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
     d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,
                                    q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
     eval_return <- eval_return %>% dplyr::bind_cols(d_vals %>% dplyr::select(dplyr::starts_with("ds"),dplyr::starts_with("df"),dplyr::everything()))
+  }
+  if (any(grepl("a",return_criteria))) { # return all parameters
+    eval_return <- eval_return %>% dplyr::bind_cols(params_df)
+  } else if (max(grepl("p",return_criteria))==1) { # identify parameters that do not vary AND are equal to default value
+    vars_stable <- params_df %>% tidyr::gather(variable,value) %>% dplyr::group_by(variable) %>%
+      dplyr::summarize(n_unique=length(unique(value))) %>%
+      # dplyr::left_join(params_default() %>% tidyr::gather(variable,default),by="variable") %>%
+      dplyr::filter(n_unique==1) %>%
+      dplyr::pull(variable)
+    params_cases <- params_df %>% dplyr::select(-match(vars_stable,names(params_df))) # remove identified parameters
+    eval_return <- eval_return %>% dplyr::bind_cols(params_cases)
   }
   return(eval_return)
 }
