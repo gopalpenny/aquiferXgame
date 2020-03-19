@@ -4,12 +4,15 @@
 \alias{evaluate_treaty_cases}
 \title{Evaluate multiple treaty scenarios}
 \usage{
-evaluate_treaty_cases(params_df, return_criteria = "qp")
+evaluate_treaty_cases(params_df, return_criteria = "qp",
+  progress_bar = FALSE)
 }
 \arguments{
 \item{params_df}{Data.frame of parameters with each row sent to \code{evaluate_treaty()}.}
 
 \item{return_criteria}{Character string containing letters that indicate output variables. See details.}
+
+\item{progress_bar}{Show a progress bar. Useful in unconfined aquifers for large N}
 }
 \value{
 Returns a \code{tibble} containing z-values needed for the treaty

@@ -60,6 +60,7 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 #' Evaluate whether or not the treaty will be made under multiple scenarios
 #' @param params_df Data.frame of parameters with each row sent to \code{evaluate_treaty()}.
 #' @param return_criteria Character string containing letters that indicate output variables. See details.
+#' @param progress_bar Show a progress bar. Useful in unconfined aquifers for large N
 #' @details
 #' Evaluate the treaty given multiple combinations of social, economic,
 #' and geophysical parameters.
@@ -91,10 +92,17 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 #' params_df <- genevoisgame::default_params
 #' evaluate_treaty_cases(df)
 #' evaluate_treaty_cases(default_params,'')
-evaluate_treaty_cases <- function(params_df,return_criteria="qp") {
+evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = FALSE) {
   aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
-  eval_results <- lapply(params_list,evaluate_treaty,aquifer_type=aquifer_type) %>% dplyr::bind_rows()
+  eval_results_list <- list()
+  if (progress_bar) pb <- txtProgressBar(min = 0, max = nrow(params_df), style = 3)
+  for (i in 1:nrow(params_df)) {
+    eval_results_list[[i]] <- evaluate_treaty(params_list[[i]],aquifer_type=aquifer_type) #lapply(params_list,evaluate_treaty,aquifer_type=aquifer_type)
+    if (progress_bar) setTxtProgressBar(pb, i)
+  }
+  if (progress_bar) close(pb)
+  eval_results <- dplyr::bind_rows(eval_results_list)
   q_vals_list <- split(eval_results %>% dplyr::select(dplyr::starts_with("q")),1:dim(eval_results)[1])
   # eval_results_treat <- eval_results %>% select(treaty,zRange,zMinSwiss,zMaxFrench)
   eval_return <- eval_results %>% dplyr::select(treaty,zRange,zMinSwiss,zMaxFrench,dplyr::starts_with("AD_"))
