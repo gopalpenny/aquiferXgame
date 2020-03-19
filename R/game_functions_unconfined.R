@@ -133,9 +133,10 @@ unconA_qeval <- function(params,unconAf_q0,unconAf_q2,qshat=NULL,qfhat=NULL) {
 }
 
 unconA_qhat0 <- function(params) {
+  # unconA_qhat0
   # get roots for F1 = F2 = 0, solving for Qs, Qf
   first_best_equations <- function(x,params) {
-    if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & x[1] > 0 & x[2] > 0) {
+    if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & x[1] >= 0 & x[2] >= 0) {
       # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       F1<-with(params,
                -Bs*dBs+p0s-(Bf*PHIfs*x[2])/(2*sqrt(h0f^2+PHIfrT*rmT-PHIfs*x[1]-PHIff*x[2]))+(Bs*(2*h0s^2+2*PHIsrT*rmT-3*PHIss*x[1]-2*PHIsf*x[2]))/(2*sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]-PHIsf*x[2]))
@@ -155,9 +156,10 @@ unconA_qhat0 <- function(params) {
 }
 
 unconA_qhat2 <- function(params,qs1,qf1) {
+  # unconA_qhat2
   # get roots for F1 = 0
   first_best_equations_qs2 <- function(x,params,qf1) {
-    if (!check_aquifer_depleted(x,qf1,params,TRUE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
+    if (!check_aquifer_depleted(x,qf1,params,TRUE) & x >= 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       F1<-with(params,
                -Bs*dBs+p0s-(Bf*PHIfs*qf1)/(2*sqrt(h0f^2-PHIff*qf1+PHIfrT*rmT-PHIfs*x))+(Bs*(2*h0s^2-2*PHIsf*qf1+2*PHIsrT*rmT-3*PHIss*x))/(2*sqrt(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x))
       )
@@ -169,7 +171,7 @@ unconA_qhat2 <- function(params,qs1,qf1) {
   qs2_hat <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs1,params=params,qf1=qf1)$root
 
   first_best_equations_qf2 <- function(x,params,qs1) {
-    if (!check_aquifer_depleted(qs1,x,params,TRUE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
+    if (!check_aquifer_depleted(qs1,x,params,TRUE) & x >= 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       F2<-with(params,
                -Bf*dBf+p0f+(Bf*(2*h0f^2-2*PHIfs*qs1+2*PHIfrT*rmT-3*PHIff*x))/(2*sqrt(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x))-(Bs*PHIsf*qs1)/(2*sqrt(h0s^2-PHIss*qs1+PHIsrT*rmT-PHIsf*x))
       )
@@ -184,9 +186,10 @@ unconA_qhat2 <- function(params,qs1,qf1) {
 }
 
 unconA_qstar0 <- function(params) {
+  # unconA_qstar0
   # get roots for N1 = N2 = 0, solving for Qs, Qf
   nash_equations <- function(x,params) {
-    if (!check_aquifer_depleted(x[1],x[2],params,FALSE) & x[1] > 0 & x[2] > 0) {
+    if (!check_aquifer_depleted(x[1],x[2],params,FALSE) & x[1] >= 0 & x[2] >= 0) {
       # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       N1<-with(params,
                -Bs*dBs+p0s+(Bs*(2*h0s^2+2*PHIsrN*rmN-3*PHIss*x[1]-2*PHIsf*x[2]))/(2*sqrt(h0s^2+PHIsrN*rmN-PHIss*x[1]-PHIsf*x[2]))
@@ -206,9 +209,10 @@ unconA_qstar0 <- function(params) {
 }
 
 unconA_qstar2 <- function(params,qs1,qf1) {
+  # unconA_qstar2
   # get roots for N1 = 0, solving for Qs
   nash_equations_qs2 <- function(x,params,qf1) {
-    if (!check_aquifer_depleted(x,qf1,params,FALSE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
+    if (!check_aquifer_depleted(x,qf1,params,FALSE) & x >= 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       N1<-with(params,
                -Bs*dBs+p0s+(Bs*(2*h0s^2-2*PHIsf*qf1+2*PHIsrN*rmN-3*PHIss*x))/(2*sqrt(h0s^2-PHIsf*qf1+PHIsrN*rmN-PHIss*x))
       )
@@ -221,7 +225,7 @@ unconA_qstar2 <- function(params,qs1,qf1) {
 
   # get roots for N2 = 0, solving for Qf
   nash_equations_qf2 <- function(x,params,qs1) {
-    if (!check_aquifer_depleted(qs1,x,params,FALSE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
+    if (!check_aquifer_depleted(qs1,x,params,FALSE) & x >= 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       N2<-with(params,
                -Bf*dBf+p0f+(Bf*(2*h0f^2-2*PHIfs*qs1+2*PHIfrN*rmN-3*PHIff*x))/(2*sqrt(h0f^2-PHIfs*qs1+PHIfrN*rmN-PHIff*x))
       )
@@ -236,6 +240,7 @@ unconA_qstar2 <- function(params,qs1,qf1) {
 }
 
 unconA_qdouble0 <- function(params,qshat,qfhat) {
+  # unconA_qdouble0
   # get roots for D1 = D2 = 0, solving for Qs, Qf
   cheat_equations <- function(x,params,qshat,qfhat) {# need to ensure aquifer is not fully depleted for any combination of qs, qf, qshat, qfhat
     if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & # qs, qf
@@ -261,6 +266,7 @@ unconA_qdouble0 <- function(params,qshat,qfhat) {
 }
 
 unconA_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
+  # unconA_qdouble2
   # get roots for D1 = D2 = 0, solving for Qs
   cheat_equations_qs2 <- function(x,params,qshat,qfhat,qf1) {
     if (!check_aquifer_depleted(x,qf1,params,TRUE) &
