@@ -19,6 +19,18 @@ Evaluate whether or not the treaty will be made.
 }
 \details{
 Evaluate the treaty given social, economic, and geophysical parameters.
+
+Note that root finding proceeds in two steps for each of the First Besh, Nash Equilibrium, and Cheat scenarios:
+\enumerate{
+\item Pumping rates (for both players) are determined simultaneously to maximize utility based on the scenario (ie,
+by finding the roots). Root finding stops immediately if the aquifer is fully depleted.
+\item Pumping has to fall within the range [0, Qi] for both players. If it is outside this range, it is constrained
+to be within the range. Then, pumping for each player is optimized individually given a fixed pumping rate for the
+other player. The new values are then constrained, and the process repeats recursively until convergin on a solution
+(or 500 tries). Within each iteration, root finding stops if the aquifer is fully depleted.
+}
+Note: if the aquifer is fully depleted in any of the solutions, this function will return 3 additional columns:
+\code{AD_fb,AD_nash,AD_cheat}, representing logical values that indicate in which scenario the aquifer was depleted.
 }
 \examples{
 evaluate_treaty(default_params)

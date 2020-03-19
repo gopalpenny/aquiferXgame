@@ -8,6 +8,18 @@
 #' necessary parameters to evaluate the agreement in an unconfined case.
 #' @details
 #' Evaluate the treaty given social, economic, and geophysical parameters.
+#'
+#' Note that root finding proceeds in two steps for each of the First Besh, Nash Equilibrium, and Cheat scenarios:
+#' \enumerate{
+#' \item Pumping rates (for both players) are determined simultaneously to maximize utility based on the scenario (ie,
+#' by finding the roots). Root finding stops immediately if the aquifer is fully depleted.
+#' \item Pumping has to fall within the range [0, Qi] for both players. If it is outside this range, it is constrained
+#' to be within the range. Then, pumping for each player is optimized individually given a fixed pumping rate for the
+#' other player. The new values are then constrained, and the process repeats recursively until convergin on a solution
+#' (or 500 tries). Within each iteration, root finding stops if the aquifer is fully depleted.
+#' }
+#' Note: if the aquifer is fully depleted in any of the solutions, this function will return 3 additional columns:
+#' \code{AD_fb,AD_nash,AD_cheat}, representing logical values that indicate in which scenario the aquifer was depleted.
 #' @return
 #' Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
 #' and whether or not there is a treaty (i.e., if zRange > 0)
@@ -42,11 +54,14 @@ evaluate_treaty_unconfined <- function(params) {
                            qsdouble=q_double$qs,qfdouble=q_double$qf)
 
   # is the aquifer depleted (AD) in any of the cases?
-  AD_fb <- check_aquifer_depleted(q_vals$qshat,q_vals$qshat,params,treaty=TRUE)
+  AD_fb <- check_aquifer_depleted(q_vals$qshat,q_vals$qfhat,params,treaty=TRUE)
   AD_nash <- check_aquifer_depleted(q_vals$qsstar,q_vals$qfstar,params,treaty=FALSE)
   AD_cheat <- check_aquifer_depleted(q_vals$qsdouble,q_vals$qfdouble,params,treaty=TRUE)
-  if (any(c(AD_fb,AD_fb,AD_cheat))) {
-    warning(paste0("The aquifer was fully depleted for at least one player in the ",paste(c("First Best","Nash","Cheat")[c(AD_fb,AD_nash,AD_cheat)],sep=", "),"scenarios"))
+  AD_cols <- tibble::tibble()
+  if (any(c(AD_fb,AD_nash,AD_cheat))) {
+    AD_cols <- tibble::tibble(AD_fb=AD_fb,AD_nash=AD_nash,AD_cheat=AD_cheat)
+    # warning(paste("The aquifer was fully depleted for at least one player in the",
+    #               paste(c("First Best","Nash","Cheat")[c(AD_fb,AD_nash,AD_cheat)],sep=", "),"scenario(s)"))
   }
 
   # # get z constraints
@@ -56,7 +71,9 @@ evaluate_treaty_unconfined <- function(params) {
   treaty <- ifelse(zRange_calc>0,"Y","N")
   return(tibble::tibble(treaty=treaty,zRange=zRange_calc,
                 zMinSwiss=zMinSwiss_calc,zMaxFrench=zMaxFrench_calc) %>%
-           dplyr::bind_cols(q_vals))
+           dplyr::bind_cols(q_vals,
+                            AD_cols)
+  )
 }
 
 
@@ -220,8 +237,11 @@ unconA_qstar2 <- function(params,qs1,qf1) {
 
 unconA_qdouble0 <- function(params,qshat,qfhat) {
   # get roots for D1 = D2 = 0, solving for Qs, Qf
-  cheat_equations <- function(x,params,qshat,qfhat) {
-    if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & x[1] > 0 & x[2] > 0) {
+  cheat_equations <- function(x,params,qshat,qfhat) {# need to ensure aquifer is not fully depleted for any combination of qs, qf, qshat, qfhat
+    if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & # qs, qf
+        !check_aquifer_depleted(qshat,x[2],params,TRUE) & # qshat, qf
+        !check_aquifer_depleted(x[1],qfhat,params,TRUE) & # qf, qshat
+        x[1] > 0 & x[2] > 0) {
       # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       D1<-with(params,
                gs*(p0s-(Bs*PHIss*x[1])/(2*sqrt(h0s^2-PHIsf*qfhat+PHIsrT*rmT-PHIss*x[1]))-Bs*(dBs-sqrt(h0s^2-PHIsf*qfhat+PHIsrT*rmT-PHIss*x[1])))+(1-gs)*(p0s-(Bs*PHIss*x[1])/(2*sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]-PHIsf*x[2]))-Bs*(dBs-sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]-PHIsf*x[2])))
@@ -243,7 +263,9 @@ unconA_qdouble0 <- function(params,qshat,qfhat) {
 unconA_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
   # get roots for D1 = D2 = 0, solving for Qs
   cheat_equations_qs2 <- function(x,params,qshat,qfhat,qf1) {
-    if (!check_aquifer_depleted(x,qf1,params,TRUE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
+    if (!check_aquifer_depleted(x,qf1,params,TRUE) &
+        !check_aquifer_depleted(x,qfhat,params,TRUE) &
+        x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       D1<-with(params,
                (1-gs)*(p0s-(Bs*PHIss*x)/(2*sqrt(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x))-Bs*(dBs-sqrt(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x)))+gs*(p0s-(Bs*PHIss*x)/(2*sqrt(h0s^2-PHIsf*qfhat+PHIsrT*rmT-PHIss*x))-Bs*(dBs-sqrt(h0s^2-PHIsf*qfhat+PHIsrT*rmT-PHIss*x)))
       )
@@ -256,7 +278,9 @@ unconA_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
 
   # get roots for D1 = D2 = 0, solving for Qf
   cheat_equations_qf2 <- function(x,params,qshat,qfhat,qs1) {
-    if (!check_aquifer_depleted(qs1,x,params,TRUE) & x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
+    if (!check_aquifer_depleted(qs1,x,params,TRUE) &
+        !check_aquifer_depleted(qshat,x,params,TRUE) &
+        x > 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       D2<-with(params,
                (1-gf)*(p0f-(Bf*PHIff*x)/(2*sqrt(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x))-Bf*(dBf-sqrt(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x)))+gf*(p0f-(Bf*PHIff*x)/(2*sqrt(h0f^2-PHIfs*qshat+PHIfrT*rmT-PHIff*x))-Bf*(dBf-sqrt(h0f^2-PHIfs*qshat+PHIfrT*rmT-PHIff*x)))
       )
