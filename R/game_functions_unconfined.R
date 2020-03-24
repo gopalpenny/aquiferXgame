@@ -68,7 +68,13 @@ evaluate_treaty_unconfined <- function(params) {
   zMaxFrench_calc <- unconA_zMaxFrench(params,q_vals)
   zMinSwiss_calc <- unconA_zMinSwiss(params,q_vals)
   zRange_calc <- round(zMaxFrench_calc - zMinSwiss_calc,6)
-  treaty <- ifelse(zRange_calc>0,"Y","N")
+
+  treaty <- dplyr::case_when(
+    zRange_calc>0 ~ "Y",
+    zRange_calc<=0 ~ "N",
+    any(c(AD_fb,AD_nash,AD_cheat)) ~ "D",
+    TRUE ~ as.character(NA)
+  )
   return(tibble::tibble(treaty=treaty,zRange=zRange_calc,
                 zMinSwiss=zMinSwiss_calc,zMaxFrench=zMaxFrench_calc) %>%
            dplyr::bind_cols(q_vals,
