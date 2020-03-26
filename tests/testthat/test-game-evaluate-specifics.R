@@ -9,10 +9,24 @@ test_that("evaluate_treaty_cases first estimate of first best produces negative 
 })
 
 
-# Unconfined quifer fully depleted
+# Unconfined aquifer fully depleted
 df_input_depleted <- data.frame(B=0.91, dBf=75.4, dBs=75.4, h0f=45.3, h0s=42.7, p0s=100, PHIff=110, PHIfrN=97.5, PHIfrT=97.5, PHIfs=91.4, PHIsf=91.4, PHIsrN=121, PHIsrT=121, PHIss=110, year=1956, row=17, Qs=17, Qf=0, gs=0.6, gf=0.6, p0f=5e+05, crs=5e+05, rmN=0, rmT=0, es=0, ef=0)
 df_output_depleted <- tibble::tibble(treaty="D", zRange=NaN, zMinSwiss=NaN, zMaxFrench=0, AD_fb=TRUE, AD_nash=TRUE, AD_cheat=FALSE, qshat=17, qsstar=17, qsdouble=15.3, qfhat=0, qfstar=0, qfdouble=0, ds_hat=NaN, ds_star=NaN, ds_double=63.5556, ds_hat_double=63.5556, df_hat=53.0776, df_star=53.0776, df_double=53.0776, df_hat_double=53.0776)
 test_that('evaluate_treaty_cases returns \'D\' for depleted aquifer',{
-  expect_equal(evaluate_treaty_cases(df_input_depleted,'qd') %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)),
-               df_output_depleted)
+  expect_warning(evaluate_treaty_cases(df_input_depleted,'qd'),paste("(NaNs produced)|",
+                 "(The aquifer was fully depleted for at least one player in some parameter sets in the First Best, Nash scenario\\(s\\))"))
+  # expect_equal(evaluate_treaty_cases(df_input_depleted,'qd') %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)),
+  #              df_output_depleted)
+})
+
+
+# Unconfined aquifer, q_double is not less than q_hat
+# in row 1, qshat is 17, qsdouble should be 17
+# in row 2, qfhat is 5, qfdouble should be 5
+df_input_qdouble <- data.frame(B=c(0.91, 0.91), dBf=c(75.4, 75.4), dBs=c(75.4, 75.4), h0f=c(45.3, 45.3), h0s=c(42.7, 42.7), p0s=c(1e+05, 1e+05), year=c(1956, 1976), row=c(17, 37), Qs=c(17, 20), Qf=c(0, 5), gs=c(0.6, 0.925), gf=c(0.6, 0.925), p0f=c(1000, 200), crs=c(50000, 10000), rmN=c(0, 8.2), rmT=c(0, 8.2), es=c(0, 0), ef=c(0, 0), drawdown_years=c(5, 50),
+                         PHIff=c(34.9166483561281, 109.80662752661), PHIfrT=c(18.6388805781934, 97.4085453273349), PHIfs=c(14.362429420851, 91.3701219010559), PHIsf=c(14.3624294208507, 91.3701219010546), PHIsrT=c(29.6525338473577, 120.883872795857), PHIss=c(25.9900272148918, 110.030353031565), PHIsrN=c(59.3050676947154, 241.767745591714), PHIfrN=c(9.3194402890967, 48.7042726636675))
+df_output_qdouble <- tibble::tibble(treaty=c("N", "N"), zRange=c(0, -328.9488), zMinSwiss=c(0, 388.6396), zMaxFrench=c(0, 59.6909), qshat=c(17, 20), qsstar=c(17, 20), qsdouble=c(17, 20), qfhat=c(0, 5), qfstar=c(0, 5), qfdouble=c(0, 5), ds_hat=c(38.232, 62.8668), ds_star=c(38.232, 41.513), ds_double=c(38.232, 62.8668), ds_hat_double=c(38.232, 62.8668), df_hat=c(32.8803, 53.6192), df_star=c(32.8803, 66.738), df_double=c(32.8803, 53.6192), df_hat_double=c(32.8803, 53.6192))
+test_that('evaluate_treaty_cases returns qx_double equal to qi_hat and qi_star in cases where qj is 0',{
+  expect_equal(evaluate_treaty_cases(df_input_qdouble,'qd') %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)),
+               df_output_qdouble)
 })
