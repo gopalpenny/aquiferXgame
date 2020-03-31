@@ -74,4 +74,18 @@ test_that("evaluate_treaty_cases UNCONFINED returns all input parameters for opt
                c('treaty','zRange','zMinSwiss','zMaxFrench','ds_hat','ds_star','ds_double','ds_hat_double','df_hat','df_star','df_double','df_hat_double'))
 })
 
+df_grid <- expand.grid(x=seq(-5,5,length.out=20),y=seq(-5,5,length.out=20))
+df_grid$z <- sqrt(df_grid$x^2+df_grid$y^2)
+cl_results <- tibble::tibble(x=c(-1.8421, -1.9824, -1.9824, -1.8421, -1.8375, -1.4976),
+                             y=c(-0.7742, -0.2632, 0.2632, 0.7742, 0.7895, 1.3158),
+                             level=c(2, 2, 2, 2, 2, 2),
+                             line=c(1, 1, 1, 1, 1, 1),
+                             i=c(1, 2, 3, 4, 5, 6),
+                             level_factor=c("2", "2", "2", "2", "2", "2"))
+cl_output <- head(get_contours(df_grid,levels=seq(2,10,by=2))) %>%
+  dplyr::mutate_if(is.numeric,function(x) round(x,4)) %>%
+  dplyr::mutate(level_factor=as.character(level_factor)) %>% tibble::as_tibble()
+test_that("get_contours works for simple example",{
+  expect_equal(cl_output,cl_results)
+})
 
