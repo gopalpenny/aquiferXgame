@@ -264,7 +264,9 @@ get_contours <- function(df = NULL, levels = 0, ...) {
   } else if (!all(c("x","y","z") %in% names(df))) {
     stop("df must contain columns for x, y, and z")
   }
-  z_values_check <- df %>% tidyr::complete(x,y) %>% purrr::pluck("z")
+
+  grid_points_all <- merge(expand.grid(x=unique(df$x),y=unique(df$y)), df,by=c("x","y"))
+  z_values_check <- grid_points_all$z
   df_error <-  any(is.na(z_values_check) & !is.nan(z_values_check))
   if (df_error) {
     stop("in df, every x, y combination must have a z value.")
