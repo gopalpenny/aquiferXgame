@@ -2,7 +2,7 @@
 % Please edit documentation in R/game_params.R
 \name{check_game_dynamics}
 \alias{check_game_dynamics}
-\title{Check game dynamics}
+\title{Check game dynamics (NOT WORKING)}
 \usage{
 check_game_dynamics(params, text_results = TRUE, aquifer_type = NULL)
 }
@@ -39,6 +39,7 @@ than the cost of alternative supply. If this is not the case, then the players c
 working together than they could on their own.
 }
 \examples{
+\dontrun{
 library(magrittr)
 
 # Table output
@@ -49,3 +50,5 @@ example_params_unconfined \%>\% dplyr::mutate(Qs=1,Qf=1) \%>\% check_game_dynami
 check_game_dynamics(example_params_unconfined) \%>\% cat()
 example_params_unconfined \%>\% dplyr::mutate(Qs=1,Qf=1) \%>\% check_game_dynamics() \%>\% cat()
 }
+}
+\keyword{internal}

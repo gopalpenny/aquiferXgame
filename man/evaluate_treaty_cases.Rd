@@ -52,7 +52,6 @@ The parameter \code{return_criteria} can contain the following letters:
 }
 \examples{
 library(genevoisgame)
-params_df <- genevoisgame::default_params
-evaluate_treaty_cases(df)
-evaluate_treaty_cases(default_params,'')
+evaluate_treaty_cases(rbind(example_params_confined,example_params_confined))
+evaluate_treaty_cases(rbind(example_params_unconfined,example_params_unconfined),"qudp")
 }

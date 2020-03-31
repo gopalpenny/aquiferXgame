@@ -18,5 +18,8 @@ Returns the corrected equations
 Convert Mathematica to R
 }
 \examples{
+\dontrun{
 eqns <- MM2R(path="mathematica/unconfined_eqns.txt", g1=c(" ","*"), g1=c("Sqrt","sqrt"))
 }
+}
+\keyword{internal}

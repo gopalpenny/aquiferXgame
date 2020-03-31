@@ -47,9 +47,9 @@ And for unconfined aquifers:
 library(genevoisgame)
 check_params(example_params_confined)
 check_params(example_params_unconfined)
-check_params(example_params_confined \%>\% dplyr::select())
+\dontrun{check_params(example_params_confined[,-ncol(example_params_confined):-1])}
 
-params <- example_params_confined \%>\% dplyr::select(-gs) \%>\% tidyr::crossing(gs=c(0.2,0.8))
+params <- data.frame(example_params_confined,gs=c(0.2,0.8))
 check_params(params)
-check_params(params \%>\% dplyr::select())
+\dontrun{check_params(params[,-ncol(example_params_confined):-1])}
 }

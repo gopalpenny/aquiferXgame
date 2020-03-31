@@ -9,6 +9,9 @@ evaluate_treaty(params, aquifer_type = NULL)
 \arguments{
 \item{params}{Parameter list (or data.frame with 1 row) containing
 necessary parameters to evaluate the agreement. See \code{?check_params} for details.}
+
+\item{aquifer_type}{Aquifer type as "confined" or "unconfined". If not specified
+(default) \code{check_params} is run and used to determine the aquifer type.}
 }
 \value{
 Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
@@ -29,5 +32,6 @@ Evaluate whether or not the treaty will be made in a confined or unconfined aqui
 Evaluate the treaty given social, economic, and geophysical parameters
 }
 \examples{
-evaluate_treaty(default_params)
+evaluate_treaty(example_params_confined)
+evaluate_treaty(example_params_unconfined)
 }

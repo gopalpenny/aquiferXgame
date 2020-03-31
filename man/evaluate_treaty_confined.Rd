@@ -21,5 +21,5 @@ Evaluate whether or not the treaty will be made.
 Evaluate the treaty given social, economic, and geophysical parameters.
 }
 \examples{
-evaluate_treaty(default_params)
+evaluate_treaty_confined(example_params_confined)
 }

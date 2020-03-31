@@ -33,5 +33,5 @@ Note: if the aquifer is fully depleted in any of the solutions, this function wi
 \code{AD_fb,AD_nash,AD_cheat}, representing logical values that indicate in which scenario the aquifer was depleted.
 }
 \examples{
-evaluate_treaty(default_params)
+evaluate_treaty_unconfined(example_params_unconfined)
 }

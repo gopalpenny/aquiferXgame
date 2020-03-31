@@ -6,6 +6,15 @@
 \usage{
 evaluate_treaty_depths(params, q_vals, aquifer_type)
 }
+\arguments{
+\item{params}{Parameter list (or data.frame with 1 row) containing
+necessary parameters to evaluate the agreement. See \code{?check_params} for details.}
+
+\item{q_vals}{list of pumping rates}
+
+\item{aquifer_type}{Aquifer type as "confined" or "unconfined". If not specified
+(default) \code{check_params} is run and used to determine the aquifer type.}
+}
 \description{
 Evaluate water table depth given (single) treaty parameters
 }

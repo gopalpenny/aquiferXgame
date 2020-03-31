@@ -10,5 +10,8 @@ in_range(x, range)
 Check if value is within an inclusive range
 }
 \examples{
+\dontrun{
 in_range(c(-3,-1,0,5,10,14),c(0,10))
 }
+}
+\keyword{internal}

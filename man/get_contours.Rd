@@ -18,7 +18,10 @@ meaning every x must be represented for each y, and vice versa.}
 Get contour lines, using a wrapper for contourLines
 }
 \examples{
-df <- tidyr::crossing(x=-10:10,y=-10:10) \%>\% dplyr::mutate(z=x^2)
+library(ggplot2)
+
+df <- expand.grid(x=-10:10,y=-10:10)
+df$z <- df$x^2
 cl <- get_contours(df,levels=5)
 unique(cl$level)
 ggplot() +
@@ -28,7 +31,8 @@ ggplot() +
 cl <- get_contours(df,levels=c(15,20,60))
 unique(cl$level)
 
-df <- tidyr::crossing(x=seq(-5,5,length.out=20),y=seq(-5,5,length.out=20)) \%>\% dplyr::mutate(z=sqrt(x^2+y^2))
+df <- expand.grid(x=seq(-5,5,length.out=20),y=seq(-5,5,length.out=20))
+df$z <- sqrt(df$x^2+df$y^2)
 cl <- get_contours(df,levels=seq(2,10,by=2))
 ggplot() +
   geom_raster(data=df,aes(x,y,fill=z)) +

@@ -9,3 +9,4 @@ apply_constraints(x, interval)
 \description{
 Apply interval contraints to numeric value
 }
+\keyword{internal}
