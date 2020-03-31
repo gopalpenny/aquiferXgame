@@ -26,7 +26,9 @@
 #' @importFrom magrittr %>%
 #' @keywords internal
 #' @examples
+#' \dontrun{
 #' evaluate_treaty_unconfined(example_params_unconfined)
+#' }
 evaluate_treaty_unconfined <- function(params) {
   # (eval_out <- evaluate_treaty(params_default()))
   # this function calculates abstraction from the game,
