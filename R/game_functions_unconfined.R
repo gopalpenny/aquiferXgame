@@ -24,7 +24,7 @@
 #' Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
 #' and whether or not there is a treaty (i.e., if zRange > 0)
 #' @importFrom magrittr %>%
-#' @export
+#' @keywords internal
 #' @examples
 #' evaluate_treaty_unconfined(example_params_unconfined)
 evaluate_treaty_unconfined <- function(params) {
@@ -331,6 +331,7 @@ unconA_zRange <- function(params,q_vals) {
 #' @param treaty boolean value that determines the context for evaluation (e.g., for Nash should be \code{F}, for First Best should be \code{T})
 #' @param qs pumping from player S
 #' @param qf pumping from player F
+#' @keywords internal
 #' @return
 #' Returns boolean value, TRUE if the aquifer has been fully depleted for some amount of pumping.
 check_aquifer_depleted <- function(qs,qf,params,treaty) {

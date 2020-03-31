@@ -18,7 +18,7 @@
 #' Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
 #' and whether or not there is a treaty (i.e., if zRange > 0)
 #' @importFrom magrittr %>%
-#' @export
+#' @keywords internal
 #' @examples
 #' evaluate_treaty_confined(example_params_confined)
 evaluate_treaty_confined <- function(params) {

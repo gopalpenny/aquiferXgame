@@ -154,6 +154,7 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
 #'
 #' Evaluate utility given (single) treaty parameters
 #' @inheritParams evaluate_treaty_depths
+#' @keywords internal
 evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
   DsrN <- DsrT <- DfrN <- DfrT <- PHIsrN <- PHIsrT <- PHIfrN <- PHIfrT <- NULL
   # this function calculates utilities, given parameters and abstraction
@@ -199,6 +200,7 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
 #' Evaluate water table depth given (single) treaty parameters
 #' @inheritParams evaluate_treaty
 #' @param q_vals list of pumping rates
+#' @keywords internal
 evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
   # this function calculates water table depth, given parameters and abstraction
   if(dim(params)[1]!=1){
