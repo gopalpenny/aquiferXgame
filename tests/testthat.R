@@ -1,4 +1,4 @@
 library(testthat)
-library(aquiferXgame)
+library(genevoisgame)
 
-test_check("aquiferXgame")
+test_check("genevoisgame")
