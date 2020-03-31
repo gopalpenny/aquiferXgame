@@ -26,7 +26,8 @@
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
-#' evaluate_treaty(default_params)
+#' evaluate_treaty(example_params_confined)
+#' evaluate_treaty(example_params_unconfined)
 evaluate_treaty <- function(params, aquifer_type = NULL) {
   # (eval_out <- evaluate_treaty(params_default()))
   # this function calculates abstraction from the game,
@@ -101,9 +102,8 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 #' @export
 #' @examples
 #' library(genevoisgame)
-#' params_df <- genevoisgame::default_params
-#' evaluate_treaty_cases(df)
-#' evaluate_treaty_cases(default_params,'')
+#' evaluate_treaty_cases(rbind(example_params_confined,example_params_confined))
+#' evaluate_treaty_cases(rbind(example_params_unconfined,example_params_unconfined))
 evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = FALSE) {
   aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
@@ -236,7 +236,10 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
-#' df <- tidyr::crossing(x=-10:10,y=-10:10) %>% dplyr::mutate(z=x^2)
+#' library(ggplot2)
+#'
+#' df <- expand.grid(x=-10:10,y=-10:10)
+#' df$z <- df$x^2
 #' cl <- get_contours(df,levels=5)
 #' unique(cl$level)
 #' ggplot() +
@@ -246,7 +249,8 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
 #' cl <- get_contours(df,levels=c(15,20,60))
 #' unique(cl$level)
 #'
-#' df <- tidyr::crossing(x=seq(-5,5,length.out=20),y=seq(-5,5,length.out=20)) %>% dplyr::mutate(z=sqrt(x^2+y^2))
+#' df <- expand.grid(x=seq(-5,5,length.out=20),y=seq(-5,5,length.out=20))
+#' df$z <- sqrt(df$x^2+df$y^2)
 #' cl <- get_contours(df,levels=seq(2,10,by=2))
 #' ggplot() +
 #'   geom_raster(data=df,aes(x,y,fill=z)) +
@@ -270,11 +274,10 @@ get_contours <- function(df = NULL, levels = 0, ...) {
   # if (nlevels > nx | nlevels > ny) {
   #   stop("nlevels (",nlevels,") must be less than nx (",nx,") and ny (",ny,").")
   # }
-  df <- df %>%
-    dplyr::arrange(y,x)
-  xmat <- df %>% purrr::pluck("x") %>% matrix(ncol=ny)
-  ymat <- df %>% purrr::pluck("y") %>% matrix(ncol=ny)
-  zmat <- df %>% purrr::pluck("z") %>% matrix(ncol=ny)
+  df <- df[order(df$y,df$x),]
+  xmat <- matrix(df$x,ncol=ny)
+  ymat <- matrix(df$y,ncol=ny)
+  zmat <- matrix(df$z,ncol=ny)
   x_seq <- xmat[,1]
   y_seq <- ymat[1,]
 
@@ -286,9 +289,9 @@ get_contours <- function(df = NULL, levels = 0, ...) {
     }
 
     # bind contour lines
-    cl <- do.call(rbind,lapply(cl_list,function(l) data.frame(x=l$x,y=l$y,level=l$level, line=l$line))) %>%
-      dplyr::mutate(i=dplyr::row_number(),
-                    level_factor=as.factor(as.character(level)))
+    cl <- do.call(rbind,lapply(cl_list,function(l) data.frame(x=l$x,y=l$y,level=l$level, line=l$line)))
+    cl$i <- 1:nrow(cl)
+    cl$level_factor <- as.factor(as.character(cl$level))
 
   } else {
     warning(paste0("No contours found. Level range: (",min(level),",",max(level),"). ",
