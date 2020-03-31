@@ -10,6 +10,8 @@
 #' Evaluate whether or not the treaty will be made in a confined or unconfined aquifer
 #' @param params Parameter list (or data.frame with 1 row) containing
 #' necessary parameters to evaluate the agreement. See \code{?check_params} for details.
+#' @param aquifer_type Aquifer type as "confined" or "unconfined". If not specified
+#' (default) \code{check_params} is run and used to determine the aquifer type.
 #' @details
 #' Evaluate the treaty given social, economic, and geophysical parameters
 #' @return
@@ -103,7 +105,7 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 #' @examples
 #' library(genevoisgame)
 #' evaluate_treaty_cases(rbind(example_params_confined,example_params_confined))
-#' evaluate_treaty_cases(rbind(example_params_unconfined,example_params_unconfined))
+#' evaluate_treaty_cases(rbind(example_params_unconfined,example_params_unconfined),"qudp")
 evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = FALSE) {
   aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
@@ -153,7 +155,9 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
 #' Evaluate treaty utility
 #'
 #' Evaluate utility given (single) treaty parameters
+#' @inheritParams evaluate_treaty_depths
 evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
+  DsrN <- DsrT <- DfrN <- DfrT <- PHIsrN <- PHIsrT <- PHIfrN <- PHIfrT <- NULL
   # this function calculates utilities, given parameters and abstraction
   if(dim(params)[1]!=1){
     stop("This is an error message because params not 1 dimension")
@@ -173,14 +177,14 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
     params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIsrT,PHIfr=PHIfrT) # note: major speed improvements after switching from recode
     params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIsrN,PHIfr=PHIfrN)
   }
-  Us_hat <- get_Us(qs=qshat,qf=qfhat,params_treaty,z=0)
-  Uf_hat <- get_Uf(qs=qshat,qf=qfhat,params_treaty,z=0)
-  Us_star <- get_Us(qs=qsstar,qf=qfstar,params_notreaty,z=0)
-  Uf_star <- get_Uf(qs=qsstar,qf=qfstar,params_notreaty,z=0)
-  Us_double <- get_Us(qs=qsdouble,qf=qfhat,params_treaty,z=0)
-  Uf_double <- get_Uf(qs=qshat,qf=qfdouble,params_treaty,z=0)
-  Us_hat_double <- get_Us(qs=qshat,qf=qfdouble,params_treaty,z=0)
-  Uf_hat_double <- get_Uf(qs=qsdouble,qf=qfhat,params_treaty,z=0)
+  Us_hat <- get_Us(qs=q_vals$qshat,qf=q_vals$qfhat,params_treaty,z=0)
+  Uf_hat <- get_Uf(qs=q_vals$qshat,qf=q_vals$qfhat,params_treaty,z=0)
+  Us_star <- get_Us(qs=q_vals$qsstar,qf=q_vals$qfstar,params_notreaty,z=0)
+  Uf_star <- get_Uf(qs=q_vals$qsstar,qf=q_vals$qfstar,params_notreaty,z=0)
+  Us_double <- get_Us(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty,z=0)
+  Uf_double <- get_Uf(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty,z=0)
+  Us_hat_double <- get_Us(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty,z=0)
+  Uf_hat_double <- get_Uf(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty,z=0)
   u_vals <- tibble::tibble(Us_hat=Us_hat,Uf_hat=Uf_hat,
                            Us_star=Us_star,Uf_star=Uf_star,
                            Us_double=Us_double,Uf_double=Uf_double,
@@ -191,6 +195,8 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
 #' Evaluate treaty depths
 #'
 #' Evaluate water table depth given (single) treaty parameters
+#' @inheritParams evaluate_treaty
+#' @param q_vals list of pumping rates
 evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
   # this function calculates water table depth, given parameters and abstraction
   if(dim(params)[1]!=1){
@@ -201,24 +207,28 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
   if (aquifer_type == "confined") {
     get_ds <- conA_ds
     get_df <- conA_df
-    params_treaty <- params %>% dplyr::rename(rm=rmT,Dsr=DsrT,Dfr=DfrT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,Dsr=DsrN,Dfr=DfrN)
+    params_treaty <- params
+    names(params_treaty)[match(c("rmT","DsrT","DfrT"),names(params_treaty))] <- c("rm","Dsr","Dfr")
+    params_notreaty <- params
+    names(params_notreaty)[match(c("rmN","DsrN","DfrN"),names(params_notreaty))] <- c("rm","Dsr","Dfr")
   } else {
     params$Bs <- params$B
     params$Bf <- params$B
     get_ds <- unconA_ds
     get_df <- unconA_df
-    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIsrT,PHIfr=PHIfrT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIsrN,PHIfr=PHIfrN)
+    params_treaty <- params
+    names(params_treaty)[match(c("rmT","PHIsrT","PHIfrT"),names(params_treaty))] <- c("rm","PHIsr","PHIfr")
+    params_notreaty <- params
+    names(params_notreaty)[match(c("rmN","PHIsrN","PHIfrN"),names(params_notreaty))] <- c("rm","PHIsr","PHIfr")
   }
-  ds_hat <- get_ds(qs=qshat,qf=qfhat,params_treaty)
-  df_hat <- get_df(qs=qshat,qf=qfhat,params_treaty)
-  ds_star <- get_ds(qs=qsstar,qf=qfstar,params_notreaty)
-  df_star <- get_df(qs=qsstar,qf=qfstar,params_notreaty)
-  ds_double <- get_ds(qs=qsdouble,qf=qfhat,params_treaty)
-  df_double <- get_df(qs=qshat,qf=qfdouble,params_treaty)
-  ds_hat_double <- get_ds(qs=qsdouble,qf=qfhat,params_treaty)
-  df_hat_double <- get_df(qs=qshat,qf=qfdouble,params_treaty)
+  ds_hat <- get_ds(qs=q_vals$qshat,qf=q_vals$qfhat,params_treaty)
+  df_hat <- get_df(qs=q_vals$qshat,qf=q_vals$qfhat,params_treaty)
+  ds_star <- get_ds(qs=q_vals$qsstar,qf=q_vals$qfstar,params_notreaty)
+  df_star <- get_df(qs=q_vals$qsstar,qf=q_vals$qfstar,params_notreaty)
+  ds_double <- get_ds(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty)
+  df_double <- get_df(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty)
+  ds_hat_double <- get_ds(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty)
+  df_hat_double <- get_df(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty)
   d_vals <- tibble::tibble(ds_hat=ds_hat,df_hat=df_hat,
                            ds_star=ds_star,df_star=df_star,
                            ds_double=ds_double,df_double=df_double,
@@ -234,6 +244,7 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
 #' @param levels A vector of values at which contours should be plotted. If used, nlevels is ignored.
 #' @param ... If x, y, and z are directly specified here, df will be ignored.
 #' @importFrom magrittr %>%
+#' @importFrom grDevices contourLines
 #' @export
 #' @examples
 #' library(ggplot2)
@@ -258,9 +269,9 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
 get_contours <- function(df = NULL, levels = 0, ...) {
   params <- list(...)
   if (all(c("x","y","z") %in% names(params))) {
-    df$x <- x
-    df$y <- y
-    df$z <- z
+    df$x <- params$x
+    df$y <- params$y
+    df$z <- params$z
   } else if (!all(c("x","y","z") %in% names(df))) {
     stop("df must contain columns for x, y, and z")
   }
@@ -296,7 +307,7 @@ get_contours <- function(df = NULL, levels = 0, ...) {
     cl$level_factor <- as.factor(as.character(cl$level))
 
   } else {
-    warning(paste0("No contours found. Level range: (",min(level),",",max(level),"). ",
+    warning(paste0("No contours found. Level range: (",min(levels),",",max(levels()),"). ",
                    "z range: (",min(df$z,na.rm=TRUE),",",max(df$z,na.rm=TRUE),")"))
     cl <- NULL
   }
