@@ -11,4 +11,4 @@ example_params_unconfined
 \description{
 Example params unconfined
 }
-\keyword{datasets}
+\keyword{internal}

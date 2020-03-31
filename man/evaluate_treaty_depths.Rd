@@ -18,3 +18,4 @@ necessary parameters to evaluate the agreement. See \code{?check_params} for det
 \description{
 Evaluate water table depth given (single) treaty parameters
 }
+\keyword{internal}

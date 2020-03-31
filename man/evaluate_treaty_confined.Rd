@@ -23,3 +23,4 @@ Evaluate the treaty given social, economic, and geophysical parameters.
 \examples{
 evaluate_treaty_confined(example_params_confined)
 }
+\keyword{internal}

@@ -11,4 +11,4 @@ example_params_confined
 \description{
 Example params confined
 }
-\keyword{datasets}
+\keyword{internal}

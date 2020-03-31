@@ -21,3 +21,4 @@ Returns boolean value, TRUE if the aquifer has been fully depleted for some amou
 \description{
 Is pumping enough to fully deplete the aquifer for either player?
 }
+\keyword{internal}

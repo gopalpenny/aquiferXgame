@@ -35,3 +35,4 @@ Note: if the aquifer is fully depleted in any of the solutions, this function wi
 \examples{
 evaluate_treaty_unconfined(example_params_unconfined)
 }
+\keyword{internal}
