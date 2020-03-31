@@ -110,16 +110,17 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
   aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
   eval_results_list <- list()
-  if (progress_bar) pb <- txtProgressBar(min = 0, max = nrow(params_df), style = 3)
+  if (progress_bar) pb <- utils::txtProgressBar(min = 0, max = nrow(params_df), style = 3)
   for (i in 1:nrow(params_df)) {
     eval_results_list[[i]] <- evaluate_treaty(params_list[[i]],aquifer_type=aquifer_type) #lapply(params_list,evaluate_treaty,aquifer_type=aquifer_type)
-    if (progress_bar) setTxtProgressBar(pb, i)
+    if (progress_bar) utils::setTxtProgressBar(pb, i)
   }
   if (progress_bar) close(pb)
   eval_results <- dplyr::bind_rows(eval_results_list)
   q_vals_list <- split(eval_results %>% dplyr::select(dplyr::starts_with("q")),1:dim(eval_results)[1])
   # eval_results_treat <- eval_results %>% select(treaty,zRange,zMinSwiss,zMaxFrench)
-  eval_return <- eval_results %>% dplyr::select(treaty,zRange,zMinSwiss,zMaxFrench,dplyr::starts_with("AD_"))
+  eval_return <- eval_results[,c("treaty","zRange","zMinSwiss","zMaxFrench")] %>%
+    dplyr::bind_cols(eval_results %>% dplyr::select(dplyr::starts_with("AD_")))
   if (any(grepl("q",return_criteria))) { # return abstraction rates
     eval_return <- eval_return %>% dplyr::bind_cols(eval_results%>% dplyr::select(dplyr::starts_with("qs"),dplyr::starts_with("qf")))
   }
@@ -136,12 +137,9 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
   if (any(grepl("a",return_criteria))) { # return all parameters
     eval_return <- eval_return %>% dplyr::bind_cols(params_df)
   } else if (max(grepl("p",return_criteria))==1) { # identify parameters that do not vary AND are equal to default value
-    vars_stable <- params_df %>% tidyr::gather(variable,value) %>% dplyr::group_by(variable) %>%
-      dplyr::summarize(n_unique=length(unique(value))) %>%
-      # dplyr::left_join(params_default() %>% tidyr::gather(variable,default),by="variable") %>%
-      dplyr::filter(n_unique==1) %>%
-      dplyr::pull(variable)
-    params_cases <- params_df %>% dplyr::select(-match(vars_stable,names(params_df))) # remove identified parameters
+    name_table <- sapply(params_df,function(x) length(unique(x)))
+    vars_stable <- names(name_table[name_table == 1])
+    params_cases <- params_df[,-match(vars_stable,names(params_df))] # remove identified parameters
     eval_return <- eval_return %>% dplyr::bind_cols(params_cases)
   }
   # check for aquifer depletion
@@ -167,15 +165,19 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
   if (aquifer_type == "confined") {
     get_Us <- conA_Us
     get_Uf <- conA_Uf
-    params_treaty <- params %>% dplyr::rename(rm=rmT,Dsr=DsrT,Dfr=DfrT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,Dsr=DsrN,Dfr=DfrN)
+    params_treaty <- params
+    names(params_treaty)[match(c("rmT","DsrT","DfrT"),names(params_treaty))] <- c("rm","Dsr","Dfr")
+    params_notreaty <- params
+    names(params_notreaty)[match(c("rmN","DsrN","DfrN"),names(params_notreaty))] <- c("rm","Dsr","Dfr")
   } else {
     params$Bs <- params$B
     params$Bf <- params$B
     get_Us <- unconA_Us
     get_Uf <- unconA_Uf
-    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIsrT,PHIfr=PHIfrT) # note: major speed improvements after switching from recode
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIsrN,PHIfr=PHIfrN)
+    params_treaty <- params
+    names(params_treaty)[match(c("rmT","PHIsrT","PHIfrT"),names(params_treaty))] <- c("rm","PHIsr","PHIfr")
+    params_notreaty <- params
+    names(params_notreaty)[match(c("rmN","PHIsrN","PHIfrN"),names(params_notreaty))] <- c("rm","PHIsr","PHIfr")
   }
   Us_hat <- get_Us(qs=q_vals$qshat,qf=q_vals$qfhat,params_treaty,z=0)
   Uf_hat <- get_Uf(qs=q_vals$qshat,qf=q_vals$qfhat,params_treaty,z=0)

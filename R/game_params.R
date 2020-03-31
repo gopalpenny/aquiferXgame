@@ -107,7 +107,7 @@ check_params <- function(params) {
 
 
 
-#' Check game dynamics
+#' Check game dynamics (NOT WORKING)
 #'
 #' Check the basic game dynamics, particularly in cases where zRange=0 and the first best
 #' and nash outcomes are the same.
@@ -133,6 +133,7 @@ check_params <- function(params) {
 #' \item: \code{ds_max, df_max}: The maximum depth for each player, if both players pump at their demand (\code{Qs, Qf}).
 #' \item: \code{ds_threshold, df_threshold}: The depth for each player where the cost of pumping equals the cost of alternative supply (\code{Qi=B*di}).
 #' }
+#' @keywords internal
 #' @examples
 #' \dontrun{
 #' library(magrittr)
@@ -146,51 +147,51 @@ check_params <- function(params) {
 #' example_params_unconfined %>% dplyr::mutate(Qs=1,Qf=1) %>% check_game_dynamics() %>% cat()
 #' }
 check_game_dynamics <- function(params, text_results=TRUE, aquifer_type=NULL) {
-  # this function calculates water table depth, given parameters and abstraction
-  if(dim(params)[1]!=1){
-    stop("This is an error message because params not 1 dimension")
-  }
-  if (is.null(aquifer_type)) {
-    aquifer_type <- check_params(params)
-  }
+  # # this function calculates water table depth, given parameters and abstraction
+  # if(dim(params)[1]!=1){
+  #   stop("This is an error message because params not 1 dimension")
+  # }
+  # if (is.null(aquifer_type)) {
+  #   aquifer_type <- check_params(params)
+  # }
+  #
+  # # get depths
+  # if (aquifer_type == "confined") {
+  #   get_ds <- conA_ds
+  #   get_df <- conA_df
+  #   params_treaty <- params %>% dplyr::rename(rm=rmT,Dsr=DsrT,Dfr=DfrT)
+  #   params_notreaty <- params %>% dplyr::rename(rm=rmN,Dsr=DsrN,Dfr=DfrN)
+  #   ds_threshold <- params$p0s / params$B
+  #   df_threshold <- params$p0f / params$B
+  # } else {
+  #   params$Bs <- params$B
+  #   params$Bf <- params$B
+  #   get_ds <- unconA_ds
+  #   get_df <- unconA_df
+  #   params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIsrT,PHIfr=PHIfrT)
+  #   params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIsrN,PHIfr=PHIfrN)
+  #   ds_threshold <- params$p0s / params$Bs
+  #   df_threshold <- params$p0f / params$Bf
+  # }
+  #
+  # ds_max <- get_ds(qs=params$Qs,qf=params$Qf,params_notreaty)
+  # df_max <- get_df(qs=params$Qs,qf=params$Qf,params_notreaty)
+  #
+  # if (ds_max > ds_threshold | df_max > df_threshold) {
+  #   dynamics <- "possibly interesting"
+  # } else {
+  #   dynamics <- "no interesting"
+  # }
+  #
+  # if (text_results) {
+  #   results <- paste0("If both players pump at their maximum (qi=Qi), the water table depth will be ds = ",ds_max,", df = ",df_max,".\n",
+  #                     "For the cost of pumping to equal the cost of alternative supply, the depths would be ds = ",ds_threshold,", df = ",df_threshold,".\n",
+  #                     "In other words, you would expect ",dynamics," dynamics from this game.\n")
+  # } else {
+  #   results <- tibble::tibble(ds_max=ds_max,df_max=df_max,
+  #                             ds_threshold=ds_threshold,df_threshold=df_threshold,
+  #                             dynamics=dynamics)
+  # }
 
-  # get depths
-  if (aquifer_type == "confined") {
-    get_ds <- conA_ds
-    get_df <- conA_df
-    params_treaty <- params %>% dplyr::rename(rm=rmT,Dsr=DsrT,Dfr=DfrT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,Dsr=DsrN,Dfr=DfrN)
-    ds_threshold <- params$p0s / params$B
-    df_threshold <- params$p0f / params$B
-  } else {
-    params$Bs <- params$B
-    params$Bf <- params$B
-    get_ds <- unconA_ds
-    get_df <- unconA_df
-    params_treaty <- params %>% dplyr::rename(rm=rmT,PHIsr=PHIsrT,PHIfr=PHIfrT)
-    params_notreaty <- params %>% dplyr::rename(rm=rmN,PHIsr=PHIsrN,PHIfr=PHIfrN)
-    ds_threshold <- params$p0s / params$Bs
-    df_threshold <- params$p0f / params$Bf
-  }
-
-  ds_max <- get_ds(qs=params$Qs,qf=params$Qf,params_notreaty)
-  df_max <- get_df(qs=params$Qs,qf=params$Qf,params_notreaty)
-
-  if (ds_max > ds_threshold | df_max > df_threshold) {
-    dynamics <- "possibly interesting"
-  } else {
-    dynamics <- "no interesting"
-  }
-
-  if (text_results) {
-    results <- paste0("If both players pump at their maximum (qi=Qi), the water table depth will be ds = ",ds_max,", df = ",df_max,".\n",
-                      "For the cost of pumping to equal the cost of alternative supply, the depths would be ds = ",ds_threshold,", df = ",df_threshold,".\n",
-                      "In other words, you would expect ",dynamics," dynamics from this game.\n")
-  } else {
-    results <- tibble::tibble(ds_max=ds_max,df_max=df_max,
-                              ds_threshold=ds_threshold,df_threshold=df_threshold,
-                              dynamics=dynamics)
-  }
-
-  return(results)
+  return(NULL)
 }
