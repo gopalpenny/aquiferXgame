@@ -44,7 +44,10 @@ Next we will load the package along with the `tidyverse` package for easy data w
 
 ```{r setup, message=FALSE}
 library(genevoisgame)
-library(tidyverse)
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
 ```
 
 ### Confned aquifer: trust vs trust
