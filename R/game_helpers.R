@@ -2,6 +2,7 @@
 
 
 #' Apply interval contraints to numeric value
+#' @keywords internal
 apply_constraints <- function(x,interval) {
   if (x<interval[1]) {
     x <- interval[1]
@@ -13,8 +14,11 @@ apply_constraints <- function(x,interval) {
 
 
 #' Check if value is within an inclusive range
+#' @keywords internal
 #' @examples
+#' \dontrun{
 #' in_range(c(-3,-1,0,5,10,14),c(0,10))
+#' }
 in_range <- function(x,range) {
   x >= range[1] & x <= range[2]
 }
@@ -25,8 +29,11 @@ in_range <- function(x,range) {
 #' @param ... Arguments to change, listed in vector format, e.g.: \code{c(" ","*"))}
 #' @return
 #' Returns the corrected equations
+#' @keywords internal
 #' @examples
+#' \dontrun{
 #' eqns <- MM2R(path="mathematica/unconfined_eqns.txt", g1=c(" ","*"), g1=c("Sqrt","sqrt"))
+#' }
 MM2R <- function(path,...) {
   fil <- file(path)
   # cat("TITLE extra line", "2 3 5 7", "", "11 13 17", file = fil,
