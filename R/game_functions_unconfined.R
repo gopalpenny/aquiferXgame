@@ -335,9 +335,9 @@ unconA_zRange <- function(params,q_vals) {
 #' Returns boolean value, TRUE if the aquifer has been fully depleted for some amount of pumping.
 check_aquifer_depleted <- function(qs,qf,params,treaty) {
   if (treaty) {
-    params <- params %>% dplyr::rename(rm=rmT, PHIsr=PHIsrT, PHIfr=PHIfrT)
+    names(params)[match(c("rmT","PHIsrT","PHIfrT"),names(params))] <- c("rm","PHIsr","PHIfr")
   } else {
-    params <- params %>% dplyr::rename(rm=rmN, PHIsr=PHIsrN, PHIfr=PHIfrN)
+    names(params)[match(c("rmN","PHIsrN","PHIfrN"),names(params))] <- c("rm","PHIsr","PHIfr")
   }
   phis<-with(params,
              h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm
