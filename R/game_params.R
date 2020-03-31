@@ -38,11 +38,11 @@
 #' library(genevoisgame)
 #' check_params(example_params_confined)
 #' check_params(example_params_unconfined)
-#' check_params(example_params_confined %>% dplyr::select())
+#' \dontrun{check_params(example_params_confined[,-ncol(example_params_confined):-1])}
 #'
-#' params <- example_params_confined %>% dplyr::select(-gs) %>% tidyr::crossing(gs=c(0.2,0.8))
+#' params <- data.frame(example_params_confined,gs=c(0.2,0.8))
 #' check_params(params)
-#' check_params(params %>% dplyr::select())
+#' \dontrun{check_params(params[,-ncol(example_params_confined):-1])}
 check_params <- function(params) {
   drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs','d0s','d0f','DsrN','DsrT','DfrN','DfrT')
   drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f','PHIsrN','PHIsrT','PHIfrN','PHIfrT')
@@ -92,7 +92,7 @@ check_params <- function(params) {
   }
 
   # 3. Check for negative values
-  neg_vals_df <- params %>% dplyr::select_if(function(x) any(x < 0))
+  neg_vals_df <- params[,sapply(params,function(x) any(x<0))]
   if (ncol(neg_vals_df) > 0) {
     warning(paste0("param column(s), ",paste(names(neg_vals_df),collapse=", "),", contain negative values."))
   }
@@ -134,6 +134,7 @@ check_params <- function(params) {
 #' \item: \code{ds_threshold, df_threshold}: The depth for each player where the cost of pumping equals the cost of alternative supply (\code{Qi=B*di}).
 #' }
 #' @examples
+#' \dontrun{
 #' library(magrittr)
 #'
 #' # Table output
@@ -143,6 +144,7 @@ check_params <- function(params) {
 #' # Text output
 #' check_game_dynamics(example_params_unconfined) %>% cat()
 #' example_params_unconfined %>% dplyr::mutate(Qs=1,Qf=1) %>% check_game_dynamics() %>% cat()
+#' }
 check_game_dynamics <- function(params, text_results=TRUE, aquifer_type=NULL) {
   # this function calculates water table depth, given parameters and abstraction
   if(dim(params)[1]!=1){
