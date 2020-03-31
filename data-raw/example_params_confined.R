@@ -28,4 +28,4 @@ params_default_confined <- function(area_km2=50) {
 
 example_params_confined <- params_default_confined()
 
-usethis::use_data(example_params_confined,overwrite = TRUE)
+usethis::use_data(example_params_confined)
