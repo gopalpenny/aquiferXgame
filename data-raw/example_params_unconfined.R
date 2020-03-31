@@ -38,4 +38,4 @@ params_default_unconfined <- function(drawdown) {
 
 example_params_unconfined <- params_default_unconfined(drawdown)
 
-usethis::use_data(example_params_unconfined,overwrite = TRUE)
+usethis::use_data(example_params_unconfined)
