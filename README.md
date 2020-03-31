@@ -2,6 +2,7 @@
 # genevoisgame
 
 <!-- badges: start -->
+[![Travis build status](https://travis-ci.org/gopalpenny/genevoisgame.svg?branch=master)](https://travis-ci.org/gopalpenny/genevoisgame)
 <!-- badges: end -->
 
 The goal of genevoisgame is to ...

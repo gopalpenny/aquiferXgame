@@ -6,3 +6,4 @@
 ^ignore$
 ^docs$
 ^LICENSE\.md$
+^\.travis\.yml$
