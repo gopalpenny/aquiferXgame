@@ -9,17 +9,27 @@ MM2R(path, ...)
 \arguments{
 \item{path}{Path to file to convert}
 
-\item{...}{Arguments to change, listed in vector format, e.g.: \code{c(" ","*"))}}
+\item{...}{Arguments to change, listed in vector format as \code{c(x1,x2)}}
 }
 \value{
-Returns the corrected equations
+Returns the corrected equations using
 }
 \description{
 Convert Mathematica to R
 }
+\details{
+For each argument in \code{...}, replaces x1 with x2 using gsub. For example, \code{c(" ","*")} changes
+  " " to "*". Special characters must be escaped
+}
 \examples{
 \dontrun{
 eqns <- MM2R(path="mathematica/unconfined_eqns.txt", g1=c(" ","*"), g1=c("Sqrt","sqrt"))
+eqns <- MM2R(path="mathematica/unconfined_nl_eqns.txt",
+             g1=c(" ","*"),
+             g2=c("Sqrt","sqrt"),
+             g3=c("Log","log"),
+             g4=c("\\\\[","\\\\("),
+             g4=c("\\\\]","\\\\)"))
 }
 }
 \keyword{internal}
