@@ -2,9 +2,9 @@
 % Please edit documentation in R/game_functions_unconfined.R
 \name{evaluate_treaty_unconfined}
 \alias{evaluate_treaty_unconfined}
-\title{Evaluate the treaty in unconfined aquifer}
+\title{Evaluate the treaty in unconfined aquifer with linear cost}
 \usage{
-evaluate_treaty_unconfined(params)
+evaluate_treaty_unconfined(params, cost = "linear")
 }
 \arguments{
 \item{params}{Parameter list (or data.frame with 1 row) containing
@@ -15,7 +15,7 @@ Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
 and whether or not there is a treaty (i.e., if zRange > 0)
 }
 \description{
-Evaluate whether or not the treaty will be made.
+Evaluate whether or not the treaty will be made where pumping cost is linear with depth.
 }
 \details{
 Evaluate the treaty given social, economic, and geophysical parameters.
@@ -34,7 +34,7 @@ Note: if the aquifer is fully depleted in any of the solutions, this function wi
 }
 \examples{
 \dontrun{
-evaluate_treaty_unconfined(example_params_unconfined)
+evaluate_treaty_unconfined_linear(example_params_unconfined)
 }
 }
 \keyword{internal}

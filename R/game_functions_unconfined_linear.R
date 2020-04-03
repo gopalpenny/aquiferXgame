@@ -1,117 +1,34 @@
-# game_functions_unconfined.R
-
-
-#' Evaluate the treaty in unconfined aquifer
-#'
-#' Evaluate whether or not the treaty will be made.
-#' @param params Parameter list (or data.frame with 1 row) containing
-#' necessary parameters to evaluate the agreement in an unconfined case.
-#' @details
-#' Evaluate the treaty given social, economic, and geophysical parameters.
-#'
-#' Note that root finding proceeds in two steps for each of the First Besh, Nash Equilibrium, and Cheat scenarios:
-#' \enumerate{
-#' \item Pumping rates (for both players) are determined simultaneously to maximize utility based on the scenario (ie,
-#' by finding the roots). Root finding stops immediately if the aquifer is fully depleted.
-#' \item Pumping has to fall within the range [0, Qi] for both players. If it is outside this range, it is constrained
-#' to be within the range. Then, pumping for each player is optimized individually given a fixed pumping rate for the
-#' other player. The new values are then constrained, and the process repeats recursively until convergin on a solution
-#' (or 500 tries). Within each iteration, root finding stops if the aquifer is fully depleted.
-#' }
-#' Note: if the aquifer is fully depleted in any of the solutions, this function will return 3 additional columns:
-#' \code{AD_fb,AD_nash,AD_cheat}, representing logical values that indicate in which scenario the aquifer was depleted.
-#' @return
-#' Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
-#' and whether or not there is a treaty (i.e., if zRange > 0)
-#' @importFrom magrittr %>%
-#' @keywords internal
-#' @examples
-#' \dontrun{
-#' evaluate_treaty_unconfined(example_params_unconfined)
-#' }
-evaluate_treaty_unconfined <- function(params) {
-  # (eval_out <- evaluate_treaty(params_default()))
-  # this function calculates abstraction from the game,
-  # and determines whether or not a treaty is signed
-  if(nrow(params)!=1){
-    stop("This is an error message because params not 1 dimension")
-  }
-  params$Bs <- params$B
-  params$Bf <- params$B
-  params$phi0s <- params$h0s^2
-  params$phi0f <- params$h0f^2
-
-  q_hat <- unconA_qeval(params,unconA_qhat0,unconA_qhat2)
-  q_star <- unconA_qeval(params,unconA_qstar0,unconA_qstar2)
-  q_double <- unconA_qeval(params,unconA_qdouble0,unconA_qdouble2,qshat=q_hat$qs,qfhat=q_hat$qf)
-  # q_double <- unconA_qdouble(params,qshat=q_hat[1],qfhat=q_hat[2])
-
-  # q_hat <- conA_qeval(params,conAf_qs0=conA_qshat0,conA_qfhat0,conA_qshat2,conA_qfhat2)
-  # q_star <- conA_qeval(params,conAf_qs0=conA_qsstar0,conA_qfstar0,conA_qsstar2,conA_qfstar2)
-  # q_double <- conA_qeval(params %>% dplyr::mutate(qshat=q_hat$qs,qfhat=q_hat$qf),
-  #                        conAf_qs0=conA_qsdouble0,conA_qfdouble0,conA_qsdouble2,conA_qfdouble2)
-
-  q_vals <- tibble::tibble(qshat=q_hat$qs,qfhat=q_hat$qf,
-                           qsstar=q_star$qs,qfstar=q_star$qf,
-                           qsdouble=q_double$qs,qfdouble=q_double$qf)
-
-  # is the aquifer depleted (AD) in any of the cases?
-  AD_fb <- check_aquifer_depleted(q_vals$qshat,q_vals$qfhat,params,treaty=TRUE)
-  AD_nash <- check_aquifer_depleted(q_vals$qsstar,q_vals$qfstar,params,treaty=FALSE)
-  AD_cheat <- check_aquifer_depleted(q_vals$qsdouble,q_vals$qfdouble,params,treaty=TRUE)
-  AD_cols <- tibble::tibble()
-  if (any(c(AD_fb,AD_nash,AD_cheat))) {
-    AD_cols <- tibble::tibble(AD_fb=AD_fb,AD_nash=AD_nash,AD_cheat=AD_cheat)
-    # warning(paste("The aquifer was fully depleted for at least one player in the",
-    #               paste(c("First Best","Nash","Cheat")[c(AD_fb,AD_nash,AD_cheat)],sep=", "),"scenario(s)"))
-  }
-
-  # # get z constraints
-  zMaxFrench_calc <- unconA_zMaxFrench(params,q_vals)
-  zMinSwiss_calc <- unconA_zMinSwiss(params,q_vals)
-  zRange_calc <- round(zMaxFrench_calc - zMinSwiss_calc,6)
-
-  treaty <- dplyr::case_when(
-    zRange_calc>0 ~ "Y",
-    zRange_calc<=0 ~ "N",
-    any(c(AD_fb,AD_nash,AD_cheat)) ~ "D",
-    TRUE ~ as.character(NA)
-  )
-  return(tibble::tibble(treaty=treaty,zRange=zRange_calc,
-                zMinSwiss=zMinSwiss_calc,zMaxFrench=zMaxFrench_calc) %>%
-           dplyr::bind_cols(q_vals,
-                            AD_cols)
-  )
-}
-
+# game_functions_unconfined_linear.R
+# all functions are called by game_functions_unconfined()
 
 # 4b Mathematica functions for depth, utility, and abstraction
 
-unconA_Us <- function(qs,qf,params,z) {
+unconA_lin_Us <- function(qs,qf,params,z) {
   with(params,
        -es-p0s*(-qs+Qs)-crs*rm-Bs*qs*(dBs-sqrt(h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm))+z
   )}
-unconA_Uf <- function(qs,qf,params,z) {
+unconA_lin_Uf <- function(qs,qf,params,z) {
   with(params,
        -ef-p0f*(-qf+Qf)-Bf*qf*(dBf-sqrt(h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm))-z
   )}
-unconA_ds <- function(qs,qf,params) {
+unconA_lin_ds <- function(qs,qf,params) {
   with(params,
        dBs-sqrt(h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm)
   )}
-unconA_df <- function(qs,qf,params) {
+unconA_lin_df <- function(qs,qf,params) {
   with(params,
        dBf-sqrt(h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm)
   )}
 
 # q values
 
-unconA_qeval <- function(params,unconAf_q0,unconAf_q2,qshat=NULL,qfhat=NULL) {
+unconA_lin_qeval <- function(params,unconAf_lin_q0,unconAf_lin_q2,qshat=NULL,qfhat=NULL) {
+  # uconAf is for...??? function!
   qdouble <- !is.null(qshat) | !is.null(qfhat) # if qdouble, then need to input qshat and qfhat to functions
   if (!qdouble) { # need to supply qshat, qfhat for q_double
-    q0 <- unconAf_q0(params) # get initial q_hat
+    q0 <- unconAf_lin_q0(params) # get initial q_hat
   } else {
-    q0 <- unconAf_q0(params,qshat,qfhat) # get initial q_hat
+    q0 <- unconAf_lin_q0(params,qshat,qfhat) # get initial q_hat
   }
   qs0 <- q0[1]
   qf0 <- q0[2]
@@ -125,9 +42,9 @@ unconA_qeval <- function(params,unconAf_q0,unconAf_q2,qshat=NULL,qfhat=NULL) {
       qs1 <- qs2 # store old
       qf1 <- qf2
       if (!qdouble) { # need to supply qshat, qfhat for q_double
-        q2 <- unconAf_q2(params,qs1,qf1)
+        q2 <- unconAf_lin_q2(params,qs1,qf1)
       } else {
-        q2 <- unconAf_q2(params,qs1,qf1,qshat,qfhat)
+        q2 <- unconAf_lin_q2(params,qs1,qf1,qshat,qfhat)
       }
       qs2 <- apply_constraints(q2[1],c(0,params$Qs)) # update qshat with constrained qfhat
       qf2 <- apply_constraints(q2[2],c(0,params$Qf)) # update qfhat with constrained qshat
@@ -140,8 +57,8 @@ unconA_qeval <- function(params,unconAf_q0,unconAf_q2,qshat=NULL,qfhat=NULL) {
   return(list(qs=qs2,qf=qf2))
 }
 
-unconA_qhat0 <- function(params) {
-  # unconA_qhat0
+unconA_lin_qhat0 <- function(params) {
+  # unconA_lin_qhat0
   # get roots for F1 = F2 = 0, solving for Qs, Qf
   first_best_equations <- function(x,params) {
     if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & x[1] >= 0 & x[2] >= 0) {
@@ -163,8 +80,8 @@ unconA_qhat0 <- function(params) {
   return(q_hat)
 }
 
-unconA_qhat2 <- function(params,qs1,qf1) {
-  # unconA_qhat2
+unconA_lin_qhat2 <- function(params,qs1,qf1) {
+  # unconA_lin_qhat2
   # get roots for F1 = 0
   first_best_equations_qs2 <- function(x,params,qf1) {
     if (!check_aquifer_depleted(x,qf1,params,TRUE) & x >= 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
@@ -193,8 +110,8 @@ unconA_qhat2 <- function(params,qs1,qf1) {
   return(c(qs2_hat,qf2_hat))
 }
 
-unconA_qstar0 <- function(params) {
-  # unconA_qstar0
+unconA_lin_qstar0 <- function(params) {
+  # unconA_lin_qstar0
   # get roots for N1 = N2 = 0, solving for Qs, Qf
   nash_equations <- function(x,params) {
     if (!check_aquifer_depleted(x[1],x[2],params,FALSE) & x[1] >= 0 & x[2] >= 0) {
@@ -216,8 +133,8 @@ unconA_qstar0 <- function(params) {
   return(q_star)
 }
 
-unconA_qstar2 <- function(params,qs1,qf1) {
-  # unconA_qstar2
+unconA_lin_qstar2 <- function(params,qs1,qf1) {
+  # unconA_lin_qstar2
   # get roots for N1 = 0, solving for Qs
   nash_equations_qs2 <- function(x,params,qf1) {
     if (!check_aquifer_depleted(x,qf1,params,FALSE) & x >= 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
@@ -247,8 +164,8 @@ unconA_qstar2 <- function(params,qs1,qf1) {
   return(c(qs2_star,qf2_star))
 }
 
-unconA_qdouble0 <- function(params,qshat,qfhat) {
-  # unconA_qdouble0
+unconA_lin_qdouble0 <- function(params,qshat,qfhat) {
+  # unconA_lin_qdouble0
   # get roots for D1 = D2 = 0, solving for Qs, Qf
   cheat_equations <- function(x,params,qshat,qfhat) {# need to ensure aquifer is not fully depleted for any combination of qs, qf, qshat, qfhat, and pumping is nonnegative for both players
     if (!check_aquifer_depleted(x[1],x[2],params,TRUE) & # qs, qf
@@ -273,8 +190,8 @@ unconA_qdouble0 <- function(params,qshat,qfhat) {
   return(q_double)
 }
 
-unconA_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
-  # unconA_qdouble2
+unconA_lin_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
+  # unconA_lin_qdouble2
   # get roots for D1 = D2 = 0, solving for Qs
   cheat_equations_qs2 <- function(x,params,qshat,qfhat,qf1) {
     if (!check_aquifer_depleted(x,qf1,params,TRUE) &
@@ -310,18 +227,18 @@ unconA_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
 
 
 # z constraints
-unconA_zMinSwiss <- function(params,q_vals) {
+unconA_lin_zMinSwiss <- function(params,q_vals) {
   with(q_vals, # q_vals should include qsstar,qfstar,qshat,qfhat,qsdouble,qfdouble
        with(params,
             es+p0s*(Qs-qshat)-p0s*(Qs-qsstar)-crs*rmN-Bs*qsstar*(dBs-sqrt(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIsrN*rmN))+crs*rmT+Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))-gs*(Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))-Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIsrT*rmT)))
        ))}
-unconA_zMaxFrench <- function(params,q_vals) {
+unconA_lin_zMaxFrench <- function(params,q_vals) {
   with(q_vals,
        with(params,
             -ef-p0f*(Qf-qfhat)+p0f*(Qf-qfstar)+Bf*qfstar*(dBf-sqrt(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIfrN*rmN))-Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))+gf*(Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))-Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIfrT*rmT)))
        ))}
-unconA_zRange <- function(params,q_vals) {
-  zRange <- unconA_zMaxFrench(params,q_vals) - unconA_zMinSwiss(params,q_vals)
+unconA_lin_zRange <- function(params,q_vals) {
+  zRange <- unconA_lin_zMaxFrench(params,q_vals) - unconA_lin_zMinSwiss(params,q_vals)
   return(zRange)
 }
 
