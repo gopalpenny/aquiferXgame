@@ -238,13 +238,17 @@ unconA_nl_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
 unconA_nl_zMinSwiss <- function(params,q_vals) {
   with(q_vals, # q_vals should include qsstar,qfstar,qshat,qfhat,qsdouble,qfdouble
        with(params,
-            (1/dBs)(dBs*es+dBs*p0s*(Qs-qshat)-dBs*p0s*(Qs-qsstar)-crs*dBs*rmN+crs*dBs*rmT-Bs*qsstar*(dBs-sqrt(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIsrN*rmN))*(l*(dBs-sqrt(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIsrN*rmN))-dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIsrN*rmN)))+Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))*(l*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))-dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT)))+Bs*gs*qshat*(-(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))*(l*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))-dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT)))+(dBs-sqrt(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIsrT*rmT))*(l*(dBs-sqrt(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIsrT*rmT))-dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIsrT*rmT)))))
-       ))}
+            1/dBs*(dBs*es+dBs*p0s*(Qs-qshat)-dBs*p0s*(Qs-qsstar)-crs*dBs*rmN+crs*dBs*rmT-Bs*qsstar*(dBs-sqrt(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIsrN*rmN))*(l*(dBs-sqrt(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIsrN*rmN))-dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qfstar-PHIss*qsstar+PHIsrN*rmN)))+Bs*qshat*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))*(l*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))-dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT)))+Bs*gs*qshat*(-(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))*(l*(dBs-sqrt(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT))-dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qfdouble-PHIss*qshat+PHIsrT*rmT)))+(dBs-sqrt(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIsrT*rmT))*(l*(dBs-sqrt(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIsrT*rmT))-dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qfhat-PHIss*qshat+PHIsrT*rmT)))))
+       )
+  )
+}
 unconA_nl_zMaxFrench <- function(params,q_vals) {
   with(q_vals,
        with(params,
-            (1/dBf)(-dBf*ef-dBf*p0f*(Qf-qfhat)+dBf*p0f*(Qf-qfstar)+Bf*qfstar*(dBf-sqrt(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIfrN*rmN))*(l*(dBf-sqrt(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIfrN*rmN))-dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIfrN*rmN)))-Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))*(l*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))-dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT)))+Bf*gf*qfhat*((dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))*(l*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))-dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT)))-(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIfrT*rmT))*(l*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIfrT*rmT))-dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIfrT*rmT)))))
-       ))}
+            1/dBf*(-dBf*ef-dBf*p0f*(Qf-qfhat)+dBf*p0f*(Qf-qfstar)+Bf*qfstar*(dBf-sqrt(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIfrN*rmN))*(l*(dBf-sqrt(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIfrN*rmN))-dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2-PHIff*qfstar-PHIfs*qsstar+PHIfrN*rmN)))-Bf*qfhat*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))*(l*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))-dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT)))+Bf*gf*qfhat*((dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))*(l*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT))-dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2-PHIff*qfhat-PHIfs*qsdouble+PHIfrT*rmT)))-(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIfrT*rmT))*(l*(dBf-sqrt(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIfrT*rmT))-dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2-PHIff*qfhat-PHIfs*qshat+PHIfrT*rmT)))))
+       )
+  )
+}
 unconA_nl_zRange <- function(params,q_vals) {
   zRange <- unconA_nl_zMaxFrench(params,q_vals) - unconA_nl_zMinSwiss(params,q_vals)
   return(zRange)
