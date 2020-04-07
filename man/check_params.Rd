@@ -41,6 +41,7 @@ And for unconfined aquifers:
 \item{Groundwater depth without pumping}{\code{dBs, dBf, h0s, h0f}}
 \item{Recharge relationship with a treaty}{\code{PHIsrT, PHIfrT}}
 \item{Recharge relationship without a treaty}{\code{PHIsrN, PHIfrN}}
+\item{Nonlinearity of the cost function}{\code{l}}
 }
 }
 \examples{

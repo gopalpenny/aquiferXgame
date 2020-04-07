@@ -4,7 +4,7 @@
 \alias{evaluate_treaty_unconfined}
 \title{Evaluate the treaty in unconfined aquifer with linear cost}
 \usage{
-evaluate_treaty_unconfined(params, cost = "linear")
+evaluate_treaty_unconfined(params)
 }
 \arguments{
 \item{params}{Parameter list (or data.frame with 1 row) containing
