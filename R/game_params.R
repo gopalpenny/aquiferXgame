@@ -30,6 +30,7 @@
 #' \item{Groundwater depth without pumping}{\code{dBs, dBf, h0s, h0f}}
 #' \item{Recharge relationship with a treaty}{\code{PHIsrT, PHIfrT}}
 #' \item{Recharge relationship without a treaty}{\code{PHIsrN, PHIfrN}}
+#' \item{Nonlinearity of the cost function}{\code{l}}
 #' }
 #' @export
 #' @return
@@ -45,10 +46,11 @@
 #' \dontrun{check_params(params[,-ncol(example_params_confined):-1])}
 check_params <- function(params) {
   drawdown_confined_params <- c('Dff','Dss','Dsf','Dfs','d0s','d0f','DsrN','DsrT','DfrN','DfrT')
-  drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f','PHIsrN','PHIsrT','PHIfrN','PHIfrT')
+  drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f','PHIsrN','PHIsrT','PHIfrN','PHIfrT','l')
   # initial_depth_confined_params <- c('d0s','d0f')
   # initial_depth_unconfined_params <- c('dBs','dBf','h0s','h0f')
   additional_params <- c('Qf','Qs','p0f','p0s','B','rmN','rmT','crs','gs','gf','es','ef')
+  additional_warnings <- NULL
 
   param_names <- names(params)
   missing_params <- c()
@@ -87,6 +89,14 @@ check_params <- function(params) {
       # warning(paste("missing",paste(missing_unconf_params,collapse=", "),"in params"))
       missing_params <- c(missing_params,missing_unconf_params)
     }
+    if ("l" %in% param_names) {
+      if (any(params$l < 0) | any(params$l > 1)) {
+        additional_warnings <- c(additional_warnings,"Column l contains values not in the range [0,1)")
+      }
+      if (any(params$l == 1)) {
+        additional_warnings <- c(additional_warnings,"Column l contains values equal to 1 (one). This triggers linear cost solution for the unconfined game.")
+      }
+    }
   } else {
     stop("Missing drawdown parameters (Dxx or PHIxx) in params.")
   }
@@ -99,6 +109,12 @@ check_params <- function(params) {
 
   if (length(missing_params) > 0) {
     warning(paste("missing",paste(missing_params,collapse=", "),"in params"))
+  }
+
+  if (length(additional_warnings) > 0) {
+    for (i in 1:length(additional_warnings)) {
+      warning(additional_warnings[i])
+    }
   }
 
   # return aquifer type

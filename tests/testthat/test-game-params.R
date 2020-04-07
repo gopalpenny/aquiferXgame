@@ -26,11 +26,17 @@ test_that('check_params returns correct aquifer type for data.frame with multipl
   expect_equal(check_params(params_multiple_con),"confined")
 })
 
+test_that('check_params returns warning l is not in (0,1]',{
+  expect_warning(check_params(params_unconfined %>% dplyr::mutate(l=1)),"Column l contains values equal to 1")
+  expect_warning(check_params(params_unconfined %>% dplyr::mutate(l=-0.1)),"Column l contains values not in the range")
+  expect_warning(check_params(params_unconfined %>% dplyr::mutate(l=1.1)),"Column l contains values not in the range")
+})
 
 test_that('check_params returns warning if missing UNCONFINED parameters',{
   expect_warning(check_params(params_unconfined %>% dplyr::select(-PHIff,-dBs)),"missing PHIff, dBs in params")
   expect_warning(check_params(params_unconfined %>% dplyr::select(-dBs)),"missing dBs in params")
   expect_warning(check_params(params_unconfined %>% dplyr::select(-PHIff)),"missing PHIff in params")
+  expect_warning(check_params(params_unconfined %>% dplyr::select(-l)),"missing l in params")
 })
 
 params_both <- params_unconfined %>% dplyr::bind_cols(params_confined %>% dplyr::select(dplyr::matches("D[sfij][sfij]")))

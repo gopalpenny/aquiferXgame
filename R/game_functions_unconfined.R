@@ -28,7 +28,7 @@
 #' \dontrun{
 #' evaluate_treaty_unconfined_linear(example_params_unconfined)
 #' }
-evaluate_treaty_unconfined <- function(params, cost = "linear") {
+evaluate_treaty_unconfined <- function(params) {
   # (eval_out <- evaluate_treaty(params_default()))
   # this function calculates abstraction from the game,
   # and determines whether or not a treaty is signed
@@ -40,18 +40,20 @@ evaluate_treaty_unconfined <- function(params, cost = "linear") {
   params$phi0s <- params$h0s^2
   params$phi0f <- params$h0f^2
 
-  if (cost=="linear") {
-    q_hat <- unconA_lin_qeval(params,unconA_lin_qhat0,unconA_lin_qhat2)
-    q_star <- unconA_lin_qeval(params,unconA_lin_qstar0,unconA_lin_qstar2)
-    q_double <- unconA_lin_qeval(params,unconA_lin_qdouble0,unconA_lin_qdouble2,qshat=q_hat$qs,qfhat=q_hat$qf)
-    unconA_function_zMaxFrench <- unconA_lin_zMaxFrench
-    unconA_function_zMinSwiss <- unconA_lin_zMinSwiss
-  } else if (cost=="nonlinear") {
+  if ("l" %in% names(params) & params$l != 1) {
     q_hat <- unconA_nl_qeval(params,unconA_nl_qhat0,unconA_nl_qhat2)
     q_star <- unconA_nl_qeval(params,unconA_nl_qstar0,unconA_nl_qstar2)
     q_double <- unconA_nl_qeval(params,unconA_nl_qdouble0,unconA_nl_qdouble2,qshat=q_hat$qs,qfhat=q_hat$qf)
     unconA_function_zMaxFrench <- unconA_nl_zMaxFrench
     unconA_function_zMinSwiss <- unconA_nl_zMinSwiss
+  } else if (params$l == 1) {
+    q_hat <- unconA_lin_qeval(params,unconA_lin_qhat0,unconA_lin_qhat2)
+    q_star <- unconA_lin_qeval(params,unconA_lin_qstar0,unconA_lin_qstar2)
+    q_double <- unconA_lin_qeval(params,unconA_lin_qdouble0,unconA_lin_qdouble2,qshat=q_hat$qs,qfhat=q_hat$qf)
+    unconA_function_zMaxFrench <- unconA_lin_zMaxFrench
+    unconA_function_zMinSwiss <- unconA_lin_zMinSwiss
+  } else {
+    stop("l must be in the range [0,1]")
   }
 
 
