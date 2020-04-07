@@ -28,20 +28,21 @@ in_range <- function(x,range) {
 #' @param path Path to file to convert
 #' @param ... Arguments to change, listed in vector format as \code{c(x1,x2)}
 #' @details
-#' For each argument in \code{...}, replaces x1 with x2 using gsub. For example, \code{c(" ","*")} changes
-#'   " " to "*". Special characters must be escaped
+#' For each argument in \code{...}, replaces x1 with x2 using gsub. This is done sequentially,
+#' following the order of parameters in \code{...}. For example, \code{c(" ","*"),c("x1","x\\[1\\]")} changes
+#' " " to "*" and then "x1" to "x[1]". Special characters must be escaped.
 #' @return
 #' Returns the corrected equations using
 #' @keywords internal
 #' @examples
 #' \dontrun{
 #' eqns <- MM2R(path="mathematica/unconfined_eqns.txt", g1=c(" ","*"), g1=c("Sqrt","sqrt"))
-#' eqns <- MM2R(path="mathematica/unconfined_nl_eqns.txt",
-#'              g1=c(" ","*"),
-#'              g2=c("Sqrt","sqrt"),
-#'              g3=c("Log","log"),
-#'              g4=c("\\[","\\("),
-#'              g4=c("\\]","\\)"))
+#'
+#' sink("./mathematica/unconfined_nl_eqns_R.txt")
+#' eqns <- MM2R(path="mathematica/unconfined_nl_eqns.txt",g1=c(" ","*"),g2=c("Sqrt","sqrt"),
+#'              g3=c("Log","log"),g4=c("\\[","\\("),g5=c("\\]","\\)"),g6=c("x1","x\\[1\\]"),
+#'              g6=c("x2","x\\[2\\]"))
+#' sink()
 #' }
 MM2R <- function(path,...) {
   fil <- file(path)
