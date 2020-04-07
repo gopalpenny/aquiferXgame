@@ -27,7 +27,7 @@ results_d <- suppressWarnings(evaluate_treaty_cases(example_params_unconfined_li
 test_that("evaluate_treaty_cases UNCONFINED returns all input parameters for options a, q, u, d input",{
   expect_equal(results_a %>% names(),
                c('treaty','zRange','zMinSwiss','zMaxFrench','Qf','Qs','p0f','p0s','B','dBs','dBf','h0s','h0f','rmN','rmT',
-                 'crs','gs','gf','es','ef','l','PHIff','PHIfrT','PHIfs','PHIsf','PHIsrT','PHIss','PHIsrN','PHIfrN'))
+                 'crs','c0rs','gs','gf','es','ef','l','PHIff','PHIfrT','PHIfs','PHIsf','PHIsrT','PHIss','PHIsrN','PHIfrN'))
   expect_equal(results_q %>% names(),
                c('treaty','zRange','zMinSwiss','zMaxFrench','qshat','qsstar','qsdouble','qfhat','qfstar','qfdouble'))
   expect_equal(results_u %>% names(),

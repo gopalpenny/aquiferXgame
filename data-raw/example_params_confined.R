@@ -19,6 +19,7 @@ params_default_confined <- function(area_km2=50) {
                                 DfrN=(1/area_km2)*0.5, #m/MCM
                                 DfrT=(1/area_km2)*0.5, #m/MCM)
                                 crs=0.1,
+                                c0rs=0,
                                 gs=0.5,
                                 gf=0.5,
                                 es=0,

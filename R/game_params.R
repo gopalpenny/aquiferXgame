@@ -49,7 +49,7 @@ check_params <- function(params) {
   drawdown_unconfined_params <- c('PHIff','PHIss','PHIsf','PHIfs','dBs','dBf','h0s','h0f','PHIsrN','PHIsrT','PHIfrN','PHIfrT','l')
   # initial_depth_confined_params <- c('d0s','d0f')
   # initial_depth_unconfined_params <- c('dBs','dBf','h0s','h0f')
-  additional_params <- c('Qf','Qs','p0f','p0s','B','rmN','rmT','crs','gs','gf','es','ef')
+  additional_params <- c('Qf','Qs','p0f','p0s','B','rmN','rmT','crs','c0rs','gs','gf','es','ef')
   additional_warnings <- NULL
 
   param_names <- names(params)

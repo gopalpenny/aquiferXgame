@@ -28,6 +28,7 @@ params_default_unconfined <- function(drawdown) {
                                 rmN=1, #
                                 rmT=1, #
                                 crs=0.1,
+                                c0rs=0,
                                 gs=0.5,
                                 gf=0.5,
                                 es=0,
