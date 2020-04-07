@@ -89,4 +89,36 @@ evaluate_treaty_unconfined <- function(params) {
   )
 }
 
+#' Check if unconfined aquifer is fully depleted
+#'
+#' Is pumping enough to fully deplete the aquifer for either player?
+#' @param params parameter data.frame with single row
+#' @param treaty boolean value that determines the context for evaluation (e.g., for Nash should be \code{F}, for First Best should be \code{T})
+#' @param qs pumping from player S
+#' @param qf pumping from player F
+#' @keywords internal
+#' @return
+#' Returns boolean value, TRUE if the aquifer has been fully depleted for some amount of pumping.
+check_aquifer_depleted <- function(qs,qf,params,treaty) {
+  if (treaty) {
+    names(params)[match(c("rmT","PHIsrT","PHIfrT"),names(params))] <- c("rm","PHIsr","PHIfr")
+  } else {
+    names(params)[match(c("rmN","PHIsrN","PHIfrN"),names(params))] <- c("rm","PHIsr","PHIfr")
+  }
+  phis<-with(params,
+             h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm
+  )
+
+  phif<-with(params,
+             h0f^2-PHIff*qf-PHIfs*qs+PHIfr*rm
+  )
+
+  if (phis < 0 | phif < 0) {
+    aquifer_depleted <- TRUE
+  } else {
+    aquifer_depleted <- FALSE
+  }
+  return(aquifer_depleted)
+}
+
 
