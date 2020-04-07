@@ -155,7 +155,7 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
 #' Evaluate utility given (single) treaty parameters
 #' @inheritParams evaluate_treaty_depths
 #' @keywords internal
-evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
+evaluate_treaty_utility <- function(params, q_vals, aquifer_type) {
   DsrN <- DsrT <- DfrN <- DfrT <- PHIsrN <- PHIsrT <- PHIfrN <- PHIfrT <- NULL
   # this function calculates utilities, given parameters and abstraction
   if(dim(params)[1]!=1){
@@ -173,8 +173,13 @@ evaluate_treaty_utility <- function(params,q_vals,aquifer_type) {
   } else {
     params$Bs <- params$B
     params$Bf <- params$B
-    get_Us <- unconA_Us
-    get_Uf <- unconA_Uf
+    if (params$l == 1) {
+      get_Us <- unconA_lin_Us
+      get_Uf <- unconA_lin_Uf
+    } else {
+      get_Us <- unconA_nl_Us
+      get_Uf <- unconA_nl_Uf
+    }
     params_treaty <- params
     names(params_treaty)[match(c("rmT","PHIsrT","PHIfrT"),names(params_treaty))] <- c("rm","PHIsr","PHIfr")
     params_notreaty <- params
@@ -218,8 +223,13 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
   } else {
     params$Bs <- params$B
     params$Bf <- params$B
-    get_ds <- unconA_ds
-    get_df <- unconA_df
+    if (params$l == 1) {
+      get_ds <- unconA_lin_ds
+      get_df <- unconA_lin_df
+    } else {
+      get_ds <- unconA_nl_ds
+      get_df <- unconA_nl_df
+    }
     params_treaty <- params
     names(params_treaty)[match(c("rmT","PHIsrT","PHIfrT"),names(params_treaty))] <- c("rm","PHIsr","PHIfr")
     params_notreaty <- params
