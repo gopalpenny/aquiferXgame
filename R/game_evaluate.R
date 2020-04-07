@@ -13,7 +13,14 @@
 #' @param aquifer_type Aquifer type as "confined" or "unconfined". If not specified
 #' (default) \code{check_params} is run and used to determine the aquifer type.
 #' @details
-#' Evaluate the treaty given social, economic, and geophysical parameters
+#' Evaluate the treaty given social, economic, and geophysical parameters.
+#'
+#' Note that the cost
+#' of pumping is linear for confined aquifers, and nonlinear for unconfined aquifers, with the
+#' nonlinearity depending on the parameter l, with the key feature that the cost become infinite
+#' as h -> 0. For l = 0, the cost function is exponential and crosses 0 when h_i = dB_i. As l increases
+#' towards 1, the solution becomes more linear when the water table is near the surface. When l == 1,
+#' a linear solution is used and the cost remains linear even when the aquifer is fully depleted.
 #' @return
 #' Returns a 1-row tibble containing pumping, utility ranges needed for the treaty,
 #' and whether or not there is a treaty (i.e., if zRange > 0).
@@ -83,6 +90,13 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 #' \item u - return utilities of each player
 #' \item d - return depth to water table for each player
 #' }
+#'
+#' Note that the cost
+#' of pumping is linear for confined aquifers, and nonlinear for unconfined aquifers, with the
+#' nonlinearity depending on the parameter l, with the key feature that the cost become infinite
+#' as h -> 0. For l = 0, the cost function is exponential and crosses 0 when h_i = dB_i. As l increases
+#' towards 1, the solution becomes more linear when the water table is near the surface. When l == 1,
+#' a linear solution is used and the cost remains linear even when the aquifer is fully depleted
 #' @return
 #' Returns a \code{tibble} containing z-values needed for the treaty
 #' and whether or not there is a treaty (i.e., if zRange > 0), as well as output specified by \code{return_criteria}.
