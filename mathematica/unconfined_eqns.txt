@@ -1,16 +1,16 @@
 #phis
-h0s^2-PHIsf qf-PHIss qs+PHIrs rm
+
 #phif
-h0f^2-PHIff qf-PHIfs qs+PHIrf rm
+
 #F1_2
--Bs dBs+p0s-(Bf PHIfs qf1)/(2 Sqrt[h0f^2-PHIff qf1+PHIrfT rmT-PHIfs x1])+(Bs (2 h0s^2-2 PHIsf qf1+2 PHIrsT rmT-3 PHIss x1))/(2 Sqrt[h0s^2-PHIsf qf1+PHIrsT rmT-PHIss x1])
+
 #F2_2
--Bf dBf+p0f+(Bf (2 h0f^2-2 PHIfs qs1+2 PHIrfT rmT-3 PHIff x2))/(2 Sqrt[h0f^2-PHIfs qs1+PHIrfT rmT-PHIff x2])-(Bs PHIsf qs1)/(2 Sqrt[h0s^2-PHIss qs1+PHIrsT rmT-PHIsf x2])
+
 #N1_2
--Bs dBs+p0s+(Bs (2 h0s^2-2 PHIsf qf1+2 PHIrsN rmN-3 PHIss x1))/(2 Sqrt[h0s^2-PHIsf qf1+PHIrsN rmN-PHIss x1])
+
 #N2_2
--Bf dBf+p0f+(Bf (2 h0f^2-2 PHIfs qs1+2 PHIrfN rmN-3 PHIff x2))/(2 Sqrt[h0f^2-PHIfs qs1+PHIrfN rmN-PHIff x2])
+
 #D1_2
-(1-gs) (p0s-(Bs PHIss x1)/(2 Sqrt[h0s^2-PHIsf qf1+PHIrsT rmT-PHIss x1])-Bs (dBs-Sqrt[h0s^2-PHIsf qf1+PHIrsT rmT-PHIss x1]))+gs (p0s-(Bs PHIss x1)/(2 Sqrt[h0s^2-PHIsf qfhat+PHIrsT rmT-PHIss x1])-Bs (dBs-Sqrt[h0s^2-PHIsf qfhat+PHIrsT rmT-PHIss x1]))
+
 #D2_2
-(1-gf) (p0f-(Bf PHIff x2)/(2 Sqrt[h0f^2-PHIfs qs1+PHIrfT rmT-PHIff x2])-Bf (dBf-Sqrt[h0f^2-PHIfs qs1+PHIrfT rmT-PHIff x2]))+gf (p0f-(Bf PHIff x2)/(2 Sqrt[h0f^2-PHIfs qshat+PHIrfT rmT-PHIff x2])-Bf (dBf-Sqrt[h0f^2-PHIfs qshat+PHIrfT rmT-PHIff x2]))
+
