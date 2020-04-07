@@ -31,7 +31,8 @@ params_default_unconfined <- function(drawdown) {
                                 gs=0.5,
                                 gf=0.5,
                                 es=0,
-                                ef=0) %>%
+                                ef=0,
+                                l=0.9) %>%
     dplyr::bind_cols(drawdown_wide)
   return(par_default)
 }
