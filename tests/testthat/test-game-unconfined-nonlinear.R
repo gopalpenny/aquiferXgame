@@ -35,3 +35,18 @@ test_that("evaluate_treaty_cases UNCONFINED nonlinear returns all input paramete
   expect_equal(results_d %>% names(),
                c('treaty','zRange','zMinSwiss','zMaxFrench','ds_hat','ds_star','ds_double','ds_hat_double','df_hat','df_star','df_double','df_hat_double'))
 })
+
+
+
+# expect_equal(,return_criteria = "qud") %>%
+#                dplyr::mutate_if(is.numeric,function(x) round(x,4)),output_1)
+
+boundary_input <- example_params_unconfined[c(1,1,1),]
+boundary_input$B[1] <- 1
+boundary_input$p0s[2] <- 0.1
+boundary_input$p0f[3] <- 0.1
+boundary_output <- tibble::tibble(treaty=c("N", "N", "N"), zRange=c(0, 0, 0), zMinSwiss=c(0, 0, 0), zMaxFrench=c(0, 0, 0), qshat=c(0, 0, 8.3165), qsstar=c(0, 0, 8.3164), qsdouble=c(0, 0, 8.3164), qfhat=c(0, 7.6169, 0), qfstar=c(0, 7.6169, 0), qfdouble=c(0, 7.6169, 0), Us_hat=c(-20.1, -2.1, -16.6437), Us_star=c(-20.1, -2.1, -16.6437), Us_double=c(-20.1, -2.1, -16.6437), Us_hat_double=c(-20.1, -2.1, -16.6437), Uf_hat=c(-20, -16.8465, -2), Uf_star=c(-20, -16.8465, -2), Uf_double=c(-20, -16.8465, -2), Uf_hat_double=c(-20, -16.8465, -2), ds_hat=c(1.8799, 3.4923, 5.8075), ds_star=c(1.8799, 3.4923, 5.8074), ds_double=c(1.8799, 3.4923, 5.8074), ds_hat_double=c(1.8799, 3.4923, 5.8074), df_hat=c(1.9102, 5.8231, 3.6747), df_star=c(1.9102, 5.8231, 3.6747), df_double=c(1.9102, 5.8231, 3.6747), df_hat_double=c(1.9102, 5.8231, 3.6747), p0f=c(1, 1, 0.1), p0s=c(1, 0.1, 1), B=c(1, 0.1, 0.1))
+test_that("evaluate_treaty_cases works for unconfined nonlinear when max utility is at a boundary point (qs or qf = 0)",{
+  expect_equal(evaluate_treaty_cases(boundary_input,'qudp') %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)),
+               boundary_output)
+})

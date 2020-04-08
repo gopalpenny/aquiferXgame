@@ -109,11 +109,14 @@ unconA_nl_qhat2 <- function(params,qs1,qf1) {
   }
   qf2_hat <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf1,params=params,qs1=qs1)$root
 
-  possible_max <- data.frame(qs=c(qs1,qs2_hat,0,0),
-                             qf=c(qf1,0,qf2_hat,0))
-  Us <- mapply(unconA_nl_Us,qs=possible_max$qs,qf=possible_max$qf,params=list(params),z=0)
-  Uf <- mapply(unconA_nl_Uf,qs=possible_max$qs,qf=possible_max$qf,params=list(params),z=0)
-  idx <- which.max(Us+Uf)
+  params_treaty <- params
+  names(params_treaty)[match(c("rmT","PHIsrT","PHIfrT"),names(params_treaty))] <- c("rm","PHIsr","PHIfr")
+  possible_max <- data.frame(qs=sapply(c(qs1,qs2_hat,0,0),apply_constraints,interval=c(0,params$Qs)),
+                             qf=sapply(c(qf1,0,qf2_hat,0),apply_constraints,interval=c(0,params$Qs)))
+  possible_max <- possible_max[!duplicated(possible_max),]
+  Us <- mapply(unconA_nl_Us,qs=possible_max$qs,qf=possible_max$qf,params=list(params_treaty),z=0)
+  Uf <- mapply(unconA_nl_Uf,qs=possible_max$qs,qf=possible_max$qf,params=list(params_treaty),z=0)
+  idx <- which.max(Us+Uf)[1]
 
   return(c(possible_max$qs[idx],possible_max$qf[idx]))
 }
