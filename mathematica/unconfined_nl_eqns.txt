@@ -3,18 +3,21 @@
 h0s^2-PHIsf qf-PHIss qs+PHIsr rm
 #phif
 h0f^2-PHIff qf-PHIfs qs+PHIfr rm
+
 #Us
 -c0rs-es+p0s (qs-Qs)-crs rm+z+Bs qs (l (-dBs+Sqrt[h0s^2-PHIsf qf-PHIss qs+PHIsr rm])+dBs (-1+l) (Log[dBs]-1/2 Log[h0s^2-PHIsf qf-PHIss qs+PHIsr rm]))
 #Uf
 -ef+p0f (qf-Qf)-z+Bf qf (l (-dBf+Sqrt[h0f^2-PHIff qf-PHIfs qs+PHIfr rm])+dBf (-1+l) (Log[dBf]-1/2 Log[h0f^2-PHIff qf-PHIfs qs+PHIfr rm]))
+
 #F1
 1/2 (2 p0s-(Bf l PHIfs x2)/Sqrt[h0f^2+PHIfrT rmT-PHIfs x1-PHIff x2]-(Bf dBf (-1+l) PHIfs x2)/(-h0f^2-PHIfrT rmT+PHIfs x1+PHIff x2)-(Bs l PHIss x1)/Sqrt[h0s^2+PHIsrT rmT-PHIss x1-PHIsf x2]-(Bs dBs (-1+l) PHIss x1)/(-h0s^2-PHIsrT rmT+PHIss x1+PHIsf x2)+2 Bs l (-dBs+Sqrt[h0s^2+PHIsrT rmT-PHIss x1-PHIsf x2])+Bs dBs (-1+l) (2 Log[dBs]-Log[h0s^2+PHIsrT rmT-PHIss x1-PHIsf x2]))
 #F2
 1/2 (2 p0f-(Bf l PHIff x2)/Sqrt[h0f^2+PHIfrT rmT-PHIfs x1-PHIff x2]-(Bf dBf (-1+l) PHIff x2)/(-h0f^2-PHIfrT rmT+PHIfs x1+PHIff x2)-(Bs l PHIsf x1)/Sqrt[h0s^2+PHIsrT rmT-PHIss x1-PHIsf x2]-(Bs dBs (-1+l) PHIsf x1)/(-h0s^2-PHIsrT rmT+PHIss x1+PHIsf x2)+2 Bf l (-dBf+Sqrt[h0f^2+PHIfrT rmT-PHIfs x1-PHIff x2])+Bf dBf (-1+l) (2 Log[dBf]-Log[h0f^2+PHIfrT rmT-PHIfs x1-PHIff x2]))
-#Fqf0
-p0s+(Bs dBs (-1+l) PHIss x1)/(2 (h0s^2+PHIsrT rmT-PHIss x1))-(Bs l PHIss x1)/(2 Sqrt[h0s^2+PHIsrT rmT-PHIss x1])+Bs l (-dBs+Sqrt[h0s^2+PHIsrT rmT-PHIss x1])+Bs dBs (-1+l) (Log[dBs]-1/2 Log[h0s^2+PHIsrT rmT-PHIss x1])
-#Fqs0
-p0f+(Bf dBf (-1+l) PHIff x1)/(2 (h0f^2+PHIfrT rmT-PHIff x1))-(Bf l PHIff x1)/(2 Sqrt[h0f^2+PHIfrT rmT-PHIff x1])+Bf l (-dBf+Sqrt[h0f^2+PHIfrT rmT-PHIff x1])+Bf dBf (-1+l) (Log[dBf]-1/2 Log[h0f^2+PHIfrT rmT-PHIff x1])
+#F1_q2
+1/2 (2 p0s-(Bf l PHIfs qf1)/Sqrt[h0f^2-PHIff qf1+PHIfrT rmT-PHIfs x1]-(Bf dBf (-1+l) PHIfs qf1)/(-h0f^2+PHIff qf1-PHIfrT rmT+PHIfs x1)-(Bs l PHIss x1)/Sqrt[h0s^2-PHIsf qf1+PHIsrT rmT-PHIss x1]-(Bs dBs (-1+l) PHIss x1)/(-h0s^2+PHIsf qf1-PHIsrT rmT+PHIss x1)+2 Bs l (-dBs+Sqrt[h0s^2-PHIsf qf1+PHIsrT rmT-PHIss x1])+Bs dBs (-1+l) (2 Log[dBs]-Log[h0s^2-PHIsf qf1+PHIsrT rmT-PHIss x1]))
+#F2_q2
+1/2 (2 p0f-(Bf l PHIff x1)/Sqrt[h0f^2-PHIfs qs1+PHIfrT rmT-PHIff x1]-(Bf dBf (-1+l) PHIff x1)/(-h0f^2+PHIfs qs1-PHIfrT rmT+PHIff x1)-(Bs l PHIsf qs1)/Sqrt[h0s^2-PHIss qs1+PHIsrT rmT-PHIsf x1]-(Bs dBs (-1+l) PHIsf qs1)/(-h0s^2+PHIss qs1-PHIsrT rmT+PHIsf x1)+2 Bf l (-dBf+Sqrt[h0f^2-PHIfs qs1+PHIfrT rmT-PHIff x1])+Bf dBf (-1+l) (2 Log[dBf]-Log[h0f^2-PHIfs qs1+PHIfrT rmT-PHIff x1]))
+
 #N1
 p0s+1/2 Bs (-2 dBs l+(dBs (-1+l) PHIss x1)/(h0s^2+PHIsrN rmN-PHIss x1-PHIsf x2)+(l (2 h0s^2+2 PHIsrN rmN-3 PHIss x1-2 PHIsf x2))/Sqrt[h0s^2+PHIsrN rmN-PHIss x1-PHIsf x2])+1/2 Bs dBs (-1+l) (2 Log[dBs]-Log[h0s^2+PHIsrN rmN-PHIss x1-PHIsf x2])
 #N2
@@ -23,6 +26,7 @@ p0f+(Bf dBf (-1+l) PHIff x2)/(2 (h0f^2+PHIfrN rmN-PHIfs x1-PHIff x2))-(Bf l PHIf
 p0s+(Bs dBs (-1+l) PHIss x1)/(2 (h0s^2-PHIsf qf1+PHIsrN rmN-PHIss x1))-(Bs l PHIss x1)/(2 Sqrt[h0s^2-PHIsf qf1+PHIsrN rmN-PHIss x1])+Bs l (-dBs+Sqrt[h0s^2-PHIsf qf1+PHIsrN rmN-PHIss x1])+Bs dBs (-1+l) (Log[dBs]-1/2 Log[h0s^2-PHIsf qf1+PHIsrN rmN-PHIss x1])
 #N2_q2
 p0f+(Bf dBf (-1+l) PHIff x1)/(2 (h0f^2-PHIfs qs1+PHIfrN rmN-PHIff x1))-(Bf l PHIff x1)/(2 Sqrt[h0f^2-PHIfs qs1+PHIfrN rmN-PHIff x1])+Bf l (-dBf+Sqrt[h0f^2-PHIfs qs1+PHIfrN rmN-PHIff x1])+Bf dBf (-1+l) (Log[dBf]-1/2 Log[h0f^2-PHIfs qs1+PHIfrN rmN-PHIff x1])
+
 #D1
 gs (p0s+(Bs dBs (-1+l) PHIss x1)/(2 (h0s^2-PHIsf qfhat+PHIsrT rmT-PHIss x1))-(Bs l PHIss x1)/(2 Sqrt[h0s^2-PHIsf qfhat+PHIsrT rmT-PHIss x1])+Bs l (-dBs+Sqrt[h0s^2-PHIsf qfhat+PHIsrT rmT-PHIss x1])+Bs dBs (-1+l) (Log[dBs]-1/2 Log[h0s^2-PHIsf qfhat+PHIsrT rmT-PHIss x1]))+(1-gs) (p0s+(Bs dBs (-1+l) PHIss x1)/(2 (h0s^2+PHIsrT rmT-PHIss x1-PHIsf x2))-(Bs l PHIss x1)/(2 Sqrt[h0s^2+PHIsrT rmT-PHIss x1-PHIsf x2])+Bs l (-dBs+Sqrt[h0s^2+PHIsrT rmT-PHIss x1-PHIsf x2])+Bs dBs (-1+l) (Log[dBs]-1/2 Log[h0s^2+PHIsrT rmT-PHIss x1-PHIsf x2]))
 #D2
@@ -31,6 +35,7 @@ gf (p0f+(Bf dBf (-1+l) PHIff x2)/(2 (h0f^2-PHIfs qshat+PHIfrT rmT-PHIff x2))-(Bf
 (1-gs) (p0s+(Bs dBs (-1+l) PHIss x1)/(2 (h0s^2-PHIsf qf1+PHIsrT rmT-PHIss x1))-(Bs l PHIss x1)/(2 Sqrt[h0s^2-PHIsf qf1+PHIsrT rmT-PHIss x1])+Bs l (-dBs+Sqrt[h0s^2-PHIsf qf1+PHIsrT rmT-PHIss x1])+Bs dBs (-1+l) (Log[dBs]-1/2 Log[h0s^2-PHIsf qf1+PHIsrT rmT-PHIss x1]))+gs (p0s+(Bs dBs (-1+l) PHIss x1)/(2 (h0s^2-PHIsf qfhat+PHIsrT rmT-PHIss x1))-(Bs l PHIss x1)/(2 Sqrt[h0s^2-PHIsf qfhat+PHIsrT rmT-PHIss x1])+Bs l (-dBs+Sqrt[h0s^2-PHIsf qfhat+PHIsrT rmT-PHIss x1])+Bs dBs (-1+l) (Log[dBs]-1/2 Log[h0s^2-PHIsf qfhat+PHIsrT rmT-PHIss x1]))
 #D2_q2
 (1-gf) (p0f+(Bf dBf (-1+l) PHIff x1)/(2 (h0f^2-PHIfs qs1+PHIfrT rmT-PHIff x1))-(Bf l PHIff x1)/(2 Sqrt[h0f^2-PHIfs qs1+PHIfrT rmT-PHIff x1])+Bf l (-dBf+Sqrt[h0f^2-PHIfs qs1+PHIfrT rmT-PHIff x1])+Bf dBf (-1+l) (Log[dBf]-1/2 Log[h0f^2-PHIfs qs1+PHIfrT rmT-PHIff x1]))+gf (p0f+(Bf dBf (-1+l) PHIff x1)/(2 (h0f^2-PHIfs qshat+PHIfrT rmT-PHIff x1))-(Bf l PHIff x1)/(2 Sqrt[h0f^2-PHIfs qshat+PHIfrT rmT-PHIff x1])+Bf l (-dBf+Sqrt[h0f^2-PHIfs qshat+PHIfrT rmT-PHIff x1])+Bf dBf (-1+l) (Log[dBf]-1/2 Log[h0f^2-PHIfs qshat+PHIfrT rmT-PHIff x1]))
+
 #zSwissMin
 es-p0s qshat+p0s qsstar-crs rmN+crs rmT+Bs l (dBs (qshat-qsstar)+qsstar Sqrt[h0s^2-PHIsf qfstar-PHIss qsstar+PHIsrN rmN]+qshat (-Sqrt[h0s^2-PHIsf qfdouble-PHIss qshat+PHIsrT rmT]+gs Sqrt[h0s^2-PHIsf qfdouble-PHIss qshat+PHIsrT rmT]-gs Sqrt[h0s^2-PHIsf qfhat-PHIss qshat+PHIsrT rmT]))-1/2 Bs dBs (-1+l) (2 (qshat-qsstar) Log[dBs]+qsstar Log[h0s^2-PHIsf qfstar-PHIss qsstar+PHIsrN rmN]+(-1+gs) qshat Log[h0s^2-PHIsf qfdouble-PHIss qshat+PHIsrT rmT]-gs qshat Log[h0s^2-PHIsf qfhat-PHIss qshat+PHIsrT rmT])
 #zFrenchMax

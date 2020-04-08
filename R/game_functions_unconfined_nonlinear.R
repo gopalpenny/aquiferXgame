@@ -83,40 +83,52 @@ unconA_nl_qhat0 <- function(params) {
 unconA_nl_qhat2 <- function(params,qs1,qf1) {
   # unconA_nl_qhat2
   # this function calculates estimates pumping rates on the boundary points for first best -- ie, qs = 0 | qf = 0
-  # get roots for Fqf0 = 0
+  # get roots for F1_q2 = 0
   first_best_equations_qs2 <- function(x,params,qf1) {
     if (!check_aquifer_depleted(x,qf1,params,TRUE) & x >= 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       F1<-with(params,
-               p0s+(Bs*dBs*(-1+l)*PHIss*x[1])/(2*(h0s^2+PHIsrT*rmT-PHIss*x[1]))-(Bs*l*PHIss*x[1])/(2*sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]))+Bs*l*(-dBs+sqrt(h0s^2+PHIsrT*rmT-PHIss*x[1]))+Bs*dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2+PHIsrT*rmT-PHIss*x[1]))
+               1/2*(2*p0s-(Bf*l*PHIfs*qf1)/sqrt(h0f^2-PHIff*qf1+PHIfrT*rmT-PHIfs*x[1])-(Bf*dBf*(-1+l)*PHIfs*qf1)/(-h0f^2+PHIff*qf1-PHIfrT*rmT+PHIfs*x[1])-(Bs*l*PHIss*x[1])/sqrt(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x[1])-(Bs*dBs*(-1+l)*PHIss*x[1])/(-h0s^2+PHIsf*qf1-PHIsrT*rmT+PHIss*x[1])+2*Bs*l*(-dBs+sqrt(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x[1]))+Bs*dBs*(-1+l)*(2*log(dBs)-log(h0s^2-PHIsf*qf1+PHIsrT*rmT-PHIss*x[1])))
       )
     } else { # Stop root finding if aquifer depleted or pumping is negative for either player
       F1 <- 0
     }
     return(c(F1))
   }
-  qs2_hat <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs1,params=params,qf1=qf1)$root
+  qs2_hat_qf0 <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs1,params=params,qf1=0)$root # estimate qs when qf=0
+  qs2_hat_qfQf <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs1,params=params,qf1=params$Qf)$root # estimate qs when qf=Qf
 
-  # get roots for Fqs0 = 0
+  # get roots for F2_q2 = 0
   first_best_equations_qf2 <- function(x,params,qs1) {
     if (!check_aquifer_depleted(qs1,x,params,TRUE) & x >= 0) { # Continue with root finding if aquifer is not depleted, and pumping is positive for both players
       F2<-with(params,
-               p0f+(Bf*dBf*(-1+l)*PHIff*x[1])/(2*(h0f^2+PHIfrT*rmT-PHIff*x[1]))-(Bf*l*PHIff*x[1])/(2*sqrt(h0f^2+PHIfrT*rmT-PHIff*x[1]))+Bf*l*(-dBf+sqrt(h0f^2+PHIfrT*rmT-PHIff*x[1]))+Bf*dBf*(-1+l)*(log(dBf)-1/2*log(h0f^2+PHIfrT*rmT-PHIff*x[1]))
+               1/2*(2*p0f-(Bf*l*PHIff*x[1])/sqrt(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x[1])-(Bf*dBf*(-1+l)*PHIff*x[1])/(-h0f^2+PHIfs*qs1-PHIfrT*rmT+PHIff*x[1])-(Bs*l*PHIsf*qs1)/sqrt(h0s^2-PHIss*qs1+PHIsrT*rmT-PHIsf*x[1])-(Bs*dBs*(-1+l)*PHIsf*qs1)/(-h0s^2+PHIss*qs1-PHIsrT*rmT+PHIsf*x[1])+2*Bf*l*(-dBf+sqrt(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x[1]))+Bf*dBf*(-1+l)*(2*log(dBf)-log(h0f^2-PHIfs*qs1+PHIfrT*rmT-PHIff*x[1])))
       )
     } else { # Stop root finding if aquifer depleted or pumping is negative for either player
       F2 <- 0
     }
     return(c(F2))
   }
-  qf2_hat <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf1,params=params,qs1=qs1)$root
+  qf2_hat_qs0 <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf1,params=params,qs1=0)$root # estimate qf when qs=0
+  qf2_hat_qsQs <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf1,params=params,qs1=params$Qs)$root # estimate qf when qs=Qs
 
+  q_FB_matrix <- rbind(c(qs1,qf1),
+                       c(qs2_hat_qf0,0),
+                       c(qs2_hat_qfQf,params$Qf),
+                       c(0,qf2_hat_qs0),
+                       c(params$Qs,qf2_hat_qsQs),
+                       c(0,0))
+  possible_max <- data.frame(qs=sapply(q_FB_matrix[,1],apply_constraints,interval=c(0,params$Qs)),
+                             qf=sapply(q_FB_matrix[,2],apply_constraints,interval=c(0,params$Qf)))
+  possible_max <- possible_max[!duplicated(possible_max),]
+
+  # fix parameters to represent the treaty scenario
   params_treaty <- params
   names(params_treaty)[match(c("rmT","PHIsrT","PHIfrT"),names(params_treaty))] <- c("rm","PHIsr","PHIfr")
-  possible_max <- data.frame(qs=sapply(c(qs1,qs2_hat,0,0),apply_constraints,interval=c(0,params$Qs)),
-                             qf=sapply(c(qf1,0,qf2_hat,0),apply_constraints,interval=c(0,params$Qs)))
-  possible_max <- possible_max[!duplicated(possible_max),]
-  Us <- mapply(unconA_nl_Us,qs=possible_max$qs,qf=possible_max$qf,params=list(params_treaty),z=0)
-  Uf <- mapply(unconA_nl_Uf,qs=possible_max$qs,qf=possible_max$qf,params=list(params_treaty),z=0)
-  idx <- which.max(Us+Uf)[1]
+  # get utility for each of the scenarios for both players
+  possible_max$Us <- mapply(unconA_nl_Us,qs=possible_max$qs,qf=possible_max$qf,params=list(params_treaty),z=0)
+  possible_max$Uf <- mapply(unconA_nl_Uf,qs=possible_max$qs,qf=possible_max$qf,params=list(params_treaty),z=0)
+  possible_max$joint <- possible_max$Us+possible_max$Uf
+  idx <- which.max(possible_max$joint)[1]
 
   return(c(possible_max$qs[idx],possible_max$qf[idx]))
 }

@@ -50,3 +50,16 @@ test_that("evaluate_treaty_cases works for unconfined nonlinear when max utility
   expect_equal(evaluate_treaty_cases(boundary_input,'qudp') %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)),
                boundary_output)
 })
+
+
+## Additional special cases
+
+# in this case, Qf = 5, limiting french puming. The first best must account for the fact that the joint optimum
+# may occur when Qf = 5, ie a boundary point.
+params_small_Qf <- data.frame(B=910, c0rs=2e+07, crs=100, dBf=75.4, dBs=75.4, ef=0, es=0, gf=1, gs=1, h0f=45.3, h0s=42.7, l=0.8, p0f=67000, p0s=67000, PHIff=110, PHIfrN=97.5, PHIfrT=97.5, PHIfs=91.4, PHIsf=91.4, PHIsrN=121, PHIsrT=121, PHIss=110, Qf=5, Qs=20, rmN=8.2, rmT=8.2)
+output_small_Qf <- tibble::tibble(treaty="Y", zRange=4783.46, zMinSwiss=4733, zMaxFrench=9516.46, qshat=10.72, qsstar=12.05, qsdouble=12.05, qfhat=5, qfstar=5, qfdouble=5, Us_hat=-21058697.99, Us_star=-21053964.99, Us_double=-21053964.99, Us_hat_double=-21058697.99, Uf_hat=-192180.22, Uf_star=-201696.68, Uf_double=-192180.22, Uf_hat_double=-201696.68, ds_hat=41.06, ds_star=43.26, ds_double=43.26, ds_hat_double=43.26, df_hat=39.05, df_star=40.75, df_double=39.05, df_hat_double=39.05)
+results_small_Qf <- evaluate_treaty_cases(params_small_Qf,"qud") %>% dplyr::mutate_if(is.numeric,function(x) round(x,2))
+test_that("evaluate_treaty_cases unconfined nonlinear works when qf is limited by Qf",{
+  expect_equal(results_small_Qf,output_small_Qf)
+})
+
