@@ -29,7 +29,14 @@ the treaty outcome. If necessary, it can be recalculated as \code{zRange = zMaxF
 Evaluate whether or not the treaty will be made in a confined or unconfined aquifer
 }
 \details{
-Evaluate the treaty given social, economic, and geophysical parameters
+Evaluate the treaty given social, economic, and geophysical parameters.
+
+Note that the cost
+of pumping is linear for confined aquifers, and nonlinear for unconfined aquifers, with the
+nonlinearity depending on the parameter l, with the key feature that the cost become infinite
+as h -> 0. For l = 0, the cost function is exponential and crosses 0 when h_i = dB_i. As l increases
+towards 1, the solution becomes more linear when the water table is near the surface. When l == 1,
+a linear solution is used and the cost remains linear even when the aquifer is fully depleted.
 }
 \examples{
 evaluate_treaty(example_params_confined)
