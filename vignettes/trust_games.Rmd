@@ -66,7 +66,7 @@ params_df_trust_v_trust <- params_basic_trust_v_trust %>%
            gf=seq(0,1,by=.05))
 
 # Run the game theoretic model
-outcomes_trust_v_trust <- evaluate_treaty_cases(params_df_trust_v_trust)
+outcomes_trust_v_trust <- evaluate_treaty_cases(params_df_trust_v_trust,"pqud")
 
 # Get contours for the model
 cl_trust_v_trust <- get_contours(outcomes_trust_v_trust %>% rename(x=gs,y=gf,z=zRange),
@@ -79,6 +79,13 @@ ggplot() +
   scale_fill_gradient2() + coord_equal() +
   theme(legend.box = "horizontal")
 ```
+
+Note that the parameters `"pqud"` in the `evaluate_treaty_cases` function returns utility (u), depth (d), pumping (q), and the varying parameters (p). Checking the names of the output `outcomes_trust_v_trust`, we can see the these values are present for the potential scenarios first best (\*hat), nash equilibrium (\*star), cheating the other player (\*double), and victim of the cheat (\*hat_double). The nash equilibrium is the scenario without a treaty. The others involve the signing of a treaty and the combination of players being gentleman or cheats. The scenario where both players are cheats is not included as it is unecessary to evaluate if a treaty occurs. 
+
+```{r}
+names(outcomes_trust_v_trust)
+```
+
 
 ### Unconfined aquifer: trust vs trust
 
