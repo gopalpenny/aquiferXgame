@@ -332,7 +332,7 @@ get_contours <- function(df = NULL, levels = 0, ...) {
     # bind contour lines
     cl <- do.call(rbind,lapply(cl_list,function(l) data.frame(x=l$x,y=l$y,level=l$level, line=l$line)))
     cl$i <- 1:nrow(cl)
-    cl$level_factor <- as.factor(as.character(cl$level))
+    cl$level_factor <- factor(cl$level)
 
   } else {
     warning(paste0("No contours found. Level range: (",min(levels),",",max(levels()),"). ",
