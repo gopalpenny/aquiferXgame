@@ -1,8 +1,29 @@
 # game_functions_unconfined_nonlinear.R
 # all functions are called by game_functions_unconfined()
 
-# 4b Mathematica functions for depth, utility, and abstraction
+get_q_aquifer_nearly_depleted <- function(params) {
+  # this function obtains values of qs, qf which are less than or equal to Qs, Qf
+  # and do not deplete the aquifer. The values are checked successively by reducing
+  # Qs, Qf by 5% and checking if the aquifer is depleted.
+  qs_guessT <- params$Qs
+  qf_guessT <- params$Qf
+  while(check_aquifer_depleted(qs_guessT,qf_guessT,params,treaty=TRUE)) {
+    qs_guessT <- qs_guessT*0.9
+    qf_guessT <- qf_guessT*0.9
+  }
 
+  qs_guessN <- params$Qs
+  qf_guessN <- params$Qf
+  while(check_aquifer_depleted(qs_guessN,qf_guessN,params,treaty=FALSE)) {
+    qs_guessN <- qs_guessN*0.9
+    qf_guessN <- qf_guessN*0.9
+  }
+
+  return(list(qsT=qs_guessT,qfT=qf_guessT,
+              qsN=qs_guessN,qfN=qf_guessN))
+}
+
+# 4b Mathematica functions for depth, utility, and abstraction
 unconA_nl_Us <- function(qs,qf,params,z) {
   with(params,
        -c0rs-es+p0s*(qs-Qs)-crs*rm+z+Bs*qs*(l*(-dBs+sqrt(h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm))+dBs*(-1+l)*(log(dBs)-1/2*log(h0s^2-PHIsf*qf-PHIss*qs+PHIsr*rm)))
@@ -76,7 +97,7 @@ unconA_nl_qhat0 <- function(params) {
     }
     return(c(F1,F2))
   }
-  q_hat <- rootSolve::multiroot(f=first_best_equations,start=c(params$Qs*0.9,params$Qf*0.9),params=params)$root
+  q_hat <- rootSolve::multiroot(f=first_best_equations,start=c(params$qs_guessT,params$qf_guessT),params=params)$root
   return(q_hat)
 }
 
@@ -119,7 +140,10 @@ unconA_nl_qhat2 <- function(params,qs1,qf1) {
                        c(0,0))
   possible_max <- data.frame(qs=sapply(q_FB_matrix[,1],apply_constraints,interval=c(0,params$Qs)),
                              qf=sapply(q_FB_matrix[,2],apply_constraints,interval=c(0,params$Qf)))
-  possible_max <- possible_max[!duplicated(possible_max),]
+  depleted_aquifer <- mapply(check_aquifer_depleted,qs=possible_max$qs,qf=possible_max$qf,params=list(params),treaty=TRUE)
+  duplicated_rows <- !duplicated(possible_max)
+  possible_max <- possible_max[!depleted_aquifer & !duplicated(possible_max),]
+
 
   # fix parameters to represent the treaty scenario
   params_treaty <- params
@@ -152,7 +176,7 @@ unconA_nl_qstar0 <- function(params) {
     }
     return(c(N1, N2))
   }
-  q_star <- rootSolve::multiroot(f=nash_equations,start=c(params$Qs*0.9,params$Qf*0.9),params=params)$root
+  q_star <- rootSolve::multiroot(f=nash_equations,start=c(params$qs_guessN,params$qf_guessN),params=params)$root
   return(q_star)
 }
 
@@ -209,7 +233,7 @@ unconA_nl_qdouble0 <- function(params,qshat,qfhat) {
     }
     return(c(D1, D2))
   }
-  q_double <- rootSolve::multiroot(f=cheat_equations,start=c(params$Qs*0.9,params$Qf*0.9),params=params,qshat=qshat,qfhat=qfhat)$root
+  q_double <- rootSolve::multiroot(f=cheat_equations,start=c(params$qs_guessT,params$qf_guessT),params=params,qshat=qshat,qfhat=qfhat)$root
   return(q_double)
 }
 

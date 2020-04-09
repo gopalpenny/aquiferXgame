@@ -41,6 +41,12 @@ evaluate_treaty_unconfined <- function(params) {
   params$phi0f <- params$h0f^2
 
   if ("l" %in% names(params) & params$l != 1) {
+    # because utility is nonlinear, need to make sure we don't overshoot qs, qf and fully deplete the aquifer
+    q_guess <- get_q_aquifer_nearly_depleted(params)
+    params$qs_guessT <- q_guess$qsT
+    params$qf_guessT <- q_guess$qfT
+    params$qs_guessN <- q_guess$qsN
+    params$qf_guessN <- q_guess$qfN
     q_hat <- unconA_nl_qeval(params,unconA_nl_qhat0,unconA_nl_qhat2)
     q_star <- unconA_nl_qeval(params,unconA_nl_qstar0,unconA_nl_qstar2)
     q_double <- unconA_nl_qeval(params,unconA_nl_qdouble0,unconA_nl_qdouble2,qshat=q_hat$qs,qfhat=q_hat$qf)
@@ -60,21 +66,31 @@ evaluate_treaty_unconfined <- function(params) {
   q_vals <- tibble::tibble(qshat=q_hat$qs,qfhat=q_hat$qf,
                            qsstar=q_star$qs,qfstar=q_star$qf,
                            qsdouble=q_double$qs,qfdouble=q_double$qf)
-  # # get z constraints
-  zMaxFrench_calc <- unconA_function_zMaxFrench(params,q_vals)
-  zMinSwiss_calc <- unconA_function_zMinSwiss(params,q_vals)
-  zRange_calc <- round(zMaxFrench_calc - zMinSwiss_calc,6)
 
   # is the aquifer depleted (AD) in any of the cases?
   AD_fb <- check_aquifer_depleted(q_vals$qshat,q_vals$qfhat,params,treaty=TRUE)
   AD_nash <- check_aquifer_depleted(q_vals$qsstar,q_vals$qfstar,params,treaty=FALSE)
-  AD_cheat <- check_aquifer_depleted(q_vals$qsdouble,q_vals$qfdouble,params,treaty=TRUE)
+  AD_cheat_2 <- check_aquifer_depleted(q_vals$qsdouble,q_vals$qfdouble,params,treaty=TRUE) # both are cheats
+  AD_cheat_f <- check_aquifer_depleted(q_vals$qshat,q_vals$qfdouble,params,treaty=TRUE) # F is a cheat
+  AD_cheat_s <- check_aquifer_depleted(q_vals$qsdouble,q_vals$qfhat,params,treaty=TRUE) # S is a cheat
+  AD_cheat <- any(c(AD_cheat_2,AD_cheat_f,AD_cheat_s))
   AD_cols <- tibble::tibble()
   if (any(c(AD_fb,AD_nash,AD_cheat))) {
     AD_cols <- tibble::tibble(AD_fb=AD_fb,AD_nash=AD_nash,AD_cheat=AD_cheat)
-    # warning(paste("The aquifer was fully depleted for at least one player in the",
-    #               paste(c("First Best","Nash","Cheat")[c(AD_fb,AD_nash,AD_cheat)],sep=", "),"scenario(s)"))
   }
+
+  # # get z constraints
+  if (!AD_cheat_s) {
+    zMaxFrench_calc <- unconA_function_zMaxFrench(params,q_vals)
+  } else {
+    zMaxFrench_calc <- -Inf
+  }
+  if (!AD_cheat_f) {
+    zMinSwiss_calc <- unconA_function_zMinSwiss(params,q_vals)
+  } else {
+    zMinSwiss_calc <- Inf
+  }
+  zRange_calc <- round(zMaxFrench_calc - zMinSwiss_calc,6)
 
   treaty <- dplyr::case_when(
     zRange_calc>0 ~ "Y",
