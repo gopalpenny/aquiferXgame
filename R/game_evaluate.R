@@ -112,8 +112,13 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 #' to be fully depleted for as least one of the players (hi < 0). In this case, the results will included
 #' three additional columns:
 #' \code{AD_fb,AD_nash,AD_cheat}, representing logical values that indicate in which scenario the aquifer was depleted
-#' (first best, nash, or cheat). Unfortunately, this model is unable to resolve such a scenario which represents
-#' another type of game: a game of chicken.
+#' (first best, nash, or cheat). In the nonlinear game, this *should* only happen in one of two scenarios:
+#' \enumerate{
+#' \item A treaty is signed to maximize join utility, but a cheat pumps more and the aquifer
+#'   is depleted for the other player. In this case, the treaty is set to "N", even if trust is equal to 1.
+#' \item The numerical root finder jumps to a value where the aquifer is fully depleted.
+#'   This is unlikely, as the initial guesses are set to minimize the change of this occurring.
+#' }
 #' @importFrom magrittr %>%
 #' @export
 #' @examples
@@ -135,17 +140,35 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
   # eval_results_treat <- eval_results %>% select(treaty,zRange,zMinSwiss,zMaxFrench)
   eval_return <- eval_results[,c("treaty","zRange","zMinSwiss","zMaxFrench")] %>%
     dplyr::bind_cols(eval_results %>% dplyr::select(dplyr::starts_with("AD_")))
+
+  if (any(grepl("^AD_",names(eval_return)))) {
+    ignore_nan_warning <- "NaNs produced"
+  } else {
+    ignore_nan_warning <- "ALLOW WARNINGS"
+  }
   if (any(grepl("q",return_criteria))) { # return abstraction rates
     eval_return <- eval_return %>% dplyr::bind_cols(eval_results%>% dplyr::select(dplyr::starts_with("qs"),dplyr::starts_with("qf")))
   }
   if (any(grepl("u",return_criteria))) { # return utilities
-    u_vals <- do.call(rbind,mapply(evaluate_treaty_utility,params=params_list,
-                                   q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+    # if the aquifer is depleted in any scenario, ignore NaN warnings for Utility
+    withCallingHandlers({
+      u_vals <- do.call(rbind,mapply(evaluate_treaty_utility,params=params_list,
+                                     q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+    }, warning=function(w) {
+      if (startsWith(conditionMessage(w), ignore_nan_warning))
+        invokeRestart("muffleWarning")
+    })
     eval_return <- eval_return %>% dplyr::bind_cols(u_vals %>% dplyr::select(dplyr::starts_with("Us"),dplyr::starts_with("Uf"),dplyr::everything()))
   }
   if (any(grepl("d",return_criteria))) { # return depth to water table
-    d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,
-                                   q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+    # if the aquifer is depleted in any scenario, ignore NaN warnings for Depth
+    withCallingHandlers({
+      d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,
+                                     q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+    }, warning=function(w) {
+      if (startsWith(conditionMessage(w), ignore_nan_warning))
+        invokeRestart("muffleWarning")
+    })
     eval_return <- eval_return %>% dplyr::bind_cols(d_vals %>% dplyr::select(dplyr::starts_with("ds"),dplyr::starts_with("df"),dplyr::everything()))
   }
   if (any(grepl("a",return_criteria))) { # return all parameters
@@ -159,7 +182,9 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
   # check for aquifer depletion
   if (all(c("AD_fb","AD_nash","AD_cheat") %in% names(eval_return))) {
     warning(paste("The aquifer was fully depleted for at least one player in some parameter sets in the",
-                  with(eval_return,paste(c("First Best","Nash","Cheat")[c(any(AD_fb),any(AD_nash),any(AD_cheat))],collapse=", ")),"scenario(s)"))
+                  with(eval_return,paste(c("First Best","Nash","Cheat")[c(any(c(AD_fb,FALSE),na.rm=TRUE),
+                                                                          any(c(AD_nash,FALSE),na.rm=TRUE),
+                                                                          any(c(AD_cheat,FALSE),na.rm=TRUE))],collapse=", ")),"scenario(s)"))
   }
   return(eval_return)
 }
