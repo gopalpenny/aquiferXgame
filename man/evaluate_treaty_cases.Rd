@@ -29,8 +29,13 @@ In unconfined aquifers, it is possible that the game converges on a result that 
 to be fully depleted for as least one of the players (hi < 0). In this case, the results will included
 three additional columns:
 \code{AD_fb,AD_nash,AD_cheat}, representing logical values that indicate in which scenario the aquifer was depleted
-(first best, nash, or cheat). Unfortunately, this model is unable to resolve such a scenario which represents
-another type of game: a game of chicken.
+(first best, nash, or cheat). In the nonlinear game, this *should* only happen in one of two scenarios:
+\enumerate{
+\item A treaty is signed to maximize join utility, but a cheat pumps more and the aquifer
+  is depleted for the other player
+\item The numerical root finder jumps to a value where the aquifer is fully depleted.
+  This is unlikely, as the initial guesses are set to minimize the change of this occurring.
+}
 }
 \description{
 Evaluate whether or not the treaty will be made under multiple scenarios
