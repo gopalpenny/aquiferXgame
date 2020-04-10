@@ -58,19 +58,18 @@ unconA_nl_qeval <- function(params,unconAf_nl_q0,unconAf_nl_q2,qshat=NULL,qfhat=
   # uconAf is for...??? function!
   qdouble <- !is.null(qshat) | !is.null(qfhat) # if qdouble, then need to input qshat and qfhat to functions
   if (!qdouble) { # need to supply qshat, qfhat for q_double
-    q0 <- unconAf_nl_q0(params) # get initial q_hat, and whether or not the aquifer is depleted
+    q0 <- unconAf_nl_q0(params) # get initial q_hat
   } else {
-    q0 <- unconAf_nl_q0(params,qshat,qfhat) # get initial q_hat, and whether or not the aquifer is depleted
+    q0 <- unconAf_nl_q0(params,qshat,qfhat) # get initial q_hat
   }
   qs0 <- q0[1]
   qf0 <- q0[2]
-  q_depleted <- q0[3] # q_depleted is 1 if aquifer is depleted
   qs1 <- qs0
   qf1 <- qf0
   qs2 <- apply_constraints(qs1,c(0,params$Qs)) # contrain q_hat to bounds
   qf2 <- apply_constraints(qf1,c(0,params$Qf))
   for (i in 1:500) {
-    if (qs1 != qs2 | qf1 != qf2 | q_depleted == 1) { # if constrained q_hat != initial q_hat
+    if (qs1 != qs2 | qf1 != qf2) { # if constrained q_hat != initial q_hat
       # cat('qs1 =',qs1,'\nqs2 =',qs2,'\nqf1 =',qf1,'\nqf2 =',qf2,"\n")
       qs1 <- qs2 # store old
       qf1 <- qf2
@@ -81,7 +80,6 @@ unconA_nl_qeval <- function(params,unconAf_nl_q0,unconAf_nl_q2,qshat=NULL,qfhat=
       }
       qs2 <- apply_constraints(q2[1],c(0,params$Qs)) # update qshat with constrained qfhat
       qf2 <- apply_constraints(q2[2],c(0,params$Qf)) # update qfhat with constrained qshat
-      q_depleted <- q2[3]
     } else {
       return(list(qs=qs2,qf=qf2))
     }
@@ -111,8 +109,7 @@ unconA_nl_qhat0 <- function(params) {
     return(c(F1,F2))
   }
   q_hat <- rootSolve::multiroot(f=first_best_equations,start=c(params$qs_guessT,params$qf_guessT),params=params)$root
-  q_depleted <- check_aquifer_depleted(q_hat[1],q_hat[2],params,TRUE)
-  return(c(q_hat,q_depleted))
+  return(q_hat)
 }
 
 unconA_nl_qhat2 <- function(params,qs1,qf1) {
@@ -179,9 +176,7 @@ unconA_nl_qhat2 <- function(params,qs1,qf1) {
   possible_max$joint <- possible_max$Us+possible_max$Uf
   idx <- which.max(possible_max$joint)[1]
 
-  q_hat <- c(possible_max$qs[idx],possible_max$qf[idx])
-  q_depleted <- check_aquifer_depleted(q_hat[1],q_hat[2],params,TRUE)
-  return(c(q_hat,q_depleted))
+  return(c(possible_max$qs[idx],possible_max$qf[idx]))
 }
 
 unconA_nl_qstar0 <- function(params) {
@@ -204,8 +199,7 @@ unconA_nl_qstar0 <- function(params) {
     return(c(N1, N2))
   }
   q_star <- rootSolve::multiroot(f=nash_equations,start=c(params$qs_guessN,params$qf_guessN),params=params)$root
-  q_depleted <- check_aquifer_depleted(q_star[1],q_star[2],params,FALSE)
-  return(c(q_star,q_depleted))
+  return(q_star)
 }
 
 unconA_nl_qstar2 <- function(params,qs1,qf1) {
@@ -236,10 +230,7 @@ unconA_nl_qstar2 <- function(params,qs1,qf1) {
   }
   qf2_star <- rootSolve::multiroot(f=nash_equations_qf2,start=qf1,params=params,qs1=qs1)$root
 
-  q_star <- c(qs2_star,qf2_star)
-  q_depleted <- check_aquifer_depleted(q_star[1],q_star[2],params,FALSE)
-
-  return(c(q_star,q_depleted))
+  return(c(qs2_star,qf2_star))
 }
 
 unconA_nl_qdouble0 <- function(params,qshat,qfhat) {
@@ -265,7 +256,7 @@ unconA_nl_qdouble0 <- function(params,qshat,qfhat) {
     return(c(D1, D2))
   }
   q_double <- rootSolve::multiroot(f=cheat_equations,start=c(params$qs_guessT,params$qf_guessT),params=params,qshat=qshat,qfhat=qfhat)$root
-  return(c(q_double,0))
+  return(q_double)
 }
 
 unconA_nl_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
@@ -300,7 +291,7 @@ unconA_nl_qdouble2 <- function(params,qs1,qf1,qshat,qfhat) {
   }
   qf2_double <- rootSolve::multiroot(f=cheat_equations_qf2,start=qf1,params=params,qshat=qshat,qfhat=qfhat,qs1=qs1)$root
 
-  return(c(qs2_double,qf2_double,0))
+  return(c(qs2_double,qf2_double))
 }
 
 
