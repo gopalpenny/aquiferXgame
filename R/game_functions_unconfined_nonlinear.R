@@ -86,7 +86,7 @@ unconA_nl_qeval <- function(params,unconAf_nl_q0,unconAf_nl_q2,qshat=NULL,qfhat=
   }
   cat("q values not converging given params:\n")
   print(as.data.frame(params[1,]))
-  return(list(qs=qs2,qf=qf2))
+  return(list(qs=NA,qf=NA))
 }
 
 unconA_nl_qhat0 <- function(params) {
