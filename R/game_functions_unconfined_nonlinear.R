@@ -129,6 +129,7 @@ unconA_nl_qhat2 <- function(params,qs1,qf1) {
   # get initial guesses of qs
   qs_qf0_guess <- get_q_aquifer_nearly_depleted(params,s_ratio = 0.9,f_ratio=0.98,qf_start=0)$qsT
   qs_qfQf_guess <- get_q_aquifer_nearly_depleted(params,s_ratio = 0.9,f_ratio=0.98)$qsT
+  qs2_hat_q1 <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs1,params=params,qf1=qf1)$root # estimate qs when qf=0
   qs2_hat_qf0 <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs_qf0_guess,params=params,qf1=0)$root # estimate qs when qf=0
   qs2_hat_qfQf <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs_qfQf_guess,params=params,qf1=params$Qf)$root # estimate qs when qf=Qf
 
@@ -146,10 +147,14 @@ unconA_nl_qhat2 <- function(params,qs1,qf1) {
   # get initial guesses
   qf_qs0_guess <- get_q_aquifer_nearly_depleted(params,s_ratio = 0.98,f_ratio=0.9,qs_start=0)$qsT
   qf_qsQs_guess <- get_q_aquifer_nearly_depleted(params,s_ratio = 0.98,f_ratio=0.9)$qsT
+  qf2_hat_q1 <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf1,params=params,qs1=qs1)$root # estimate qf when qs=0
   qf2_hat_qs0 <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf_qs0_guess,params=params,qs1=0)$root # estimate qf when qs=0
   qf2_hat_qsQs <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf_qsQs_guess,params=params,qs1=params$Qs)$root # estimate qf when qs=Qs
 
   q_FB_matrix <- rbind(c(qs1,qf1),
+                       c(qs2_hat_q1,qf1),
+                       c(qs1,qf2_hat_q1),
+                       c(qs2_hat_q1,qf2_hat_q1),
                        c(qs2_hat_qf0,0),
                        c(qs2_hat_qfQf,params$Qf),
                        c(0,qf2_hat_qs0),
