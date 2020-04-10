@@ -102,20 +102,4 @@ test_that("evaluate_treaty_cases, initial FB has negative pumping and second rou
 })
 
 
-params_exception6 <- data.frame(Qf=5.56, Qs=22.271, p0f=58113.306, p0s=60762.08, B=812.864, PHIss=113.012, PHIsf=106.072, PHIff=90.945, PHIfs=88.303, PHIsrT=108.687, PHIfrT=89.013, dBs=63.023, h0s=39.95, c0rs=18405583.778, rmT=9.419, crs=108.412, gs=0.906, gf=0.859, es=0, ef=0, l=0.726, rmN=9.419, PHIsrN=108.687, PHIfrN=89.013, dBf=63.023, h0f=39.95)
-output_exception6 <- tibble::tibble(treaty="N", zRange=-Inf, zMinSwiss=2789.7, zMaxFrench=-Inf, AD_fb=FALSE, AD_nash=FALSE, AD_cheat=TRUE, qshat=10.48, qsstar=11.62, qsdouble=18.04, qfhat=5.56, qfstar=5.56, qfdouble=4.5, Us_hat=-19446743.44, Us_star=-19442007.16, Us_double=NaN, Us_hat_double=-19426035.05, Uf_hat=-156567.72, Uf_star=-166046.42, Uf_double=-181380.93, Uf_hat_double=-243062.38, ds_hat=33.95, ds_star=36.26, ds_double=NaN, ds_hat_double=NaN, df_hat=31.35, df_star=32.98, df_double=29.87, df_hat_double=29.87)
-results_exception6 <- suppressWarnings(evaluate_treaty_cases(params_exception6,"qud") %>%
-  dplyr::mutate_if(is.numeric,function(x) round(x,2)))# %>% ggp::print_data_frame_for_entry(single_line = T)
-test_that("evaluate_treaty_cases, FB must be iterated (or Nash will have greater joint utility)",{
-  expect_equal(results_exception6, output_exception6)
-})
-
-# params_exception7 <- data.frame(Qf=5.566, Qs=23.41, p0f=56334.473, p0s=78242.446, B=1013.76, PHIss=124.478, PHIsf=97.578, PHIff=105.872, PHIfs=75.747, PHIsrT=138.388, PHIfrT=92.966, dBs=90.232, h0s=40.344, c0rs=20345783.42, rmT=6.725, crs=86.476, gs=0.982, gf=0.808, es=0, ef=0, l=0.31, rmN=6.725, PHIsrN=138.388, PHIfrN=92.966, dBf=90.232, h0f=40.344)
-# output_exception7 <- tibble::tibble
-# results_exception7 <- suppressWarnings(evaluate_treaty_cases(params_exception7,"qud") %>%
-#                                          dplyr::mutate_if(is.numeric,function(x) round(x,2)))# %>% ggp::print_data_frame_for_entry(single_line = T)
-# test_that("evaluate_treaty_cases, FB must be iterated (or Nash will have greater joint utility)",{
-#   expect_equal(results_exception7, output_exception7)
-# })
-
 
