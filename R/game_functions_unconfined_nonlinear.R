@@ -1,22 +1,33 @@
 # game_functions_unconfined_nonlinear.R
 # all functions are called by game_functions_unconfined()
 
-get_q_aquifer_nearly_depleted <- function(params) {
-  # this function obtains values of qs, qf which are less than or equal to Qs, Qf
+get_q_aquifer_nearly_depleted <- function(params,s_ratio=0.9,f_ratio=0.9,qs_start = NULL, qf_start = NULL) {
+  # this function obtains values of qs, qf which are less than or equal to qs_start (Qs
+  # if qs_start not supplied) and qf_start (Qf if qf_start not supplied)
   # and do not deplete the aquifer. The values are checked successively by reducing
-  # Qs, Qf by 5% and checking if the aquifer is depleted.
-  qs_guessT <- params$Qs
-  qf_guessT <- params$Qf
-  while(check_aquifer_depleted(qs_guessT,qf_guessT,params,treaty=TRUE)) {
-    qs_guessT <- qs_guessT*0.9
-    qf_guessT <- qf_guessT*0.9
+  # starting values by s_ratio, f_ratio and checking if the aquifer is depleted.
+  if (s_ratio == 1 | f_ratio == 1) {
+    stop("Both s_ratio and f_ratio must be less than 1.")
+  }
+  if (is.null(qs_start)) {
+    qs_guessN <- qs_guessT <- params$Qs
+  } else {
+    qs_guessN <- qs_guessT <- qs_start
+  }
+  if (is.null(qf_start)) {
+    qf_guessN <- qf_guessT <- params$Qf
+  } else {
+    qf_guessN <- qf_guessT <- qf_start
   }
 
-  qs_guessN <- params$Qs
-  qf_guessN <- params$Qf
+  while(check_aquifer_depleted(qs_guessT,qf_guessT,params,treaty=TRUE)) {
+    qs_guessT <- qs_guessT*s_ratio
+    qf_guessT <- qf_guessT*f_ratio
+  }
+
   while(check_aquifer_depleted(qs_guessN,qf_guessN,params,treaty=FALSE)) {
-    qs_guessN <- qs_guessN*0.9
-    qf_guessN <- qf_guessN*0.9
+    qs_guessN <- qs_guessN*s_ratio
+    qf_guessN <- qf_guessN*f_ratio
   }
 
   return(list(qsT=qs_guessT,qfT=qf_guessT,
@@ -115,8 +126,11 @@ unconA_nl_qhat2 <- function(params,qs1,qf1) {
     }
     return(c(F1))
   }
-  qs2_hat_qf0 <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs1,params=params,qf1=0)$root # estimate qs when qf=0
-  qs2_hat_qfQf <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs1,params=params,qf1=params$Qf)$root # estimate qs when qf=Qf
+  # get initial guesses of qs
+  qs_qf0_guess <- get_q_aquifer_nearly_depleted(params,s_ratio = 0.9,f_ratio=0.98,qf_start=0)$qsT
+  qs_qfQf_guess <- get_q_aquifer_nearly_depleted(params,s_ratio = 0.9,f_ratio=0.98)$qsT
+  qs2_hat_qf0 <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs_qf0_guess,params=params,qf1=0)$root # estimate qs when qf=0
+  qs2_hat_qfQf <- rootSolve::multiroot(f=first_best_equations_qs2,start=qs_qfQf_guess,params=params,qf1=params$Qf)$root # estimate qs when qf=Qf
 
   # get roots for F2_q2 = 0
   first_best_equations_qf2 <- function(x,params,qs1) {
@@ -129,8 +143,11 @@ unconA_nl_qhat2 <- function(params,qs1,qf1) {
     }
     return(c(F2))
   }
-  qf2_hat_qs0 <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf1,params=params,qs1=0)$root # estimate qf when qs=0
-  qf2_hat_qsQs <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf1,params=params,qs1=params$Qs)$root # estimate qf when qs=Qs
+  # get initial guesses
+  qf_qs0_guess <- get_q_aquifer_nearly_depleted(params,s_ratio = 0.98,f_ratio=0.9,qs_start=0)$qsT
+  qf_qsQs_guess <- get_q_aquifer_nearly_depleted(params,s_ratio = 0.98,f_ratio=0.9)$qsT
+  qf2_hat_qs0 <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf_qs0_guess,params=params,qs1=0)$root # estimate qf when qs=0
+  qf2_hat_qsQs <- rootSolve::multiroot(f=first_best_equations_qf2,start=qf_qsQs_guess,params=params,qs1=params$Qs)$root # estimate qf when qs=Qs
 
   q_FB_matrix <- rbind(c(qs1,qf1),
                        c(qs2_hat_qf0,0),

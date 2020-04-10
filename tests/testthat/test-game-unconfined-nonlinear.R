@@ -47,12 +47,11 @@ boundary_input <- example_params_unconfined[c(1,1,1),]
 boundary_input$B[1] <- 1
 boundary_input$p0s[2] <- 0.1
 boundary_input$p0f[3] <- 0.1
-boundary_output <- tibble::tibble(treaty=c("N", "N", "N"), zRange=c(0, 0, 0), zMinSwiss=c(0, 0, 0), zMaxFrench=c(0, 0, 0), qshat=c(0, 0, 8.3165), qsstar=c(0, 0, 8.3164), qsdouble=c(0, 0, 8.3164), qfhat=c(0, 7.6169, 0), qfstar=c(0, 7.6169, 0), qfdouble=c(0, 7.6169, 0), Us_hat=c(-20.1, -2.1, -16.6437), Us_star=c(-20.1, -2.1, -16.6437), Us_double=c(-20.1, -2.1, -16.6437), Us_hat_double=c(-20.1, -2.1, -16.6437), Uf_hat=c(-20, -16.8465, -2), Uf_star=c(-20, -16.8465, -2), Uf_double=c(-20, -16.8465, -2), Uf_hat_double=c(-20, -16.8465, -2), ds_hat=c(1.8799, 3.4923, 5.8075), ds_star=c(1.8799, 3.4923, 5.8074), ds_double=c(1.8799, 3.4923, 5.8074), ds_hat_double=c(1.8799, 3.4923, 5.8074), df_hat=c(1.9102, 5.8231, 3.6747), df_star=c(1.9102, 5.8231, 3.6747), df_double=c(1.9102, 5.8231, 3.6747), df_hat_double=c(1.9102, 5.8231, 3.6747), p0f=c(1, 1, 0.1), p0s=c(1, 0.1, 1), B=c(1, 0.1, 0.1))
+boundary_output <- tibble::tibble(treaty=c("N", "N", "N"), zRange=c(0, 0, 0), zMinSwiss=c(0, 0, 0), zMaxFrench=c(0, 0, 0), qshat=c(0, 0, 8.316), qsstar=c(0, 0, 8.316), qsdouble=c(0, 0, 8.316), qfhat=c(0, 7.617, 0), qfstar=c(0, 7.617, 0), qfdouble=c(0, 7.617, 0), Us_hat=c(-20.1, -2.1, -16.644), Us_star=c(-20.1, -2.1, -16.644), Us_double=c(-20.1, -2.1, -16.644), Us_hat_double=c(-20.1, -2.1, -16.644), Uf_hat=c(-20, -16.847, -2), Uf_star=c(-20, -16.847, -2), Uf_double=c(-20, -16.847, -2), Uf_hat_double=c(-20, -16.847, -2), ds_hat=c(1.88, 3.492, 5.807), ds_star=c(1.88, 3.492, 5.807), ds_double=c(1.88, 3.492, 5.807), ds_hat_double=c(1.88, 3.492, 5.807), df_hat=c(1.91, 5.823, 3.675), df_star=c(1.91, 5.823, 3.675), df_double=c(1.91, 5.823, 3.675), df_hat_double=c(1.91, 5.823, 3.675), p0f=c(1, 1, 0.1), p0s=c(1, 0.1, 1), B=c(1, 0.1, 0.1))
 test_that("evaluate_treaty_cases works for unconfined nonlinear when max utility is at a boundary point (qs or qf = 0)",{
-  expect_equal(evaluate_treaty_cases(boundary_input,'qudp') %>% dplyr::mutate_if(is.numeric,function(x) round(x,4)),
+  expect_equal(evaluate_treaty_cases(boundary_input,'qudp') %>% dplyr::mutate_if(is.numeric,function(x) round(x,3)),
                boundary_output)
 })
-
 
 ## Additional special cases
 
@@ -93,5 +92,14 @@ results_exception4 <- suppressWarnings(evaluate_treaty_cases(params_exception4,"
 test_that("evaluate_treaty_cases works where ADcheat is TRUE",{
   expect_equal(results_exception4,output_exception4)
 })
+
+params_exception5 <- data.frame(Qf=4.086, Qs=23.232, p0f=79642.438, p0s=59546.88, B=775.015, PHIss=112.582, PHIsf=74.707, PHIff=106.693, PHIfs=102.931, PHIsrT=127.551, PHIfrT=79.869, dBs=66.097, h0s=42.824, c0rs=17458630.785, rmT=7.551, crs=98.826, gs=0.847, gf=0.874, es=0, ef=0, l=0.678, rmN=7.551, PHIsrN=127.551, PHIfrN=79.869, dBf=66.097, h0f=42.824)
+output_exception5 <- tibble::tibble(treaty="Y", zRange=6057.6, zMinSwiss=7154.07, zMaxFrench=13211.67, qshat=12.45, qsstar=13.99, qsdouble=13.99, qfhat=4.09, qfstar=4.09, qfdouble=4.09, Us_hat=-18460332.29, Us_star=-18453178.22, Us_double=-18453178.22, Us_hat_double=-18460332.29, Uf_hat=-145126.25, Uf_star=-160242.58, Uf_double=-145126.25, Uf_hat_double=-160242.58, ds_hat=33.08, ds_star=35.82, ds_double=35.82, ds_hat_double=35.82, df_hat=39.28, df_star=42.41, df_double=39.28, df_hat_double=39.28)
+results_exception5 <- evaluate_treaty_cases(params_exception5,"qud") %>%
+  dplyr::mutate_if(is.numeric,function(x) round(x,2)) #%>% ggp::print_data_frame_for_entry(single_line = T)
+test_that("evaluate_treaty_cases, initial FB has negative pumping and second round leaded to aquifer depletion",{
+  expect_equal(results_exception5,output_exception5)
+})
+
 
 
