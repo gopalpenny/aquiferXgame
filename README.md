@@ -28,4 +28,4 @@ More than one game can be evaluated at a time, including for confined an unconfi
 
 ## More information
 
-The package website can be found on [github.io](https://gopalpenny.github.io/genevoisgame/index.html)
+The package website can be found on [github.io](https://gopalpenny.github.io/genevoisgame)
