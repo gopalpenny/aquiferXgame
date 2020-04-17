@@ -50,7 +50,7 @@ library(tidyr)
 library(ggplot2)
 ```
 
-### Confned aquifer: trust vs trust
+### Confined aquifer: trust vs trust
 
 We will use the built-in dataset `example_params_confined` as a basis for our analysis. Whenever a treaty game is simulated, parameters are validated using the `check_params` function, and a full list of required parameters can be found in the documentation for this function. The game determines whether to use a confined or unconfined scenario using the parameters input to the game. If `Dxx` are used, the game will apply to a *confined* aquifer. If `PHIxx` are used, the game will apply to an *unconfined* aquifer. See `?check_params` for details.
 
