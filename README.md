@@ -26,6 +26,6 @@ evaluate_treaty(example_params_confined)
 
 More than one game can be evaluated at a time, including for confined an unconfined aquifers and a range of socioeconomic and geophysical parameters. 
 
-## Vignette
+## More information
 
-For more details, see the full vignette on [github.io](https://gopalpenny.github.io/genevoisgame/genevoisgame-vignette.html)
+The package website can be found on [github.io](https://gopalpenny.github.io/genevoisgame/index.html)
