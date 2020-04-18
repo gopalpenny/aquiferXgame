@@ -366,3 +366,43 @@ get_contours <- function(df = NULL, levels = 0, ...) {
   }
   return(cl)
 }
+
+
+
+#' Gather outcomes
+#'
+#' This function gathers the outcome variables (utility, depth, pumping) from \code{evaluate_treaty_cases}
+#' in a format that makes it easier to plot and visualize with \code{ggplot2}.
+#' @param treaty_df Outcomes from \code{evaluate_treaty_cases}, including utility, depth, pumping
+#' @importFrom magrittr %>%
+#' @importFrom rlang .data
+#' @importFrom tidyr gather
+#' @export
+#' @examples
+#' library(genevoisgame)
+#' library(ggplot2)
+#' library(tidyr)
+#' params <- example_params_confined
+#' params$gs <- NULL
+#' params <- crossing(params,gs=seq(0,1,by=0.05))
+#' treaty_df <- evaluate_treaty_cases(params,'qudp')
+#' treaty_long <- gather_outcomes(treaty_df)
+#'
+#' ggplot(treaty_long) +
+#'   geom_line(aes(x=gs,y=val,color=country,linetype=variable_subcat)) +
+#'   facet_wrap(~variable_cat,scales="free_y",ncol=1) +
+#'   scale_linetype_manual(values=c("solid","dashed","dotted","longdash")) +
+#'   theme(legend.key.width = unit(1,"cm"))
+gather_outcomes <- function(treaty_df) {
+  treaty_prep <- treaty_df %>%
+    gather(var,val,dplyr::matches("^d[sf]_.*"),dplyr::matches("U[sf]_.*"),dplyr::matches("q[sf].+$"))
+  treaty_prep$country <- substr(treaty_prep$var,2,2)
+  treaty_prep$variable_cat <- substr(treaty_prep$var,1,1)
+  treaty_prep$variable_subcat <- factor(gsub("^(.)[sf]_?(.*)$","\\2",treaty_prep$var),levels=c("hat","star","double","hat_double"))
+  treaty_long <- treaty_prep %>% dplyr::group_by(.data$variable_cat) %>%
+    dplyr::mutate(dense_r=dplyr::dense_rank(.data$variable_subcat))
+  return(treaty_long)
+}
+
+
+

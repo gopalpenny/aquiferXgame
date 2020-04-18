@@ -31,7 +31,7 @@ For unconfined aquifers, abstraction is related linearly with discharge potentia
 $$h_i^2=\phi_i=h_{0i}^2-\Phi_{ii}q_i-\Phi_{ij}q_j+\Phi_{ir}(\Omega)r_M(\Omega),$$
 where the coefficients relate discharge potential with abstraction by country $i$ ($\Phi_{ii}$), abstraction by country $j$ ($\Phi_{ij}$), and managed recharge ($\Phi_{ir}$). 
 
-## Using the package
+## Confined aquifer: trust vs trust
 
 This vignette will show you the basic utilization of the package. If you haven't installed the `genevoisgame` package, you can do so using `devtools::install_github`:
 
@@ -49,8 +49,6 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 ```
-
-### Confined aquifer: trust vs trust
 
 We will use the built-in dataset `example_params_confined` as a basis for our analysis. Whenever a treaty game is simulated, parameters are validated using the `check_params` function, and a full list of required parameters can be found in the documentation for this function. The game determines whether to use a confined or unconfined scenario using the parameters input to the game. If `Dxx` are used, the game will apply to a *confined* aquifer. If `PHIxx` are used, the game will apply to an *unconfined* aquifer. See `?check_params` for details.
 
@@ -86,8 +84,23 @@ Note that the parameters `"pqud"` in the `evaluate_treaty_cases` function return
 names(outcomes_trust_v_trust)
 ```
 
+Sometimes it may be valuable to plot the depth, utility, and pumping output along some axis. There is a helper function, `gather_outcomes` which can help with this. It gathers the output variables in long format so that it can be plotted against another variable. In this case, we are interested in seeing how the outcomes vary over `gs`, holding `gf` constant at 0.5.
 
-### Unconfined aquifer: trust vs trust
+```{r}
+outcomes_trust_long <- outcomes_trust_v_trust %>% filter(gf==0.5) %>% gather_outcomes()
+```
+
+Using `facet_wrap` from `ggplot2` and careful selection of linetypes and colors, we can better see the effect of `gs` on the outcome variables under scenarios of a treaty ("hat"), nash equlibrium ("star"), cheat ("double"), and victim ("hat_double").
+
+```{r fig.width=5,fig.height=4.5}
+ggplot(outcomes_trust_long) +
+  geom_line(aes(x=gs,y=val,color=country,linetype=variable_subcat)) +
+  facet_wrap(~variable_cat,scales="free_y",ncol=1) +
+  scale_linetype_manual(values=c("solid","dashed","dotted","longdash")) +
+  theme(legend.key.width = unit(1,"cm"))
+```
+
+## Unconfined aquifer: trust vs trust
 
 We will now do the same analysis, but using `example_params_unconfined`, meaning that the game will operate on an unconfined aquifer.
 

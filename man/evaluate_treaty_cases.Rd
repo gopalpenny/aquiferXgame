@@ -32,7 +32,7 @@ three additional columns:
 (first best, nash, or cheat). In the nonlinear game, this *should* only happen in one of two scenarios:
 \enumerate{
 \item A treaty is signed to maximize join utility, but a cheat pumps more and the aquifer
-  is depleted for the other player
+  is depleted for the other player. In this case, the treaty is set to "N", even if trust is equal to 1.
 \item The numerical root finder jumps to a value where the aquifer is fully depleted.
   This is unlikely, as the initial guesses are set to minimize the change of this occurring.
 }
