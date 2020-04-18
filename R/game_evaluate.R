@@ -280,8 +280,8 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
   df_star <- get_df(qs=q_vals$qsstar,qf=q_vals$qfstar,params_notreaty)
   ds_double <- get_ds(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty)
   df_double <- get_df(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty)
-  ds_hat_double <- get_ds(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty)
-  df_hat_double <- get_df(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty)
+  ds_hat_double <- get_ds(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty)
+  df_hat_double <- get_df(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty)
   d_vals <- tibble::tibble(ds_hat=ds_hat,df_hat=df_hat,
                            ds_star=ds_star,df_star=df_star,
                            ds_double=ds_double,df_double=df_double,
