@@ -395,7 +395,7 @@ get_contours <- function(df = NULL, levels = 0, ...) {
 #'   theme(legend.key.width = unit(1,"cm"))
 gather_outcomes <- function(treaty_df) {
   treaty_prep <- treaty_df %>%
-    gather(var,val,dplyr::matches("^d[sf]_.*"),dplyr::matches("U[sf]_.*"),dplyr::matches("q[sf].+$"))
+    gather("var","val",dplyr::matches("^d[sf]_.*"),dplyr::matches("U[sf]_.*"),dplyr::matches("q[sf].+$"))
   treaty_prep$country <- substr(treaty_prep$var,2,2)
   treaty_prep$variable_cat <- substr(treaty_prep$var,1,1)
   treaty_prep$variable_subcat <- factor(gsub("^(.)[sf]_?(.*)$","\\2",treaty_prep$var),levels=c("hat","star","double","hat_double"))

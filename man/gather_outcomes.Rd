@@ -10,7 +10,8 @@ gather_outcomes(treaty_df)
 \item{treaty_df}{Outcomes from \code{evaluate_treaty_cases}, including utility, depth, pumping}
 }
 \description{
-Gather outcomes
+This function gathers the outcome variables (utility, depth, pumping) from \code{evaluate_treaty_cases}
+in a format that makes it easier to plot and visualize with \code{ggplot2}.
 }
 \examples{
 library(genevoisgame)

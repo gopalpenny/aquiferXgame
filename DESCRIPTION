@@ -12,7 +12,11 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Imports:
-    magrittr
+    magrittr,
+    tidyr,
+    dplyr,
+    rootSolve,
+    rlang
 Depends:
     R (>= 3.1.0)
 Suggests: 
@@ -20,9 +24,6 @@ Suggests:
     rmarkdown,
     testthat,
     ggplot2,
-    tidyr,
-    dplyr,
-    tibble,
-    rootSolve
+    tibble
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
