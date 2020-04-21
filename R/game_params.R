@@ -50,6 +50,7 @@ check_params <- function(params) {
   # initial_depth_confined_params <- c('d0s','d0f')
   # initial_depth_unconfined_params <- c('dBs','dBf','h0s','h0f')
   additional_params <- c('Qf','Qs','p0f','p0s','B','rmN','rmT','crs','c0rs','gs','gf','es','ef')
+  all_params <- unique(c(drawdown_confined_params,drawdown_unconfined_params,additional_params))
   additional_warnings <- NULL
 
   param_names <- names(params)
@@ -101,8 +102,9 @@ check_params <- function(params) {
     stop("Missing drawdown parameters (Dxx or PHIxx) in params.")
   }
 
-  # 3. Check for negative values
-  neg_vals_df <- params[,sapply(params,function(x) any(x<0))]
+  # 3. Check for negative values in the parameters specified above
+  game_params <- params[,names(params) %in% all_params] # remove parameters that are not contained in one of the above lists
+  neg_vals_df <- game_params[,sapply(game_params,function(x) any(x<0))]
   if (ncol(neg_vals_df) > 0) {
     warning(paste0("param column(s), ",paste(names(neg_vals_df),collapse=", "),", contain negative values."))
   }

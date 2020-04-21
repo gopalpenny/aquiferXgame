@@ -51,9 +51,16 @@ test_that('check_params stops if UNCONFINED and CONFINED drawdown relationships 
 
 
 params_negative <- example_params_unconfined %>% dplyr::bind_rows(example_params_unconfined %>% dplyr::mutate(Qf=-10))
-test_that('check_params gives warning if a columns has negative values',{
+test_that('check_params gives warning if a param column has negative values',{
   expect_warning(check_params(params_negative),"param column\\(s\\), Qf, contain negative values.")
   expect_warning(check_params(params_negative %>% dplyr::mutate(PHIsf=c(-1,2))),"param column\\(s\\), Qf, PHIsf, contain negative values.")
+})
+
+params_unconfined_normal <- example_params_unconfined %>% dplyr::mutate(c2=c("text"),c3=c(-10))
+params_confined_normal <- example_params_confined %>% dplyr::mutate(c2=c("text"),c3=c(-10))
+test_that('check_params does NOT give warning if another column has negative values',{
+  expect_warning(check_params(params_confined_normal),NA)
+  expect_warning(check_params(params_unconfined_normal),NA)
 })
 
 
