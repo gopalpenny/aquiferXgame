@@ -374,10 +374,24 @@ get_contours <- function(df = NULL, levels = 0, ...) {
 #' This function gathers the outcome variables (utility, depth, pumping) from \code{evaluate_treaty_cases}
 #' in a format that makes it easier to plot and visualize with \code{ggplot2}.
 #' @param treaty_df Outcomes from \code{evaluate_treaty_cases}, including utility, depth, pumping
+#' @param q_expected Logical where, if TRUE, expected pumping of the other player is calculated. See details.
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom tidyr gather
 #' @export
+#' @details
+#' This function is used to assist with plotting and analysis of results from the game. Note that all variables
+#' whose column names begin with "q[sf]", "U[sf]", or "d[sf]" are gathered.
+#'
+#' If \code{q_expected} is \code{TRUE}, the expected value of q for each player is calculated under the
+#' assumption that a treaty is signed. If trust is 0, then the expected value is the cheat pumping. If
+#' trust is 1, then the expected value is the First Best. Intermediate values of trust produce intermediate
+#' values of q_expected. The belief of player \eqn{i} that player \eqn{j} is trustworthy is \eqn{g_i}.
+#' Therefore the expected values is calculated as
+#' \deqn{E[q_j] = \gamma_i \hat q_j + (1-\gamma_i) q_j \, .}{E[qj] = gi*qj_hat + (1 - gi) * qj_double .}
+#' The resulting values are returned as "qj_expected". In other words for \code{country==i}, this pumping rate
+#' is expected value of \code{qi} from the perspective of \code{j}. Note that both \code{gs} and \code{gf} must
+#' be included as columns in \code{treaty_df} for \code{q_expected} to be calculated.
 #' @examples
 #' library(genevoisgame)
 #' library(ggplot2)
@@ -385,24 +399,32 @@ get_contours <- function(df = NULL, levels = 0, ...) {
 #' params <- example_params_confined
 #' params$gs <- NULL
 #' params <- crossing(params,gs=seq(0,1,by=0.05))
-#' treaty_df <- evaluate_treaty_cases(params,'qudp')
-#' treaty_long <- gather_outcomes(treaty_df)
+#' treaty_df <- evaluate_treaty_cases(params,'quda')
+#' treaty_long <- gather_outcomes(treaty_df, TRUE)
 #'
 #' ggplot(treaty_long) +
 #'   geom_line(aes(x=gs,y=val,color=country,linetype=variable_subcat)) +
 #'   facet_wrap(~variable_cat,scales="free_y",ncol=1) +
-#'   scale_linetype_manual(values=c("solid","dashed","dotted","longdash")) +
+#'   scale_linetype_manual(values=c("solid","dashed","dotted","longdash","dotdash")) +
 #'   theme(legend.key.width = unit(1,"cm"))
-gather_outcomes <- function(treaty_df) {
+gather_outcomes <- function(treaty_df, q_expected=FALSE) {
+  if (q_expected) {
+    if (all(c("gs","gf") %in% names(treaty_df))) {
+      treaty_df$qf_expected <- with(treaty_df,gs * qfhat + (1 - gs) * qfdouble)
+      treaty_df$qs_expected <- with(treaty_df,gf * qshat + (1 - gf) * qsdouble)
+    } else {
+      stop("treaty_df must contain columns for gs, gf to calculate q_expected.")
+    }
+  }
   treaty_prep <- treaty_df %>%
-    gather("var","val",dplyr::matches("^d[sf]_.*"),dplyr::matches("U[sf]_.*"),dplyr::matches("q[sf].+$"))
+    gather("var","val",dplyr::matches("^d[sf]_.*"),dplyr::matches("U[sf]_.*"),dplyr::matches("q[sf]_?.+$"))
   treaty_prep$country <- substr(treaty_prep$var,2,2)
   treaty_prep$variable_cat <- substr(treaty_prep$var,1,1)
-  treaty_prep$variable_subcat <- factor(gsub("^(.)[sf]_?(.*)$","\\2",treaty_prep$var),levels=c("hat","star","double","hat_double"))
+  treaty_prep$variable_subcat <- factor(gsub("^(.)[sf]_?(.*)$","\\2",treaty_prep$var),levels=c("hat","star","double","hat_double","expected"))
   treaty_long <- treaty_prep %>% dplyr::group_by(.data$variable_cat) %>%
     dplyr::mutate(dense_r=dplyr::dense_rank(.data$variable_subcat))
-  treaty_long$situation_subcat <- factor(treaty_long$variable_subcat,levels=c("hat","star","double","hat_double"),
-                                         labels=c("First best","Nash","Cheat","Victim"))
+  treaty_long$situation_subcat <- factor(treaty_long$variable_subcat,levels=c("hat","star","double","hat_double","expected"),
+                                         labels=c("First best","Nash","Cheat","Victim","E[q]"))
   return(treaty_long)
 }
 

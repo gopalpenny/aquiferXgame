@@ -64,10 +64,11 @@ test_that("get_contours works for simple example",{
 params <- example_params_confined
 params$gs <- NULL
 params <- tidyr::crossing(params,gs=seq(0,1,by=0.05))
-treaty_df <- evaluate_treaty_cases(params,'qudp')
+treaty_df <- evaluate_treaty_cases(params,'quda')
 # results <- gather_outcomes(treaty_df)
 test_that('gather_outcomes working',{
-  expect_equal(dim(gather_outcomes(treaty_df)),c(462,12))
+  expect_equal(dim(gather_outcomes(treaty_df)),c(462,34))
+  expect_equal(dim(gather_outcomes(treaty_df,q_expected=TRUE)),c(504,34))
 })
 
 
