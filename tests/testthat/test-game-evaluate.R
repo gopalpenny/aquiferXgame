@@ -67,7 +67,7 @@ params <- tidyr::crossing(params,gs=seq(0,1,by=0.05))
 treaty_df <- evaluate_treaty_cases(params,'qudp')
 # results <- gather_outcomes(treaty_df)
 test_that('gather_outcomes working',{
-  expect_equal(dim(gather_outcomes(treaty_df)),c(462,11))
+  expect_equal(dim(gather_outcomes(treaty_df)),c(462,12))
 })
 
 

@@ -401,6 +401,8 @@ gather_outcomes <- function(treaty_df) {
   treaty_prep$variable_subcat <- factor(gsub("^(.)[sf]_?(.*)$","\\2",treaty_prep$var),levels=c("hat","star","double","hat_double"))
   treaty_long <- treaty_prep %>% dplyr::group_by(.data$variable_cat) %>%
     dplyr::mutate(dense_r=dplyr::dense_rank(.data$variable_subcat))
+  treaty_long$situation_subcat <- factor(treaty_long$variable_subcat,levels=c("hat","star","double","hat_double"),
+                                         labels=c("First best","Nash","Cheat","Victim"))
   return(treaty_long)
 }
 
