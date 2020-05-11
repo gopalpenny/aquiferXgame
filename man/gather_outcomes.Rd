@@ -4,12 +4,12 @@
 \alias{gather_outcomes}
 \title{Gather outcomes}
 \usage{
-gather_outcomes(treaty_df, q_expected = FALSE)
+gather_outcomes(treaty_df, expectation = FALSE)
 }
 \arguments{
 \item{treaty_df}{Outcomes from \code{evaluate_treaty_cases}, including utility, depth, pumping}
 
-\item{q_expected}{Logical where, if TRUE, expected pumping of the other player is calculated. See details.}
+\item{expectation}{Logical where, if TRUE, expected pumping of the other player is calculated. See details.}
 }
 \description{
 This function gathers the outcome variables (utility, depth, pumping) from \code{evaluate_treaty_cases}
@@ -19,11 +19,14 @@ in a format that makes it easier to plot and visualize with \code{ggplot2}.
 This function is used to assist with plotting and analysis of results from the game. Note that all variables
 whose column names begin with "q[sf]", "U[sf]", or "d[sf]" are gathered.
 
-If \code{q_expected} is \code{TRUE}, the expected value of q for each player is calculated under the
-assumption that a treaty is signed. If trust is 0, then the expected value is the cheat pumping. If
-trust is 1, then the expected value is the First Best. Intermediate values of trust produce intermediate
-values of q_expected. The belief of player \eqn{i} that player \eqn{j} is trustworthy is \eqn{g_i}.
-Therefore the expected values is calculated as
+If \code{expectation} is \code{TRUE}, the expected value of U (\code{U_expected}) and q (\code{q_expected}) for each player
+are calculated under the assumption that a treaty is signed. Utility for player i, Ui,
+is calculated under the assumption that player i is Honest.
+If trust is 0, then the expected value of U is the victim utility, and for q it is the cheat pumping. If
+trust is 1, then the expected value is the First Best for both U and q. Intermediate values of trust produce intermediate
+values of expectation. The belief of player \eqn{i} that player \eqn{j} is trustworthy is \eqn{g_i}.
+Therefore the expected values are calculated as
+\deqn{E[U_i] = \gamma_i \hat U_i + (1-\gamma_i) \hat U_i^{**} \, .}{E[Ui] = gi*Ui_hat + (1 - gi) * Ui_double .}
 \deqn{E[q_j] = \gamma_i \hat q_j + (1-\gamma_i) q_j \, .}{E[qj] = gi*qj_hat + (1 - gi) * qj_double .}
 The resulting values are returned as "qj_expected". In other words for \code{country==i}, this pumping rate
 is expected value of \code{qi} from the perspective of \code{j}. Note that both \code{gs} and \code{gf} must

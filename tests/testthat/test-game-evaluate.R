@@ -68,7 +68,7 @@ treaty_df <- evaluate_treaty_cases(params,'quda')
 # results <- gather_outcomes(treaty_df)
 test_that('gather_outcomes working',{
   expect_equal(dim(gather_outcomes(treaty_df)),c(462,34))
-  expect_equal(dim(gather_outcomes(treaty_df,q_expected=TRUE)),c(504,34))
+  expect_equal(dim(gather_outcomes(treaty_df,expectation=TRUE)),c(546,34))
 })
 
 
