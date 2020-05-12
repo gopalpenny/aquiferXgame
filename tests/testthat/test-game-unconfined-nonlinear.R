@@ -73,11 +73,11 @@ test_that("evaluate_treaty_cases works for a case with large Qf, Qs which could 
 
 params_exception2 <- data.frame(Qf=5.869, Qs=23.935, p0f=60634.306, p0s=71411.769, B=886.237, PHIss=124.485, PHIsf=104.257, PHIff=88.21, PHIfs=85.877, PHIsrT=112.543, PHIfrT=78.223, dBs=63.701, h0s=43.815, c0rs=21037350.643, rmT=9.648, crs=99.82, gs=0.928, gf=0.957, es=537.983, ef=213.288, l=0.377, rmN=9.648, PHIsrN=112.543, PHIfrN=78.223, dBf=63.701, h0f=43.815)
 output_exception2 <- tibble::tibble(treaty="N", zRange=-4066.14, zMinSwiss=-147214.8, zMaxFrench=-151280.93, qshat=14.71, qsstar=11.63, qsdouble=14.43, qfhat=0.53, qfstar=5.87, qfdouble=5.87, Us_hat=-22179416.88, Us_star=-22343417.35, Us_double=-22179957.27, Us_hat_double=-22405079.22, Us_double_double=-22393167.14, Uf_hat=-338910.06, Uf_star=-187833.22, Uf_double=-222635.45, Uf_hat_double=-338696.31, Uf_double_double=-219198.44, ds_hat=30.24, ds_star=32.95, ds_double=29.73, ds_hat_double=39.97, ds_double_double=39.27, df_hat=26.75, df_star=29.67, df_double=33.8, df_hat_double=26.44, df_double_double=33.41)
-results_exception2 <- evaluate_treaty_cases(params_exception2,"qud") %>%
+results_exception2 <- suppressWarnings(evaluate_treaty_cases(params_exception2,"qud")) %>%
   dplyr::mutate_if(is.numeric,function(x) round(x,2)) #%>% ggp::print_data_frame_for_entry(single_line = T)
 params_exception3 <- data.frame(Qf=5.869, Qs=23.935, p0f=60634.306, p0s=71411.769, B=886.237, PHIss=124.485, PHIsf=104.257, PHIff=88.21, PHIfs=85.877, PHIsrT=112.543, PHIfrT=78.223, dBs=63.701, h0s=43.815, c0rs=21037350.643, rmT=9.648, crs=99.82, gs=1, gf=1, es=537.983, ef=213.288, l=0.377, rmN=9.648, PHIsrN=112.543, PHIfrN=78.223, dBf=63.701, h0f=43.815)
 output_exception3 <- tibble::tibble(treaty="Y", zRange=12172.36, zMinSwiss=-163462.48, zMaxFrench=-151290.13, qshat=14.71, qsstar=11.63, qsdouble=14.79, qfhat=0.53, qfstar=5.87, qfdouble=5.87, Us_hat=-22179416.88, Us_star=-22343417.35, Us_double=-22179381.95, Us_hat_double=-22405079.22, Us_double_double=-22409301.89, Uf_hat=-338910.06, Uf_star=-187833.22, Uf_double=-222635.45, Uf_hat_double=-338979.9, Uf_double_double=-223764.71, ds_hat=30.24, ds_star=32.95, ds_double=30.4, ds_hat_double=39.97, ds_double_double=40.2, df_hat=26.75, df_star=29.67, df_double=33.8, df_hat_double=26.86, df_double_double=33.93)
-results_exception3 <- evaluate_treaty_cases(params_exception3,"qud") %>%
+results_exception3 <- suppressWarnings(evaluate_treaty_cases(params_exception3,"qud")) %>%
   dplyr::mutate_if(is.numeric,function(x) round(x,2)) #%>% ggp::print_data_frame_for_entry(single_line = T)
 test_that("evaluate_treaty_cases works for a case that is borderline -- small change in gs, gf changes outcome",{
   expect_equal(results_exception2,output_exception2)

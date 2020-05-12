@@ -69,6 +69,9 @@ check_params <- function(params) {
   # 2b. if PHI, ensure all PHI parameters are present along with dBs, dBf, hs, hf
   # 3. Check for negative values
 
+  connectivity_stop <- NULL
+  connectivity_warning <- NULL
+
   # 1. ensure parameters are specified as D or PHI
   if (any(grepl("D[sfij][sfij]",param_names)) & any(grepl("PHI[sfij][sfij]",param_names))) {
     stop("params should contain either Dix or PHIix, not both")
@@ -80,6 +83,13 @@ check_params <- function(params) {
       missing_conf_params <- drawdown_confined_params[!(drawdown_confined_params %in% param_names)]
       # warning(paste("missing",paste(missing_conf_params,collapse=", "),"in params"))
       missing_params <- c(missing_params,missing_conf_params)
+    }
+    if (all(c("Dsf","Dfs","Dss","Dff") %in% param_names)) {
+      if (any(with(params,pmax(Dsf,Dfs) == pmin(Dss,Dff)))) {
+        connectivity_stop <- "Dij must be less than Dii. At least one value of Dij is equal to Dii."
+      } else if (any(with(params,pmax(Dsf,Dfs) > 0.995 * pmin(Dss,Dff)))) {
+        connectivity_warning <- "Dij must be less than Dii. At least one value of Dij is very close (>99.5%) to Dii."
+      }
     }
 
     # 2b. if PHI, ensure all PHI parameters are present along with dBs, dBf, hs, hf
@@ -96,6 +106,13 @@ check_params <- function(params) {
       }
       if (any(params$l == 1)) {
         additional_warnings <- c(additional_warnings,"Column l contains values equal to 1 (one). This triggers linear cost solution for the unconfined game.")
+      }
+    }
+    if (all(c("PHIsf","PHIfs","PHIss","PHIff") %in% param_names)) {
+      if (any(with(params,pmax(PHIsf,PHIfs) == pmin(PHIss,PHIff)))) {
+        connectivity_stop <- "PHIij must be less than PHIii. At least one value of PHIij is equal to PHIii."
+      } else if (any(with(params,pmax(PHIsf,PHIfs) > 0.995 * pmin(PHIss,PHIff)))) {
+        connectivity_warning <- "PHIij must be less than PHIii. At least one value of PHIij is very close (>99.5%) to PHIii."
       }
     }
   } else {
@@ -119,10 +136,10 @@ check_params <- function(params) {
     }
   }
 
-  if (any(with(params,pmax(Dsf,Dfs) == pmin(Dss,Dff)))) {
-    stop("Dij must be less than Dii. At least one value of Dij is equal to Dii.")
-  } else if (any(with(params,pmax(Dsf,Dfs) > 0.995 * pmin(Dss,Dff)))) {
-    warning("Dij must be less than Dii. At least one value of Dij is very close (>99.5%) to Dii.")
+  if (!is.null(connectivity_stop)) {
+    stop(connectivity_stop)
+  } else if (!is.null(connectivity_warning)) {
+    warning(connectivity_warning)
   }
 
   # return aquifer type

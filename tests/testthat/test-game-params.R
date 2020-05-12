@@ -56,12 +56,21 @@ test_that('check_params gives warning if a param column has negative values',{
   expect_warning(check_params(params_negative %>% dplyr::mutate(PHIsf=c(-1,2))),"param column\\(s\\), Qf, PHIsf, contain negative values.")
 })
 
+params_highconnectivity <- example_params_confined %>% dplyr::mutate(Dsf=Dss)
+test_that('check_params gives warning if a param column has negative values',{
+  expect_error(check_params(params_highconnectivity),"Dij must be less than Dii")
+  expect_warning(check_params(params_highconnectivity %>% dplyr::mutate(Dsf=Dss*0.999)),"Dij must be less than Dii")
+})
+
+
 params_unconfined_normal <- example_params_unconfined %>% dplyr::mutate(c2=c("text"),c3=c(-10))
 params_confined_normal <- example_params_confined %>% dplyr::mutate(c2=c("text"),c3=c(-10))
 test_that('check_params does NOT give warning if another column has negative values',{
   expect_warning(check_params(params_confined_normal),NA)
   expect_warning(check_params(params_unconfined_normal),NA)
 })
+
+
 
 
 # check_game_dynamics no longer used
