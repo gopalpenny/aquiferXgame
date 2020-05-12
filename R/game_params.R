@@ -119,6 +119,12 @@ check_params <- function(params) {
     }
   }
 
+  if (any(with(params,pmax(Dsf,Dfs) == pmin(Dss,Dff)))) {
+    stop("Dij must be less than Dii. At least one value of Dij is equal to Dii.")
+  } else if (any(with(params,pmax(Dsf,Dfs) > 0.995 * pmin(Dss,Dff)))) {
+    warning("Dij must be less than Dii. At least one value of Dij is very close (>99.5%) to Dii.")
+  }
+
   # return aquifer type
   return(aquifer_type)
 }
