@@ -125,18 +125,23 @@ evaluate_treaty <- function(params, aquifer_type = NULL) {
 #' library(genevoisgame)
 #' evaluate_treaty_cases(rbind(example_params_confined,example_params_confined))
 #' evaluate_treaty_cases(rbind(example_params_unconfined,example_params_unconfined),"qudp")
+#'
+#' # with progress bar
+#' params <- do.call(rbind,rep(list(example_params_confined),200))
+#' results <- evaluate_treaty_cases(params,"qudp", progress_bar = TRUE)
 evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = FALSE) {
   aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
   eval_results_list <- list()
-  prog_max <- ifelse(grepl("d","qp") + grepl("u","qp") == 0, nrow(params_df), # increase progress max if utility and depth are requireed
-                   nrow(params_df) * (1 + 0.5 * grepl("d",return_criteria) + grepl("u",return_criteria)))
+  prog_max <- ifelse(grepl("d",return_criteria) + grepl("u",return_criteria) == 0, nrow(params_df), # increase progress max if utility and depth are requireed
+                   nrow(params_df) * (1 + grepl("d",return_criteria) + grepl("u",return_criteria)))
+  prog_base <- 0
   if (progress_bar) pb <- utils::txtProgressBar(min = 0, max = prog_max, style = 3)
   for (i in 1:nrow(params_df)) {
     eval_results_list[[i]] <- evaluate_treaty(params_list[[i]],aquifer_type=aquifer_type) #lapply(params_list,evaluate_treaty,aquifer_type=aquifer_type)
     if (progress_bar) utils::setTxtProgressBar(pb, i)
   }
-  if (progress_bar) close(pb)
+  prog_base <- nrow(params_df)
   eval_results <- dplyr::bind_rows(eval_results_list)
   q_vals_list <- split(eval_results %>% dplyr::select(dplyr::starts_with("q")),1:dim(eval_results)[1])
   # eval_results_treat <- eval_results %>% select(treaty,zRange,zMinSwiss,zMaxFrench)
@@ -154,21 +159,34 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
   if (any(grepl("u",return_criteria))) { # return utilities
     # if the aquifer is depleted in any scenario, ignore NaN warnings for Utility
     withCallingHandlers({
-      u_vals <- do.call(rbind,mapply(evaluate_treaty_utility,params=params_list,
-                                     q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+      # u_vals <- do.call(rbind,mapply(evaluate_treaty_utility,params=params_list,
+      #                                q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+      eval_utility_list <- list()
+      for (i in 1:nrow(params_df)) {
+        eval_utility_list[[i]] <- evaluate_treaty_utility(params_list[[i]],q_vals_list[[i]],aquifer_type=aquifer_type)
+        if (progress_bar) utils::setTxtProgressBar(pb, prog_base + i)
+      }
+      u_vals <- dplyr::bind_rows(eval_utility_list)
+      prog_base <- prog_base + nrow(params_df)
     }, warning=function(w) {
       if (startsWith(conditionMessage(w), ignore_nan_warning))
         invokeRestart("muffleWarning")
     })
     eval_return <- eval_return %>% dplyr::bind_cols(u_vals %>% dplyr::select(dplyr::starts_with("Us"),dplyr::starts_with("Uf"),dplyr::everything()))
-    if (progress_bar & any(grepl("d",return_criteria))) utils::setTxtProgressBar(pb, mean(i, prog_max))
-    if (progress_bar & !any(grepl("d",return_criteria))) utils::setTxtProgressBar(pb, prog_max)
+    # if (progress_bar & any(grepl("d",return_criteria))) utils::setTxtProgressBar(pb, mean(i, prog_max))
+    # if (progress_bar & !any(grepl("d",return_criteria))) utils::setTxtProgressBar(pb, prog_max)
   }
   if (any(grepl("d",return_criteria))) { # return depth to water table
     # if the aquifer is depleted in any scenario, ignore NaN warnings for Depth
     withCallingHandlers({
-      d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,
-                                     q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+      # d_vals <- do.call(rbind,mapply(evaluate_treaty_depths,params=params_list,
+      #                                q_vals=q_vals_list,aquifer_type=aquifer_type,SIMPLIFY=FALSE))
+      eval_depth_list <- list()
+      for (i in 1:nrow(params_df)) {
+        eval_depth_list[[i]] <- evaluate_treaty_depths(params_list[[i]],q_vals_list[[i]],aquifer_type=aquifer_type)
+        if (progress_bar) utils::setTxtProgressBar(pb, prog_base + i)
+      }
+      d_vals <- dplyr::bind_rows(eval_depth_list)
     }, warning=function(w) {
       if (startsWith(conditionMessage(w), ignore_nan_warning))
         invokeRestart("muffleWarning")
@@ -176,6 +194,7 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
     eval_return <- eval_return %>% dplyr::bind_cols(d_vals %>% dplyr::select(dplyr::starts_with("ds"),dplyr::starts_with("df"),dplyr::everything()))
     if (progress_bar) utils::setTxtProgressBar(pb, prog_max)
   }
+  if (progress_bar) close(pb)
   if (any(grepl("a",return_criteria))) { # return all parameters
     eval_return <- eval_return %>% dplyr::bind_cols(params_df)
   } else if (max(grepl("p",return_criteria))==1) { # identify parameters that do not vary AND are equal to default value
