@@ -129,7 +129,9 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
   aquifer_type <- check_params(params_df)
   params_list <- split(params_df,1:dim(params_df)[1])
   eval_results_list <- list()
-  if (progress_bar) pb <- utils::txtProgressBar(min = 0, max = nrow(params_df), style = 3)
+  prog_max <- ifelse(grepl("d","qp") + grepl("u","qp") == 0, nrow(params_df), # increase progress max if utility and depth are requireed
+                   nrow(params_df) * (1 + 0.5 * grepl("d",return_criteria) + grepl("u",return_criteria)))
+  if (progress_bar) pb <- utils::txtProgressBar(min = 0, max = prog_max, style = 3)
   for (i in 1:nrow(params_df)) {
     eval_results_list[[i]] <- evaluate_treaty(params_list[[i]],aquifer_type=aquifer_type) #lapply(params_list,evaluate_treaty,aquifer_type=aquifer_type)
     if (progress_bar) utils::setTxtProgressBar(pb, i)
@@ -159,6 +161,8 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
         invokeRestart("muffleWarning")
     })
     eval_return <- eval_return %>% dplyr::bind_cols(u_vals %>% dplyr::select(dplyr::starts_with("Us"),dplyr::starts_with("Uf"),dplyr::everything()))
+    if (progress_bar & any(grepl("d",return_criteria))) utils::setTxtProgressBar(pb, mean(i, prog_max))
+    if (progress_bar & !any(grepl("d",return_criteria))) utils::setTxtProgressBar(pb, prog_max)
   }
   if (any(grepl("d",return_criteria))) { # return depth to water table
     # if the aquifer is depleted in any scenario, ignore NaN warnings for Depth
@@ -170,6 +174,7 @@ evaluate_treaty_cases <- function(params_df,return_criteria="qp",progress_bar = 
         invokeRestart("muffleWarning")
     })
     eval_return <- eval_return %>% dplyr::bind_cols(d_vals %>% dplyr::select(dplyr::starts_with("ds"),dplyr::starts_with("df"),dplyr::everything()))
+    if (progress_bar) utils::setTxtProgressBar(pb, prog_max)
   }
   if (any(grepl("a",return_criteria))) { # return all parameters
     eval_return <- eval_return %>% dplyr::bind_cols(params_df)
