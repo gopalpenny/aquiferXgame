@@ -232,10 +232,13 @@ evaluate_treaty_utility <- function(params, q_vals, aquifer_type) {
   Uf_double <- get_Uf(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty,z=0)
   Us_hat_double <- get_Us(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty,z=0)
   Uf_hat_double <- get_Uf(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty,z=0)
+  Us_double_double <- get_Us(qs=q_vals$qsdouble,qf=q_vals$qfdouble,params_treaty,z=0)
+  Uf_double_double <- get_Uf(qs=q_vals$qsdouble,qf=q_vals$qfdouble,params_treaty,z=0)
   u_vals <- tibble::tibble(Us_hat=Us_hat,Uf_hat=Uf_hat,
                            Us_star=Us_star,Uf_star=Uf_star,
                            Us_double=Us_double,Uf_double=Uf_double,
-                           Us_hat_double=Us_hat_double,Uf_hat_double=Uf_hat_double)
+                           Us_hat_double=Us_hat_double,Uf_hat_double=Uf_hat_double,
+                           Us_double_double=Us_double_double,Uf_double_double=Uf_double_double)
   return(u_vals)
 }
 
@@ -282,10 +285,13 @@ evaluate_treaty_depths <- function(params,q_vals,aquifer_type) {
   df_double <- get_df(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty)
   ds_hat_double <- get_ds(qs=q_vals$qshat,qf=q_vals$qfdouble,params_treaty)
   df_hat_double <- get_df(qs=q_vals$qsdouble,qf=q_vals$qfhat,params_treaty)
+  ds_double_double <- get_ds(qs=q_vals$qsdouble,qf=q_vals$qfdouble,params_treaty)
+  df_double_double <- get_df(qs=q_vals$qsdouble,qf=q_vals$qfdouble,params_treaty)
   d_vals <- tibble::tibble(ds_hat=ds_hat,df_hat=df_hat,
                            ds_star=ds_star,df_star=df_star,
                            ds_double=ds_double,df_double=df_double,
-                           ds_hat_double=ds_hat_double,df_hat_double=df_hat_double)
+                           ds_hat_double=ds_hat_double,df_hat_double=df_hat_double,
+                           ds_double_double=ds_double_double,df_double_double=df_double_double)
   return(d_vals)
 }
 
