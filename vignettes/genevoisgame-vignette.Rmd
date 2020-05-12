@@ -78,7 +78,7 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-Note that the parameters `"pqud"` in the `evaluate_treaty_cases` function returns utility (u), depth (d), pumping (q), and the varying parameters (p). Checking the names of the output `outcomes_trust_v_trust`, we can see the these values are present for the potential scenarios first best (\*hat), nash equilibrium (\*star), cheating the other player (\*double), and victim of the cheat (\*hat_double). The nash equilibrium is the scenario without a treaty. The others involve the signing of a treaty and the combination of players being gentleman or cheats. The scenario where both players are cheats is not included as it is unecessary to evaluate if a treaty occurs. 
+Note that the parameters `"pqud"` in the `evaluate_treaty_cases` function returns utility (u), depth (d), pumping (q), and the varying parameters (p). Checking the names of the output `outcomes_trust_v_trust`, we can see the these values are present for the potential scenarios first best (\*hat), nash equilibrium (\*star), cheating the other player (\*double), victim of the cheat (\*hat_double), and cheating by both players (\*double_double). The nash equilibrium is the scenario without a treaty. The others involve the signing of a treaty and the combination of players being gentleman or cheats.
 
 ```{r}
 names(outcomes_trust_v_trust)
@@ -96,7 +96,7 @@ Using `facet_wrap` from `ggplot2` and careful selection of linetypes and colors,
 ggplot(outcomes_trust_long) +
   geom_line(aes(x=gs,y=val,color=country,linetype=variable_subcat)) +
   facet_wrap(~variable_cat,scales="free_y",ncol=1) +
-  scale_linetype_manual(values=c("solid","dashed","dotted","longdash")) +
+  scale_linetype_manual(values=c("solid","dashed","dotted","longdash","dotdash")) +
   theme(legend.key.width = unit(1,"cm"))
 ```
 

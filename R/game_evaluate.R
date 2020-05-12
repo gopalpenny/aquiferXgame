@@ -455,11 +455,11 @@ gather_outcomes <- function(treaty_df, expectation=FALSE) {
     gather("var","val",dplyr::matches("^d[sf]_.*"),dplyr::matches("U[sf]_.*"),dplyr::matches("q[sf]_?.+$"))
   treaty_prep$country <- substr(treaty_prep$var,2,2)
   treaty_prep$variable_cat <- substr(treaty_prep$var,1,1)
-  treaty_prep$variable_subcat <- factor(gsub("^(.)[sf]_?(.*)$","\\2",treaty_prep$var),levels=c("hat","star","double","hat_double","expected"))
+  treaty_prep$variable_subcat <- factor(gsub("^(.)[sf]_?(.*)$","\\2",treaty_prep$var),levels=c("hat","star","double","hat_double","double_double","expected"))
   treaty_long <- treaty_prep %>% dplyr::group_by(.data$variable_cat) %>%
     dplyr::mutate(dense_r=dplyr::dense_rank(.data$variable_subcat))
-  treaty_long$situation_subcat <- factor(treaty_long$variable_subcat,levels=c("hat","star","double","hat_double","expected"),
-                                         labels=c("First best","Nash","Cheat","Victim","E[q]"))
+  treaty_long$situation_subcat <- factor(treaty_long$variable_subcat,levels=c("hat","star","double","hat_double","double_double","expected"),
+                                         labels=c("First best","Nash","Cheat","Victim","Fool","E[q]"))
   return(treaty_long)
 }
 
