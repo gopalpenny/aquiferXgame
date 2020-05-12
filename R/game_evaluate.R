@@ -438,7 +438,7 @@ get_contours <- function(df = NULL, levels = 0, ...) {
 #' ggplot(treaty_long) +
 #'   geom_line(aes(x=gs,y=val,color=country,linetype=variable_subcat)) +
 #'   facet_wrap(~variable_cat,scales="free_y",ncol=1) +
-#'   scale_linetype_manual(values=c("solid","dashed","dotted","longdash","dotdash")) +
+#'   scale_linetype_manual(values=c("solid","dashed","dotted","longdash","dotdash","twodash")) +
 #'   theme(legend.key.width = unit(1,"cm"))
 gather_outcomes <- function(treaty_df, expectation=FALSE) {
   if (expectation) {

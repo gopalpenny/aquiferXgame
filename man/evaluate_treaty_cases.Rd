@@ -66,4 +66,8 @@ a linear solution is used and the cost remains linear even when the aquifer is f
 library(genevoisgame)
 evaluate_treaty_cases(rbind(example_params_confined,example_params_confined))
 evaluate_treaty_cases(rbind(example_params_unconfined,example_params_unconfined),"qudp")
+
+# with progress bar
+params <- do.call(rbind,rep(list(example_params_confined),200))
+results <- evaluate_treaty_cases(params,"qudp", progress_bar = TRUE)
 }
