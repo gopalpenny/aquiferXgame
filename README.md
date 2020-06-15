@@ -3,6 +3,7 @@
 
 <!-- badges: start -->
 [![Travis build status](https://travis-ci.org/gopalpenny/genevoisgame.svg?branch=master)](https://travis-ci.org/gopalpenny/genevoisgame)
+[![Codecov test coverage](https://codecov.io/gh/gopalpenny/genevoisgame/branch/master/graph/badge.svg)](https://codecov.io/gh/gopalpenny/genevoisgame?branch=master)
 <!-- badges: end -->
 
 The goal of genevoisgame is to ...

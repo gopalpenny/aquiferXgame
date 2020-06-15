@@ -24,6 +24,7 @@ Suggests:
     rmarkdown,
     testthat,
     ggplot2,
-    tibble
+    tibble,
+    covr
 VignetteBuilder: knitr
 RoxygenNote: 6.1.1
