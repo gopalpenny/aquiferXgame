@@ -98,11 +98,14 @@ evaluate_treaty_unconfined <- function(params) {
     any(c(AD_fb,AD_nash,AD_cheat)) ~ "D",
     TRUE ~ as.character(NA)
   )
-  return(tibble::tibble(treaty=treaty,zRange=zRange_calc,
-                        zMinSwiss=zMinSwiss_calc,zMaxFrench=zMaxFrench_calc) %>%
-           dplyr::bind_cols(q_vals,
-                            AD_cols)
-  )
+
+  eval_return <- tibble::tibble(treaty=treaty,zRange=zRange_calc,
+                                zMinSwiss=zMinSwiss_calc,zMaxFrench=zMaxFrench_calc) %>%
+    dplyr::bind_cols(q_vals)
+  if (any(c(AD_fb,AD_nash,AD_cheat))) {
+    eval_return <- eval_return %>% dplyr::bind_cols(AD_cols)
+  }
+  return(eval_return)
 }
 
 #' Check if unconfined aquifer is fully depleted

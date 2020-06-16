@@ -51,9 +51,9 @@ cl_results <- tibble::tibble(x=c(-1.8421, -1.9824, -1.9824, -1.8421, -1.8375, -1
                              line=c(1, 1, 1, 1, 1, 1),
                              i=c(1, 2, 3, 4, 5, 6),
                              level_factor=c("2", "2", "2", "2", "2", "2"))
-cl_output <- head(get_contours(df_grid,levels=seq(2,10,by=2))) %>%
-  dplyr::mutate_if(is.numeric,function(x) round(x,4)) %>%
-  dplyr::mutate(level_factor=as.character(level_factor)) %>% tibble::as_tibble()
+cl_output <- tibble::tibble(head(get_contours(df_grid,levels=seq(2,10,by=2))))
+cl_output[,c("x","y")] <- round(cl_output[,c("x","y")],4)
+cl_output$level_factor <- as.character(cl_output$level_factor)
 test_that("get_contours works for simple example",{
   expect_equal(cl_output,cl_results)
 })
