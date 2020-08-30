@@ -16,6 +16,8 @@ knitr::opts_chunk$set(
 
 This package is designed to allow simulation of a non-cooperative game theoretic model that evaluates whether or not two parties will agree to sign a treaty over a shared transboundary aquifer. The model incorporates geophysical, economic, and social features of the transboundary scenario to make this determination. These include aquifer connectivity and drawdown, the cost of abstracting groundwater and potential alternative sources, and trust between the players.
 
+**Note:** The models implemented in this package are currently in review at *Water Resources Research*. The variable naming conventions in the paper differ slightly from the naming convention in the package. See the final section of this vignette for guide linking the two.
+
 ## Background 
 
 The game is based on the Genevois aquifer, shared by Switzerland and France, where an important and influential groundwater sharing treaty has existed since the 1970s. Thus, in the game, the two players are refered to S and F representing these two countries.
@@ -127,3 +129,35 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
+## Variable names
+
+Some variables in the package follow a different naming convention than variables used in the manuscript (and SI) that derive the game that is modeled by the `genevoisgame` package. For instance, trust in the manuscript is $\lambda_1$ and $\lambda_2$, whereas trust in the package is `gs` and `gf`, respectively. Players 1 and 2 in the manuscript corresponds to Switzerland and France, respectively, in the package. Furthermore, Honest, Nash, and Fraud scenarios of abstraction correspond to `hat`, `star`, and `double` variables in the package. For instance:
+
+* $q_1^H \Leftrightarrow \hat q_s$: `qshat`
+* $q_1^N \Leftrightarrow q_s^*$: `qsstar`
+* $q_1^F \Leftrightarrow q_s^{**}$: `qsdouble`
+
+Furthermore, in the package the following variables correspond to specific types of utility:
+
+* `Us_hat`: $U_s(q_s^H,q_f^H)$ // `Uf_hat`: $U_f(q_s^H,q_f^H)$
+* `Us_star`: $U_s(q_s^N,q_f^N)$ // `Uf_star`: $U_f(q_s^N,q_f^N)$
+* `Us_double`: $U_s(q_s^F,q_f^H)$ // `Uf_double`: $U_f(q_s^H,q_f^F)$
+* `Us_hat_double`: $U_s(q_s^H,q_f^F)$ // `Uf_hat_double`: $U_f(q_s^F,q_f^H)$
+* `Us_double_double`: $U_s(q_s^F,q_f^F)$ // `Uf_double_double`: $U_f(q_s^F,q_f^F)$
+
+Note that the above conventions for utility are the same as for depth (i.e., `ds_hat_double` $\Leftrightarrow d_s(q_s^H,q_f^F)$).
+
+The game is solved in terms of the side payments $z$. The relationships between the manuscript and package naming are:
+
+* $z_1$: `zMinSwiss`
+* $z_2$: `zMaxFrench`
+* $\hat z = z_1 - z_2$: `zRange <- zMinSwiss - zMaxFrench`
+
+A couple more input parameters should also be noted:
+
+* $\beta$ in the manuscript is simply `B` in the package
+* $e_1, e_2$ in the manuscript is `es`, `ef` in the package
+
+Lastly, the package allows differences between $D_{ir}$ with a treaty (e.g., `DsrT`) and without a treaty (e.g., `DsrN`). The same goes for $r_m$ (`rmT` and `rmN`).
+
+The remaining variables use a naming convention that directly follows from the manuscript, keeping in mind that the subscripts are changed ($1 \to s$ and $2 \to f$).
