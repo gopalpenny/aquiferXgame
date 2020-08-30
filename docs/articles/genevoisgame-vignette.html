@@ -83,11 +83,12 @@
     
     
 <p>This package is designed to allow simulation of a non-cooperative game theoretic model that evaluates whether or not two parties will agree to sign a treaty over a shared transboundary aquifer. The model incorporates geophysical, economic, and social features of the transboundary scenario to make this determination. These include aquifer connectivity and drawdown, the cost of abstracting groundwater and potential alternative sources, and trust between the players.</p>
+<p><strong>Note:</strong> The models implemented in this package are currently in review at <em>Water Resources Research</em>. The variable naming conventions in the paper differ slightly from the naming convention in the package. See the final section of this vignette for guide linking the two.</p>
 <div id="background" class="section level2">
 <h2 class="hasAnchor">
 <a href="#background" class="anchor"></a>Background</h2>
-<p>The game is based on the genevois aquifer, shared by switzerland and France, where an important and influential groundwater sharing treaty has existed since the 1970s. Thus, in the game, the two players are refered to S and F representing these two countries.</p>
-<p>Utilities for Switzerland and France are given by: <span class="math display">\[u_i=U_i(q_s,q_f | \Omega,z,D_{ij})=-p_{0i}(Q_i-q_i)-\beta (d_{Bi}-h_i) q_i - c_{ri}r_M(\Omega)-\epsilon_i(\Omega)\pm z\]</span> where <span class="math inline">\(q_i\)</span> is the water abstracted by country <span class="math inline">\(i\)</span>, <span class="math inline">\(p_{0i}\)</span> is the unit cost of water from some alternative water source, <span class="math inline">\(Q_i\)</span> is the total water requirement, <span class="math inline">\(d_{Bi}-h_i\)</span> is the groundwater depth (calculated as the depth to the bottom of the aquifer, <span class="math inline">\(d_{Bi}\)</span>, minus hydraulic thickness of the water table, <span class="math inline">\(h_i\)</span>), <span class="math inline">\(\beta\)</span> is the volumetric pumping cost per groundwater depth, <span class="math inline">\(c_{ri}\)</span> is the unit cost of recharge (because France doesn’t pay directly, <span class="math inline">\(c_{rf}=0\)</span>), <span class="math inline">\(r_M(\Omega)\)</span> is managed aquifer recharge and is high (low) if <span class="math inline">\(\Omega=1\)</span> (<span class="math inline">\(\Omega=0\)</span>), <span class="math inline">\(\epsilon_i\)</span> accounts for uncertain costs of signing the treaty and is zero in the case of no treaty, and <span class="math inline">\(z\)</span> is the price paid by France to Switzerland for French abstraction per the agreement. Because recharge is limited by physical properties of water supply and the aquifer, we assume that the construction of a recharge facility entails a fixed quantity of recharge, <span class="math inline">\(r_M\)</span>. % <span class="math inline">\(c_{0ri}\)</span> is the fixed construction fixed cost that country <span class="math inline">\(i\)</span> has to pay if the recharge facility is built The hydraulic thickness of the water table is the hydraulic head relative to the bottom of the aquifer. In confined aquifers, the hydraulic thickness is greater than the aquifer thickness and changes linearly with pumping. It is given by <span class="math display">\[ h_i=h_{0i}-D_{ii} q_i-D_{ij} q_j+D_{ir}(\Omega) r_M(\Omega),\]</span> where <span class="math inline">\(h_{0i}\)</span> is the natural thickness of the water table accounting for steady-state recharge and discharge, and the remaining coefficients capture aquifer properties that relate groundwater depth with abstraction within country <span class="math inline">\(i\)</span> (<span class="math inline">\(D_{ii}\)</span>), abstraction by country <span class="math inline">\(j\)</span> (<span class="math inline">\(D_{ij}\)</span>), and managed recharge (<span class="math inline">\(D_{ir}\)</span>).</p>
+<p>The game is based on the Genevois aquifer, shared by Switzerland and France, where an important and influential groundwater sharing treaty has existed since the 1970s. Thus, in the game, the two players are refered to S and F representing these two countries.</p>
+<p>Utilities for Switzerland and France are given by: <span class="math display">\[U_i(q_s,q_f)=-p_{0i}(Q_i-q_i)-\beta (d_{Bi}-h_i) q_i - c_{0rs} - c_{ri}r_M(\Omega)-\epsilon_i(\Omega)\pm z\]</span> where <span class="math inline">\(q_i\)</span> is the water abstracted by country <span class="math inline">\(i\)</span>, <span class="math inline">\(p_{0i}\)</span> is the unit cost of water from some alternative water source, <span class="math inline">\(Q_i\)</span> is the total water requirement, <span class="math inline">\(d_{Bi}-h_i\)</span> is the groundwater depth (calculated as the depth to the bottom of the aquifer, <span class="math inline">\(d_{Bi}\)</span>, minus hydraulic thickness of the water table, <span class="math inline">\(h_i\)</span>), <span class="math inline">\(\beta\)</span> is the volumetric pumping cost per groundwater depth, <span class="math inline">\(c_{0rs}\)</span> is a fixed cost for building the recharge facility, <span class="math inline">\(c_{ri}\)</span> is the unit cost of recharge (because France doesn’t pay directly, <span class="math inline">\(c_{0rf}=c_{rf}=0\)</span>), <span class="math inline">\(r_M(\Omega)\)</span> is managed aquifer recharge and is high (low) if <span class="math inline">\(\Omega=1\)</span> (<span class="math inline">\(\Omega=0\)</span>), <span class="math inline">\(\epsilon_i\)</span> accounts for uncertain costs of signing the treaty and is zero in the case of no treaty, and <span class="math inline">\(z\)</span> is the price paid by France to Switzerland for French abstraction per the agreement. Because recharge is limited by physical properties of water supply and the aquifer, we assume that the construction of a recharge facility entails a fixed quantity of recharge, <span class="math inline">\(r_M\)</span>. The hydraulic thickness of the water table is the hydraulic head relative to the bottom of the aquifer. In confined aquifers, the hydraulic thickness is greater than the aquifer thickness and changes linearly with pumping. It is given by <span class="math display">\[ h_i=h_{0i}-D_{ii} q_i-D_{ij} q_j+D_{ir}(\Omega) r_M(\Omega),\]</span> where <span class="math inline">\(h_{0i}\)</span> is the natural thickness of the water table accounting for steady-state recharge and discharge, and the remaining coefficients capture aquifer properties that relate groundwater depth with abstraction within country <span class="math inline">\(i\)</span> (<span class="math inline">\(D_{ii}\)</span>), abstraction by country <span class="math inline">\(j\)</span> (<span class="math inline">\(D_{ij}\)</span>), and managed recharge (<span class="math inline">\(D_{ir}\)</span>).</p>
 <p>For unconfined aquifers, abstraction is related linearly with discharge potential, <span class="math inline">\(\phi_i\)</span>, which is equivalent to the square of the thickness of the water table, which is given by <span class="math display">\[h_i^2=\phi_i=h_{0i}^2-\Phi_{ii}q_i-\Phi_{ij}q_j+\Phi_{ir}(\Omega)r_M(\Omega),\]</span> where the coefficients relate discharge potential with abstraction by country <span class="math inline">\(i\)</span> (<span class="math inline">\(\Phi_{ii}\)</span>), abstraction by country <span class="math inline">\(j\)</span> (<span class="math inline">\(\Phi_{ij}\)</span>), and managed recharge (<span class="math inline">\(\Phi_{ir}\)</span>).</p>
 </div>
 <div id="confined-aquifer-trust-vs-trust" class="section level2">
@@ -96,11 +97,12 @@
 <p>This vignette will show you the basic utilization of the package. If you haven’t installed the <code>genevoisgame</code> package, you can do so using <code><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">devtools::install_github</a></code>:</p>
 <div class="sourceCode" id="cb1"><html><body><pre class="r"><span class="co"># Install the package</span>
 <span class="kw pkg">devtools</span><span class="kw ns">::</span><span class="fu"><a href="https://rdrr.io/pkg/devtools/man/remote-reexports.html">install_github</a></span>(<span class="st">"https://github.com/gopalpenny/genevoisgame"</span>)</pre></body></html></div>
-<p>Next we will load the package along with the <code>tidyverse</code> package for easy data wrangling.</p>
+<p>Next we will load the package along with some of the <code>tidyverse</code> packages for easy data wrangling.</p>
 <div class="sourceCode" id="cb2"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">genevoisgame</span>)
-<span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">magrittr</span>)
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">dplyr</span>)
+<span class="co">#&gt; Warning: package 'dplyr' was built under R version 3.6.2</span>
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">tidyr</span>)
+<span class="co">#&gt; Warning: package 'tidyr' was built under R version 3.6.2</span>
 <span class="fu"><a href="https://rdrr.io/r/base/library.html">library</a></span>(<span class="no">ggplot2</span>)</pre></body></html></div>
 <p>We will use the built-in dataset <code>example_params_confined</code> as a basis for our analysis. Whenever a treaty game is simulated, parameters are validated using the <code>check_params</code> function, and a full list of required parameters can be found in the documentation for this function. The game determines whether to use a confined or unconfined scenario using the parameters input to the game. If <code>Dxx</code> are used, the game will apply to a <em>confined</em> aquifer. If <code>PHIxx</code> are used, the game will apply to an <em>unconfined</em> aquifer. See <code><a href="../reference/check_params.html">?check_params</a></code> for details.</p>
 <p>The game is evaluated using <code>evaluate_treaty</code> for a single scenario, or can be evaluated for multiple scenarios using <code>evaluate_treaty_cases</code>. For confined aquifers, the game is analyzed using analytical equations.</p>
@@ -115,7 +117,7 @@
 <span class="no">outcomes_trust_v_trust</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/evaluate_treaty_cases.html">evaluate_treaty_cases</a></span>(<span class="no">params_df_trust_v_trust</span>,<span class="st">"pqud"</span>)
 
 <span class="co"># Get contours for the model</span>
-<span class="no">cl_trust_v_trust</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/get_contours.html">get_contours</a></span>(<span class="no">outcomes_trust_v_trust</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">rename</a></span>(<span class="kw">x</span><span class="kw">=</span><span class="no">gs</span>,<span class="kw">y</span><span class="kw">=</span><span class="no">gf</span>,<span class="kw">z</span><span class="kw">=</span><span class="no">zRange</span>),
+<span class="no">cl_trust_v_trust</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/get_contours.html">get_contours</a></span>(<span class="no">outcomes_trust_v_trust</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">x</span><span class="kw">=</span><span class="no">gs</span>,<span class="kw">y</span><span class="kw">=</span><span class="no">gf</span>,<span class="kw">z</span><span class="kw">=</span><span class="no">zRange</span>),
                                  <span class="kw">levels</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(-<span class="fl">0.2</span>,<span class="fl">0</span>,<span class="fl">0.2</span>))
 
 <span class="co"># Plot the output</span>
@@ -125,22 +127,26 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradient2</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span>() +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.box</span> <span class="kw">=</span> <span class="st">"horizontal"</span>)</pre></body></html></div>
 <p><img src="genevoisgame-vignette_files/figure-html/confined_example-1.png" width="480"></p>
-<p>Note that the parameters <code>"pqud"</code> in the <code>evaluate_treaty_cases</code> function returns utility (u), depth (d), pumping (q), and the varying parameters (p). Checking the names of the output <code>outcomes_trust_v_trust</code>, we can see the these values are present for the potential scenarios first best (*hat), nash equilibrium (*star), cheating the other player (*double), and victim of the cheat (*hat_double). The nash equilibrium is the scenario without a treaty. The others involve the signing of a treaty and the combination of players being gentleman or cheats. The scenario where both players are cheats is not included as it is unecessary to evaluate if a treaty occurs.</p>
+<p>Note that the parameters <code>"pqud"</code> in the <code>evaluate_treaty_cases</code> function returns utility (u), depth (d), pumping (q), and the varying parameters (p). Checking the names of the output <code>outcomes_trust_v_trust</code>, we can see the these values are present for the potential scenarios first best (*hat), nash equilibrium (*star), cheating the other player (*double), victim of the cheat (*hat_double), and cheating by both players (*double_double). The nash equilibrium is the scenario without a treaty. The others involve the signing of a treaty and the combination of players being gentleman or cheats.</p>
 <div class="sourceCode" id="cb4"><html><body><pre class="r"><span class="fu"><a href="https://rdrr.io/r/base/names.html">names</a></span>(<span class="no">outcomes_trust_v_trust</span>)
-<span class="co">#&gt;  [1] "treaty"        "zRange"        "zMinSwiss"     "zMaxFrench"   </span>
-<span class="co">#&gt;  [5] "qshat"         "qsstar"        "qsdouble"      "qfhat"        </span>
-<span class="co">#&gt;  [9] "qfstar"        "qfdouble"      "Us_hat"        "Us_star"      </span>
-<span class="co">#&gt; [13] "Us_double"     "Us_hat_double" "Uf_hat"        "Uf_star"      </span>
-<span class="co">#&gt; [17] "Uf_double"     "Uf_hat_double" "ds_hat"        "ds_star"      </span>
-<span class="co">#&gt; [21] "ds_double"     "ds_hat_double" "df_hat"        "df_star"      </span>
-<span class="co">#&gt; [25] "df_double"     "df_hat_double" "gs"            "gf"</span></pre></body></html></div>
+<span class="co">#&gt;  [1] "treaty"           "zRange"           "zMinSwiss"       </span>
+<span class="co">#&gt;  [4] "zMaxFrench"       "qshat"            "qsstar"          </span>
+<span class="co">#&gt;  [7] "qsdouble"         "qfhat"            "qfstar"          </span>
+<span class="co">#&gt; [10] "qfdouble"         "Us_hat"           "Us_star"         </span>
+<span class="co">#&gt; [13] "Us_double"        "Us_hat_double"    "Us_double_double"</span>
+<span class="co">#&gt; [16] "Uf_hat"           "Uf_star"          "Uf_double"       </span>
+<span class="co">#&gt; [19] "Uf_hat_double"    "Uf_double_double" "ds_hat"          </span>
+<span class="co">#&gt; [22] "ds_star"          "ds_double"        "ds_hat_double"   </span>
+<span class="co">#&gt; [25] "ds_double_double" "df_hat"           "df_star"         </span>
+<span class="co">#&gt; [28] "df_double"        "df_hat_double"    "df_double_double"</span>
+<span class="co">#&gt; [31] "gs"               "gf"</span></pre></body></html></div>
 <p>Sometimes it may be valuable to plot the depth, utility, and pumping output along some axis. There is a helper function, <code>gather_outcomes</code> which can help with this. It gathers the output variables in long format so that it can be plotted against another variable. In this case, we are interested in seeing how the outcomes vary over <code>gs</code>, holding <code>gf</code> constant at 0.5.</p>
 <div class="sourceCode" id="cb5"><html><body><pre class="r"><span class="no">outcomes_trust_long</span> <span class="kw">&lt;-</span> <span class="no">outcomes_trust_v_trust</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html">filter</a></span>(<span class="no">gf</span><span class="kw">==</span><span class="fl">0.5</span>) <span class="kw">%&gt;%</span> <span class="fu"><a href="../reference/gather_outcomes.html">gather_outcomes</a></span>()</pre></body></html></div>
 <p>Using <code>facet_wrap</code> from <code>ggplot2</code> and careful selection of linetypes and colors, we can better see the effect of <code>gs</code> on the outcome variables under scenarios of a treaty (“hat”), nash equlibrium (“star”), cheat (“double”), and victim (“hat_double”).</p>
 <div class="sourceCode" id="cb6"><html><body><pre class="r"><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html">ggplot</a></span>(<span class="no">outcomes_trust_long</span>) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html">geom_line</a></span>(<span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html">aes</a></span>(<span class="kw">x</span><span class="kw">=</span><span class="no">gs</span>,<span class="kw">y</span><span class="kw">=</span><span class="no">val</span>,<span class="kw">color</span><span class="kw">=</span><span class="no">country</span>,<span class="kw">linetype</span><span class="kw">=</span><span class="no">variable_subcat</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html">facet_wrap</a></span>(~<span class="no">variable_cat</span>,<span class="kw">scales</span><span class="kw">=</span><span class="st">"free_y"</span>,<span class="kw">ncol</span><span class="kw">=</span><span class="fl">1</span>) +
-  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_linetype_manual</a></span>(<span class="kw">values</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"solid"</span>,<span class="st">"dashed"</span>,<span class="st">"dotted"</span>,<span class="st">"longdash"</span>)) +
+  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_manual.html">scale_linetype_manual</a></span>(<span class="kw">values</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(<span class="st">"solid"</span>,<span class="st">"dashed"</span>,<span class="st">"dotted"</span>,<span class="st">"longdash"</span>,<span class="st">"dotdash"</span>)) +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.key.width</span> <span class="kw">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/reexports.html">unit</a></span>(<span class="fl">1</span>,<span class="st">"cm"</span>))</pre></body></html></div>
 <p><img src="genevoisgame-vignette_files/figure-html/unnamed-chunk-5-1.png" width="480"></p>
 </div>
@@ -159,7 +165,7 @@
 <span class="no">outcomes_trust_v_trust_un</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/evaluate_treaty_cases.html">evaluate_treaty_cases</a></span>(<span class="no">params_df_trust_v_trust_un</span>)
 
 <span class="co"># Get contours for the model</span>
-<span class="no">cl_trust_v_trust_un</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/get_contours.html">get_contours</a></span>(<span class="no">outcomes_trust_v_trust_un</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html">rename</a></span>(<span class="kw">x</span><span class="kw">=</span><span class="no">gs</span>,<span class="kw">y</span><span class="kw">=</span><span class="no">gf</span>,<span class="kw">z</span><span class="kw">=</span><span class="no">zRange</span>),
+<span class="no">cl_trust_v_trust_un</span> <span class="kw">&lt;-</span> <span class="fu"><a href="../reference/get_contours.html">get_contours</a></span>(<span class="no">outcomes_trust_v_trust_un</span> <span class="kw">%&gt;%</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/rename.html">rename</a></span>(<span class="kw">x</span><span class="kw">=</span><span class="no">gs</span>,<span class="kw">y</span><span class="kw">=</span><span class="no">gf</span>,<span class="kw">z</span><span class="kw">=</span><span class="no">zRange</span>),
                                     <span class="kw">levels</span><span class="kw">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span>(-<span class="fl">0.1</span>,-<span class="fl">0.05</span>,<span class="fl">0</span>,<span class="fl">0.05</span>,<span class="fl">0.1</span>))
 
 <span class="co"># Plot the output</span>
@@ -169,6 +175,62 @@
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_gradient.html">scale_fill_gradient2</a></span>() + <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_fixed.html">coord_equal</a></span>() +
   <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html">theme</a></span>(<span class="kw">legend.box</span> <span class="kw">=</span> <span class="st">"horizontal"</span>)</pre></body></html></div>
 <p><img src="genevoisgame-vignette_files/figure-html/unconfined_example-1.png" width="480"></p>
+</div>
+<div id="variable-names" class="section level2">
+<h2 class="hasAnchor">
+<a href="#variable-names" class="anchor"></a>Variable names</h2>
+<p>Some variables in the package follow a different naming convention than variables used in the manuscript (and SI) that derive the game that is modeled by the <code>genevoisgame</code> package. For instance, trust in the manuscript is <span class="math inline">\(\lambda_1\)</span> and <span class="math inline">\(\lambda_2\)</span>, whereas trust in the package is <code>gs</code> and <code>gf</code>, respectively. Players 1 and 2 in the manuscript corresponds to Switzerland and France, respectively, in the package. Furthermore, Honest, Nash, and Fraud scenarios of abstraction correspond to <code>hat</code>, <code>star</code>, and <code>double</code> variables in the package. For instance:</p>
+<ul>
+<li>
+<span class="math inline">\(q_1^H \Leftrightarrow \hat q_s\)</span>: <code>qshat</code>
+</li>
+<li>
+<span class="math inline">\(q_1^N \Leftrightarrow q_s^*\)</span>: <code>qsstar</code>
+</li>
+<li>
+<span class="math inline">\(q_1^F \Leftrightarrow q_s^{**}\)</span>: <code>qsdouble</code>
+</li>
+</ul>
+<p>Furthermore, in the package the following variables correspond to specific types of utility:</p>
+<ul>
+<li>
+<code>Us_hat</code>: <span class="math inline">\(U_s(q_s^H,q_f^H)\)</span> // <code>Uf_hat</code>: <span class="math inline">\(U_f(q_s^H,q_f^H)\)</span>
+</li>
+<li>
+<code>Us_star</code>: <span class="math inline">\(U_s(q_s^N,q_f^N)\)</span> // <code>Uf_star</code>: <span class="math inline">\(U_f(q_s^N,q_f^N)\)</span>
+</li>
+<li>
+<code>Us_double</code>: <span class="math inline">\(U_s(q_s^F,q_f^H)\)</span> // <code>Uf_double</code>: <span class="math inline">\(U_f(q_s^H,q_f^F)\)</span>
+</li>
+<li>
+<code>Us_hat_double</code>: <span class="math inline">\(U_s(q_s^H,q_f^F)\)</span> // <code>Uf_hat_double</code>: <span class="math inline">\(U_f(q_s^F,q_f^H)\)</span>
+</li>
+<li>
+<code>Us_double_double</code>: <span class="math inline">\(U_s(q_s^F,q_f^F)\)</span> // <code>Uf_double_double</code>: <span class="math inline">\(U_f(q_s^F,q_f^F)\)</span>
+</li>
+</ul>
+<p>Note that the above conventions for utility are the same as for depth (i.e., <code>ds_hat_double</code> <span class="math inline">\(\Leftrightarrow d_s(q_s^H,q_f^F)\)</span>).</p>
+<p>The game is solved in terms of the side payments <span class="math inline">\(z\)</span>. The relationships between the manuscript and package naming are:</p>
+<ul>
+<li>
+<span class="math inline">\(z_1\)</span>: <code>zMinSwiss</code>
+</li>
+<li>
+<span class="math inline">\(z_2\)</span>: <code>zMaxFrench</code>
+</li>
+<li>
+<span class="math inline">\(\hat z = z_1 - z_2\)</span>: <code>zRange &lt;- zMinSwiss - zMaxFrench</code>
+</li>
+</ul>
+<p>A couple more input parameters should also be noted:</p>
+<ul>
+<li>
+<span class="math inline">\(\beta\)</span> in the manuscript is simply <code>B</code> in the package</li>
+<li>
+<span class="math inline">\(e_1, e_2\)</span> in the manuscript is <code>es</code>, <code>ef</code> in the package</li>
+</ul>
+<p>Lastly, the package allows differences between <span class="math inline">\(D_{ir}\)</span> with a treaty (e.g., <code>DsrT</code>) and without a treaty (e.g., <code>DsrN</code>). The same goes for <span class="math inline">\(r_m\)</span> (<code>rmT</code> and <code>rmN</code>).</p>
+<p>The remaining variables use a naming convention that directly follows from the manuscript, keeping in mind that the subscripts are changed (<span class="math inline">\(1 \to s\)</span> and <span class="math inline">\(2 \to f\)</span>).</p>
 </div>
   </div>
 

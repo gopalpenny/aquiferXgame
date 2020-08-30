@@ -126,7 +126,7 @@ in a format that makes it easier to plot and visualize with ggplot2." />
 in a format that makes it easier to plot and visualize with <code>ggplot2</code>.</p>
     </div>
 
-    <pre class="usage"><span class='fu'>gather_outcomes</span>(<span class='no'>treaty_df</span>)</pre>
+    <pre class="usage"><span class='fu'>gather_outcomes</span>(<span class='no'>treaty_df</span>, <span class='kw'>expectation</span> <span class='kw'>=</span> <span class='fl'>FALSE</span>)</pre>
 
     <h2 class="hasAnchor" id="arguments"><a class="anchor" href="#arguments"></a>Arguments</h2>
     <table class="ref-arguments">
@@ -135,25 +135,42 @@ in a format that makes it easier to plot and visualize with <code>ggplot2</code>
       <th>treaty_df</th>
       <td><p>Outcomes from <code>evaluate_treaty_cases</code>, including utility, depth, pumping</p></td>
     </tr>
+    <tr>
+      <th>expectation</th>
+      <td><p>Logical where, if TRUE, expected pumping of the other player is calculated. See details.</p></td>
+    </tr>
     </table>
 
+    <h2 class="hasAnchor" id="details"><a class="anchor" href="#details"></a>Details</h2>
+
+    <p>This function is used to assist with plotting and analysis of results from the game. Note that all variables
+whose column names begin with "q[sf]", "U[sf]", or "d[sf]" are gathered.</p>
+<p>If <code>expectation</code> is <code>TRUE</code>, the expected value of U (<code>U_expected</code>) and q (<code>q_expected</code>) for each player
+are calculated under the assumption that a treaty is signed. Utility for player i, Ui,
+is calculated under the assumption that player i is Honest.
+If trust is 0, then the expected value of U is the victim utility, and for q it is the cheat pumping. If
+trust is 1, then the expected value is the First Best for both U and q. Intermediate values of trust produce intermediate
+values of expectation. The belief of player \(i\) that player \(j\) is trustworthy is \(g_i\).
+Therefore the expected values are calculated as
+$$E[U_i] = \gamma_i \hat U_i + (1-\gamma_i) \hat U_i^{**} \, .$$
+$$E[q_j] = \gamma_i \hat q_j + (1-\gamma_i) q_j \, .$$
+The resulting values are returned as "qj_expected". In other words for <code>country==i</code>, this pumping rate
+is expected value of <code>qi</code> from the perspective of <code>j</code>. Note that both <code>gs</code> and <code>gf</code> must
+be included as columns in <code>treaty_df</code> for <code>q_expected</code> to be calculated.</p>
 
     <h2 class="hasAnchor" id="examples"><a class="anchor" href="#examples"></a>Examples</h2>
     <pre class="examples"><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>genevoisgame</span>)
-<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>ggplot2</span>)</div><div class='output co'>#&gt; <span class='message'>Want to understand how all the pieces fit together? Read R for Data</span>
-#&gt; <span class='message'>Science: https://r4ds.had.co.nz/</span></div><div class='input'><span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>tidyr</span>)</div><div class='output co'>#&gt; <span class='message'></span>
-#&gt; <span class='message'>Attaching package: ‘tidyr’</span></div><div class='output co'>#&gt; <span class='message'>The following object is masked from ‘package:testthat’:</span>
-#&gt; <span class='message'></span>
-#&gt; <span class='message'>    matches</span></div><div class='input'><span class='no'>params</span> <span class='kw'>&lt;-</span> <span class='no'>example_params_confined</span>
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>ggplot2</span>)
+<span class='fu'><a href='https://rdrr.io/r/base/library.html'>library</a></span>(<span class='no'>tidyr</span>)</div><div class='output co'>#&gt; <span class='warning'>Warning: package ‘tidyr’ was built under R version 3.6.2</span></div><div class='input'><span class='no'>params</span> <span class='kw'>&lt;-</span> <span class='no'>example_params_confined</span>
 <span class='no'>params</span>$<span class='no'>gs</span> <span class='kw'>&lt;-</span> <span class='kw'>NULL</span>
 <span class='no'>params</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>crossing</a></span>(<span class='no'>params</span>,<span class='kw'>gs</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span>(<span class='fl'>0</span>,<span class='fl'>1</span>,<span class='kw'>by</span><span class='kw'>=</span><span class='fl'>0.05</span>))
-<span class='no'>treaty_df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='evaluate_treaty_cases.html'>evaluate_treaty_cases</a></span>(<span class='no'>params</span>,<span class='st'>'qudp'</span>)
-<span class='no'>treaty_long</span> <span class='kw'>&lt;-</span> <span class='fu'>gather_outcomes</span>(<span class='no'>treaty_df</span>)
+<span class='no'>treaty_df</span> <span class='kw'>&lt;-</span> <span class='fu'><a href='evaluate_treaty_cases.html'>evaluate_treaty_cases</a></span>(<span class='no'>params</span>,<span class='st'>'quda'</span>)
+<span class='no'>treaty_long</span> <span class='kw'>&lt;-</span> <span class='fu'>gather_outcomes</span>(<span class='no'>treaty_df</span>, <span class='fl'>TRUE</span>)
 
 <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span>(<span class='no'>treaty_long</span>) +
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a></span>(<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span>(<span class='kw'>x</span><span class='kw'>=</span><span class='no'>gs</span>,<span class='kw'>y</span><span class='kw'>=</span><span class='no'>val</span>,<span class='kw'>color</span><span class='kw'>=</span><span class='no'>country</span>,<span class='kw'>linetype</span><span class='kw'>=</span><span class='no'>variable_subcat</span>)) +
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/facet_wrap.html'>facet_wrap</a></span>(~<span class='no'>variable_cat</span>,<span class='kw'>scales</span><span class='kw'>=</span><span class='st'>"free_y"</span>,<span class='kw'>ncol</span><span class='kw'>=</span><span class='fl'>1</span>) +
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_linetype_manual</a></span>(<span class='kw'>values</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"solid"</span>,<span class='st'>"dashed"</span>,<span class='st'>"dotted"</span>,<span class='st'>"longdash"</span>)) +
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_linetype_manual</a></span>(<span class='kw'>values</span><span class='kw'>=</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span>(<span class='st'>"solid"</span>,<span class='st'>"dashed"</span>,<span class='st'>"dotted"</span>,<span class='st'>"longdash"</span>,<span class='st'>"dotdash"</span>,<span class='st'>"twodash"</span>)) +
   <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span>(<span class='kw'>legend.key.width</span> <span class='kw'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/reexports.html'>unit</a></span>(<span class='fl'>1</span>,<span class='st'>"cm"</span>))</div><div class='img'><img src='gather_outcomes-1.png' alt='' width='700' height='433' /></div></pre>
   </div>
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
