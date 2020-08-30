@@ -127,20 +127,3 @@ ggplot() +
   theme(legend.box = "horizontal")
 ```
 
-```{r echo=FALSE}
-
-# Generate parameter data.frame
-# params_get(scenario) %>% %>% select(-Dss,-Dff,-Dsf,-Dfs) %>%
-#   mutate(rmN=8,gs=0.4,gf=0.4)
-# params_df <- params_basic %>% 
-#   crossing(nesting(Dss=seq(0.5,5,by=.5),
-#                    Dff=seq(0.5,5,by=.5)),
-#            nesting(Dsf=seq(0.5,5,by=.5),
-#                    Dfs=seq(0.5,5,by=.5)))
-# params_df_trust_v_Dij_over_Dii <- params_basic_trust_v_Dij_over_Dii %>% 
-#   crossing(nesting(Dij_over_Dii=seq(0.05,0.95,by=0.05)),
-#            nesting(gs=seq(.01,1,by=.05),
-#                    gf=seq(.01,1,by=.05))) %>% 
-#   mutate(Dss=Dsf/Dij_over_Dii,Dff=Dfs/Dij_over_Dii)
-```
-
