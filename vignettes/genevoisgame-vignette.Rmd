@@ -18,11 +18,11 @@ This package is designed to allow simulation of a non-cooperative game theoretic
 
 ## Background 
 
-The game is based on the genevois aquifer, shared by switzerland and France, where an important and influential groundwater sharing treaty has existed since the 1970s. Thus, in the game, the two players are refered to S and F representing these two countries. 
+The game is based on the Genevois aquifer, shared by Switzerland and France, where an important and influential groundwater sharing treaty has existed since the 1970s. Thus, in the game, the two players are refered to S and F representing these two countries.
 
 Utilities for Switzerland and France are given by:
-$$u_i=U_i(q_s,q_f | \Omega,z,D_{ij})=-p_{0i}(Q_i-q_i)-\beta (d_{Bi}-h_i) q_i - c_{ri}r_M(\Omega)-\epsilon_i(\Omega)\pm z$$
-where $q_i$ is the water abstracted by country $i$, $p_{0i}$ is the unit cost of water from some alternative water source, $Q_i$ is the total water requirement, $d_{Bi}-h_i$ is the groundwater depth (calculated as the depth to the bottom of the aquifer, $d_{Bi}$, minus hydraulic thickness of the water table, $h_i$), $\beta$ is the volumetric pumping cost per groundwater depth, $c_{ri}$ is the unit cost of recharge (because France doesn't pay directly, $c_{rf}=0$), $r_M(\Omega)$ is managed aquifer recharge and is high (low) if $\Omega=1$ ($\Omega=0$), $\epsilon_i$ accounts for uncertain costs of signing the treaty and is zero in the case of no treaty, and $z$ is the price paid by France to Switzerland for French abstraction per the agreement. Because recharge is limited by physical properties of water supply and the aquifer, we assume that the construction of a recharge facility entails a fixed quantity of recharge, $r_M$. % $c_{0ri}$ is the fixed construction fixed cost that country $i$ has to pay if the recharge facility is built
+$$U_i(q_s,q_f)=-p_{0i}(Q_i-q_i)-\beta (d_{Bi}-h_i) q_i - c_{0rs} - c_{ri}r_M(\Omega)-\epsilon_i(\Omega)\pm z$$
+where $q_i$ is the water abstracted by country $i$, $p_{0i}$ is the unit cost of water from some alternative water source, $Q_i$ is the total water requirement, $d_{Bi}-h_i$ is the groundwater depth (calculated as the depth to the bottom of the aquifer, $d_{Bi}$, minus hydraulic thickness of the water table, $h_i$), $\beta$ is the volumetric pumping cost per groundwater depth, $c_{0rs}$ is a fixed cost for building the recharge facility, $c_{ri}$ is the unit cost of recharge (because France doesn't pay directly, $c_{0rf}=c_{rf}=0$), $r_M(\Omega)$ is managed aquifer recharge and is high (low) if $\Omega=1$ ($\Omega=0$), $\epsilon_i$ accounts for uncertain costs of signing the treaty and is zero in the case of no treaty, and $z$ is the price paid by France to Switzerland for French abstraction per the agreement. Because recharge is limited by physical properties of water supply and the aquifer, we assume that the construction of a recharge facility entails a fixed quantity of recharge, $r_M$.
 The hydraulic thickness of the water table is the hydraulic head relative to the bottom of the aquifer. In confined aquifers, the hydraulic thickness is greater than the aquifer thickness and changes linearly with pumping. It is given by
 $$ h_i=h_{0i}-D_{ii} q_i-D_{ij} q_j+D_{ir}(\Omega) r_M(\Omega),$$
 where $h_{0i}$ is the natural thickness of the water table accounting for steady-state recharge and discharge, and the remaining coefficients capture aquifer properties that relate groundwater depth with abstraction within country $i$ ($D_{ii}$), abstraction by country $j$ ($D_{ij}$), and managed recharge ($D_{ir}$). 
@@ -40,11 +40,10 @@ This vignette will show you the basic utilization of the package. If you haven't
 devtools::install_github("https://github.com/gopalpenny/genevoisgame")
 ```
 
-Next we will load the package along with the `tidyverse` package for easy data wrangling.
+Next we will load the package along with some of the `tidyverse` packages for easy data wrangling.
 
 ```{r setup, message=FALSE}
 library(genevoisgame)
-library(magrittr)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
