@@ -103,7 +103,7 @@ conA_qeval <- function(params,conAf_qs0,conAf_qf0,conAf_qs2,conAf_qf2) {
 
 conA_Us <- function(qs,qf,params,z) {
   with(params,
-       -es-p0s*(-qs+Qs)-crs*rm-B*qs*(d0s+Dsf*qf+Dss*qs-rm*Dsr)+z
+       -c0rs-es-p0s*(-qs+Qs)-crs*rm-B*qs*(d0s+Dsf*qf+Dss*qs-rm*Dsr)+z
   )}
 conA_Uf <- function(qs,qf,params,z) {
   with(params,
