@@ -1,7 +1,7 @@
 Package: genevoisgame
 Type: Package
 Title: Genevois Game
-Version: 0.1.0
+Version: 0.1.1
 Author: person("Gopal", "Penny", email = "gopalpenny@gmail.com",
                   role = c("aut", "cre"))
 Maintainer: Gopal Penny <gopalpenny@gmail.com>
